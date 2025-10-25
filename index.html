@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -962,7 +960,9 @@
                             <div class="calculator-operator">×</div>
                             <input type="number" placeholder="汇率" style="flex: 1;" />
                             <div class="calculator-operator">+</div>
-                            <input type="number" placeholder="卢布" style="flex: 1;" />
+                            <input type="number" placeholder="卢布1" style="flex: 1;" />
+                            <div class="calculator-operator">+</div>
+                            <input type="number" placeholder="卢布2" style="flex: 1;" />
                             <div class="calculator-operator">=</div>
                             <input type="number" placeholder="总计卢布" style="flex: 1;" readonly />
                         </div>
@@ -1056,14 +1056,15 @@
         
         function calculateCurrency(itineraryId) {
             const inputs = document.querySelectorAll(`#itinerary${itineraryId}-calculatorContainer input`);
-            if (inputs.length < 4) return;
+            if (inputs.length < 5) return;
             
             const rmb = parseFloat(inputs[0].value) || 0;
             const rate = parseFloat(inputs[1].value) || 0;
-            const rub = parseFloat(inputs[2].value) || 0;
+            const rub1 = parseFloat(inputs[2].value) || 0;
+            const rub2 = parseFloat(inputs[3].value) || 0;
             
-            const total = (rmb * rate) + rub;
-            inputs[3].value = Math.round(total);
+            const total = (rmb * rate) + rub1 + rub2;
+            inputs[4].value = Math.round(total);
         }
         
         function setupCalculatorInputs(itineraryId) {
