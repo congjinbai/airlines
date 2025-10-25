@@ -5,369 +5,378 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>航班信息生成器</title>
     <style>
-        /* 样式保持不变 */
+        /* 紧凑风格样式 */
         body {
-            font-family: Arial, sans-serif;
-            max-width: 1100px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1050px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 15px;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.4;
+            font-size: 13px;
         }
         .container {
             background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 18px;
+            border-radius: 6px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.08);
         }
         h1 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-size: 24px;
+            color: #1a365d;
+            margin-bottom: 18px;
+            font-size: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
         }
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #34495e;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 12px;
         }
         input, select {
             width: 100%;
-            padding: 9px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 7px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
             box-sizing: border-box;
-            margin-bottom: 6px;
-            font-size: 14px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            height: 32px;
         }
         select {
-            height: 38px;
+            height: 32px;
         }
         button {
-            background-color: #3498db;
+            background-color: #3182ce;
             color: white;
-            padding: 10px 16px;
+            padding: 7px 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 15px;
-            margin-right: 10px;
-            transition: background-color 0.3s;
+            font-size: 13px;
+            margin-right: 8px;
+            transition: background-color 0.2s;
+            height: 32px;
         }
         button:hover {
-            background-color: #2980b9;
+            background-color: #2c5aa0;
         }
         .flight-segment {
-            border: 1px solid #ddd;
-            padding: 18px;
-            margin-bottom: 22px;
-            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            padding: 14px;
+            margin-bottom: 16px;
+            border-radius: 5px;
             position: relative;
-            background-color: #f9f9f9;
+            background-color: #f7fafc;
         }
         .add-segment {
-            background-color: #2ecc71;
-            margin-bottom: 10px;
+            background-color: #38a169;
+            margin-bottom: 8px;
             display: inline-block;
         }
         .add-segment:hover {
-            background-color: #27ae60;
+            background-color: #2f855a;
         }
         .ticket-price-btn {
-            background-color: #9b59b6;
-            margin-bottom: 18px;
+            background-color: #805ad5;
+            margin-bottom: 14px;
             display: inline-block;
         }
         .ticket-price-btn:hover {
-            background-color: #8e44ad;
+            background-color: #6b46c1;
         }
         .calculator-btn {
-            background-color: #1abc9c;
-            margin-bottom: 18px;
+            background-color: #0bc5ea;
+            margin-bottom: 14px;
             display: inline-block;
         }
         .calculator-btn:hover {
-            background-color: #16a085;
+            background-color: #00b5d8;
         }
         .notes-toggle-btn {
-            background-color: #f39c12;
-            margin-bottom: 18px;
+            background-color: #ed8936;
+            margin-bottom: 14px;
             display: inline-block;
         }
         .notes-toggle-btn:hover {
-            background-color: #e67e22;
+            background-color: #dd6b20;
         }
         .remove-segment {
-            background-color: #e74c3c;
+            background-color: #e53e3e;
             position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 8px;
-            font-size: 13px;
+            top: 8px;
+            right: 8px;
+            padding: 4px 6px;
+            font-size: 12px;
         }
         .remove-segment:hover {
-            background-color: #c0392b;
+            background-color: #c53030;
         }
         .output {
-            margin-top: 25px;
+            margin-top: 18px;
             white-space: pre-wrap;
-            background-color: #f0f7ff;
-            padding: 18px;
-            border-radius: 6px;
-            border: 1px solid #d6e4f0;
+            background-color: #ebf8ff;
+            padding: 14px;
+            border-radius: 5px;
+            border: 1px solid #bee3f8;
             font-family: Consolas, monospace;
-            line-height: 1.5;
+            line-height: 1.4;
+            font-size: 12px;
         }
         .copy-btn {
-            background-color: #9b59b6;
-            margin-top: 12px;
+            background-color: #805ad5;
+            margin-top: 10px;
         }
         .ticket-info-btn {
-            background-color: #2ecc71;
-            margin-top: 12px;
-            margin-left: 10px;
+            background-color: #38a169;
+            margin-top: 10px;
+            margin-left: 8px;
         }
         .flex-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
             align-items: flex-start;
         }
         .flex-row > div {
             flex: 1;
         }
         .auto-fill-btn {
-            background-color: #f39c12;
+            background-color: #ed8936;
             width: 100%;
-            padding: 9px 10px;
-            font-size: 13px;
+            padding: 7px 8px;
+            font-size: 12px;
             white-space: nowrap;
-            height: 38px;
+            height: 32px;
             box-sizing: border-box;
-            margin-top: 6px;
+            margin-top: 4px;
         }
         .auto-fill-btn:hover {
-            background-color: #d35400;
+            background-color: #dd6b20;
         }
         .ticket-price-plan {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            background-color: #f7fafc;
             position: relative;
         }
         .ticket-price-details {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #ccc;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #cbd5e0;
         }
         .ticket-price-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 8px;
             align-items: center;
         }
         .ticket-price-row select {
             flex: 1;
-            min-width: 20px;
+            min-width: 18px;
         }
         .ticket-price-row input {
             flex: 1;
-            min-width: 10px;
+            min-width: 8px;
         }
         .ticket-currency {
             flex: 1;
-            min-width: 6px;
+            min-width: 5px;
         }
         .airport-input-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         .airport-select, .airport-input {
             flex: 1;
-            min-width: 15px;
+            min-width: 12px;
         }
         .time-input-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
         .time-input-equal {
             flex: 1;
-            height: 38px;
-            padding: 9px;
-            font-size: 14px;
+            height: 32px;
+            padding: 7px;
+            font-size: 13px;
         }
         .toggle-btn-equal {
-            height: 38px;
-            padding: 9px;
-            font-size: 14px;
-            background-color: #e0e0e0;
-            color: #333;
-            border: 1px solid #ccc;
+            height: 32px;
+            padding: 7px;
+            font-size: 13px;
+            background-color: #e2e8f0;
+            color: #4a5568;
+            border: 1px solid #cbd5e0;
             box-sizing: border-box;
             text-align: center;
-            min-width: 70px;
+            min-width: 60px;
         }
         .toggle-btn-evening, .toggle-btn-next-day, .toggle-btn-yi-ri {
             flex: 0.5;
         }
         .toggle-btn-equal.active {
-            background-color: #2196f3;
+            background-color: #3182ce;
             color: white;
-            border-color: #1976d2;
+            border-color: #2c5aa0;
         }
         .notes-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .note-tag {
-            background-color: #e3f2fd;
-            border: 1px solid #bbdefb;
-            border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 13px;
+            background-color: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 16px;
+            padding: 4px 10px;
+            font-size: 12px;
             cursor: pointer;
         }
         .note-tag.selected {
-            background-color: #1976d2;
+            background-color: #319795;
             color: white;
         }
         .custom-note-input {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
         }
         .custom-note-input input {
             flex: 1;
         }
         .add-custom-note {
-            background-color: #4caf50;
-            padding: 5px 15px;
-            font-size: 13px;
+            background-color: #38a169;
+            padding: 4px 12px;
+            font-size: 12px;
         }
         .selected-notes-display {
-            margin-top: 10px;
-            padding: 8px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            min-height: 30px;
-            font-size: 14px;
+            margin-top: 8px;
+            padding: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            min-height: 26px;
+            font-size: 13px;
         }
         .ticket-price-section {
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background-color: #f7fafc;
+            border-radius: 6px;
             position: relative;
         }
         .section-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #ddd;
+            margin-bottom: 12px;
+            color: #2d3748;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
         }
         .itinerary-toggle-btn {
-            background-color: #3498db;
+            background-color: #3182ce;
             color: white;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 14px;
+            margin-bottom: 16px;
             width: 100%;
         }
         .itinerary-container {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         .remove-itinerary {
-            background-color: #e74c3c;
+            background-color: #e53e3e;
             position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 5px 10px;
-            font-size: 14px;
+            top: 12px;
+            right: 12px;
+            padding: 4px 8px;
+            font-size: 13px;
         }
         .date-input-container {
             width: 100%;
-            max-width: 200px;
+            max-width: 180px;
         }
         .date-input-container input {
             text-align: center;
-            padding: 9px 5px;
-            height: 38px;
+            padding: 7px 4px;
+            height: 32px;
         }
         .flight-no-section {
             flex: 1;
-            min-width: 300px;
+            min-width: 280px;
         }
         .airport-select-container {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             align-items: center;
             width: 100%;
         }
         .airport-select-container select, .airport-select-container input {
             flex: 1;
-            font-size: 14px;
+            font-size: 13px;
         }
         .airport-select-container button {
             flex: 0.5;
-            padding: 9px;
-            font-size: 13px;
+            padding: 7px;
+            font-size: 12px;
         }
         .notes-container {
             display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
+            margin-top: 12px;
+            padding: 12px;
+            background-color: #f7fafc;
+            border-radius: 4px;
         }
         .calculator-container {
             display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f9f9f9;
+            margin-top: 12px;
+            padding: 12px;
+            background-color: #f7fafc;
             border-radius: 3px;
         }
         .calculator-inputs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
         .calculator-inputs input {
             flex: 1;
-            min-width: 10px;
+            min-width: 8px;
         }
         .button-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         .button-row {
             display: flex;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .date-format-hint {
-            font-size: 12px;
-            color: #666;
-            margin-top: 4px;
+            font-size: 11px;
+            color: #718096;
+            margin-top: 3px;
             text-align: center;
         }
         .baggage-select-container {
             display: flex;
-            gap: 15px;
-            margin-bottom: 18px;
+            gap: 12px;
+            margin-bottom: 14px;
         }
         .baggage-select-wrapper {
             flex: 1;
@@ -376,82 +385,82 @@
             width: 100%;
         }
         .baggage-input-container {
-            margin: 10px 0 15px 0;
+            margin: 8px 0 12px 0;
             display: none;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .baggage-input-container input {
-            width: 60px;
+            width: 50px;
             display: inline-block;
         }
         .calculator-operator {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            color: #333;
-            min-width: 30px;
+            color: #4a5568;
+            min-width: 26px;
         }
         .note-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         .note-option {
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 13px;
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 12px;
             cursor: pointer;
         }
         .note-option.selected {
-            background-color: #1976d2;
+            background-color: #3182ce;
             color: white;
-            border-color: #1565c0;
+            border-color: #2c5aa0;
         }
         .bottom-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
         }
         .bottom-buttons {
-            margin-top: 20px;
+            margin-top: 16px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
         }
         .passenger-info-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: #f7fafc;
+            border-radius: 6px;
             display: none;
         }
         .short-select {
-            width: 120px;
+            width: 110px;
         }
         .output-buttons {
             display: flex;
             justify-content: flex-start;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .short-select-8 {
-            width: 80px;
+            width: 70px;
         }
         .short-select-6 {
-            width: 60px;
+            width: 55px;
         }
         .stretched-input {
             width: 100%;
         }
         .transfer-seat-container {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         .transfer-container, .seat-container {
             flex: 1;
@@ -462,18 +471,18 @@
         .terminal-input {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .terminal-input input {
             flex: 1;
         }
         .city-input {
-            margin-top: 8px;
+            margin-top: 6px;
         }
         .flight-time-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
             align-items: flex-end;
         }
         .flight-time-row > div {
@@ -481,27 +490,64 @@
         }
         .passenger-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         .passenger-row > div {
             flex: 1;
         }
         .baggage-location-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         .baggage-location-item {
             flex: 1;
         }
         .baggage-requirements-row {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         .baggage-requirements-item {
             flex: 1;
+        }
+        
+        /* 新增紧凑样式 */
+        .compact-group {
+            margin-bottom: 8px;
+        }
+        .compact-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .compact-row > div {
+            flex: 1;
+        }
+        .compact-input {
+            padding: 5px;
+            font-size: 12px;
+            height: 28px;
+        }
+        .compact-select {
+            height: 28px;
+            padding: 5px;
+            font-size: 12px;
+        }
+        .compact-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            height: 28px;
+        }
+        .compact-section {
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .compact-output {
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 11px;
         }
     </style>
 </head>
@@ -515,9 +561,9 @@
         
         <div id="itinerariesContainer"></div>
         
-        <div style="margin-top: 25px; text-align: center;">
-            <button id="generateAllPlansBtn" style="background-color: #2ecc71;">生成所有方案</button>
-            <button id="resetAllBtn" style="background-color: #e74c3c;">重置所有</button>
+        <div style="margin-top: 20px; text-align: center;">
+            <button id="generateAllPlansBtn" style="background-color: #38a169;">生成所有方案</button>
+            <button id="resetAllBtn" style="background-color: #e53e3e;">重置所有</button>
         </div>
         
         <div class="output" id="allPlansOutput"></div>
@@ -532,12 +578,12 @@
             <div class="passenger-row">
                 <div class="form-group">
                     <label for="passengerNames">乘客姓名(格式：拼音字母):</label>
-                    <input type="text" id="passengerNames" placeholder="例如: WANG/YAMEI">
+                    <input type="text" id="passengerNames" placeholder="例如: WANG/YAMEI" class="compact-input">
                 </div>
 
                 <div class="form-group">
                     <label for="tripType">行程类型:</label>
-                    <select id="tripType">
+                    <select id="tripType" class="compact-select">
                         <option value="的行程如下:">单程</option>
                         <option value="的往返行程如下:">往返</option>
                         <option value="的行程更改如下:">更改行程</option>
@@ -550,11 +596,11 @@
                 <div class="baggage-location-item">
                     <label>出发地:</label>
                     <div class="airport-select-container">
-                        <select id="carryOnDeparture-select" class="airport-select short-select-8">
+                        <select id="carryOnDeparture-select" class="airport-select short-select-8 compact-select">
                             <option value="">选择地点</option>
                         </select>
-                        <input type="text" id="carryOnDeparture-input" class="airport-input" placeholder="手动输入">
-                        <button id="saveDepartureBtn">保存</button>
+                        <input type="text" id="carryOnDeparture-input" class="airport-input compact-input" placeholder="手动输入">
+                        <button id="saveDepartureBtn" class="compact-btn">保存</button>
                         <input type="hidden" id="carryOnDeparture-output">
                     </div>
                 </div>
@@ -562,11 +608,11 @@
                 <div class="baggage-location-item">
                     <label>目的地:</label>
                     <div class="airport-select-container">
-                        <select id="carryOnArrival-select" class="airport-select short-select-8">
+                        <select id="carryOnArrival-select" class="airport-select short-select-8 compact-select">
                             <option value="">选择地点</option>
                         </select>
-                        <input type="text" id="carryOnArrival-input" class="airport-input" placeholder="手动输入">
-                        <button id="saveArrivalBtn">保存</button>
+                        <input type="text" id="carryOnArrival-input" class="airport-input compact-input" placeholder="手动输入">
+                        <button id="saveArrivalBtn" class="compact-btn">保存</button>
                         <input type="hidden" id="carryOnArrival-output">
                     </div>
                 </div>
@@ -575,7 +621,7 @@
             <div class="baggage-requirements-row">
                 <div class="baggage-requirements-item">
                     <label for="carryOnBaggage">手提行李要求:</label>
-                    <select id="carryOnBaggage" class="baggage-select">
+                    <select id="carryOnBaggage" class="baggage-select compact-select">
                         <option value="">请选择</option>
                         <option value="❗️尺寸要求严格36*30*27厘米">❗️尺寸要求严格36*30*27厘米</option>
                         <option value="❗️尺寸要求严格40*30*20厘米">❗️尺寸要求严格40*30*20厘米</option>
@@ -591,7 +637,7 @@
                 
                 <div class="baggage-requirements-item">
                     <label for="checkedBaggage">托运行李要求:</label>
-                    <select id="checkedBaggage" class="baggage-select">
+                    <select id="checkedBaggage" class="baggage-select compact-select">
                         <option value="">请选择</option>
                         <option value="无托运行李">无托运行李</option>
                         <option value="1件，10公斤">1件，10公斤</option>
@@ -605,7 +651,7 @@
                         <option value="共*件，每件23公斤" data-requires-input="true">共*件，每件23公斤</option>
                     </select>
                     <div class="baggage-input-container" id="checkedBaggageInputContainer">
-                        共 <input type="number" id="checkedBaggageCount" min="1" value="1"> 件行李
+                        共 <input type="number" id="checkedBaggageCount" min="1" value="1" class="compact-input"> 件行李
                     </div>
                 </div>
             </div>
@@ -613,14 +659,14 @@
 
         <div class="bottom-section">
             <div class="bottom-buttons">
-                <button id="generateTicketInfoBtn" style="background-color: #2ecc71;">生成表单</button>
-                <button id="resetOutputBtn" style="background-color: #e74c3c;">重置表单</button>
+                <button id="generateTicketInfoBtn" style="background-color: #38a169;" class="compact-btn">生成表单</button>
+                <button id="resetOutputBtn" style="background-color: #e53e3e;" class="compact-btn">重置表单</button>
             </div>
             
             <div class="output" id="ticketInfoOutput"></div>
             
             <div style="text-align: left;">
-                <button id="copyTicketInfoBtn" class="copy-btn">复制到剪贴板</button>
+                <button id="copyTicketInfoBtn" class="copy-btn compact-btn">复制到剪贴板</button>
             </div>
         </div>
     </div>
@@ -941,30 +987,30 @@
             itineraryDiv.id = `itinerary${itineraryCount}`;
             
             itineraryDiv.innerHTML = `
-                <div class="ticket-price-section">
-                    <button class="remove-itinerary" data-itinerary-id="${itineraryCount}">× 删除此方案</button>
+                <div class="ticket-price-section compact-section">
+                    <button class="remove-itinerary compact-btn" data-itinerary-id="${itineraryCount}">× 删除此方案</button>
                     <div class="section-title">行程方案 ${itineraryCount}</div>
                     
                     <div id="flightSegments${itineraryCount}"></div>
                     
                     <div class="button-group">
-                        <button class="add-segment" data-itinerary="${itineraryCount}">+ 添加新航段</button>
-                        <button class="calculator-btn" data-itinerary="${itineraryCount}">计算</button>
-                        <button class="ticket-price-btn" id="ticketPriceBtn${itineraryCount}" style="display: none;">+ 机票价格</button>
-                        <button class="notes-toggle-btn" data-itinerary="${itineraryCount}">备注信息</button>
+                        <button class="add-segment compact-btn" data-itinerary="${itineraryCount}">+ 添加新航段</button>
+                        <button class="calculator-btn compact-btn" data-itinerary="${itineraryCount}">计算</button>
+                        <button class="ticket-price-btn compact-btn" id="ticketPriceBtn${itineraryCount}" style="display: none;">+ 机票价格</button>
+                        <button class="notes-toggle-btn compact-btn" data-itinerary="${itineraryCount}">备注信息</button>
                     </div>
                     
                     <div class="calculator-container" id="itinerary${itineraryCount}-calculatorContainer">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <input type="number" placeholder="人民币" style="flex: 1;" />
+                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                            <input type="number" placeholder="人民币" style="flex: 1;" class="compact-input" />
                             <div class="calculator-operator">×</div>
-                            <input type="number" placeholder="汇率" style="flex: 1;" />
+                            <input type="number" placeholder="汇率" style="flex: 1;" class="compact-input" />
                             <div class="calculator-operator">+</div>
-                            <input type="number" placeholder="卢布1" style="flex: 1;" />
+                            <input type="number" placeholder="卢布1" style="flex: 1;" class="compact-input" />
                             <div class="calculator-operator">+</div>
-                            <input type="number" placeholder="卢布2" style="flex: 1;" />
+                            <input type="number" placeholder="卢布2" style="flex: 1;" class="compact-input" />
                             <div class="calculator-operator">=</div>
-                            <input type="number" placeholder="总计卢布" style="flex: 1;" readonly />
+                            <input type="number" placeholder="总计卢布" style="flex: 1;" readonly class="compact-input" />
                         </div>
                     </div>
                     
@@ -977,8 +1023,8 @@
                                 ${presetNotes.map(note => `<div class="note-tag">${note}</div>`).join('')}
                             </div>
                             <div class="custom-note-input">
-                                <input type="text" id="itinerary${itineraryCount}-customNoteInput" placeholder="输入自定义备注">
-                                <button type="button" class="add-custom-note">添加</button>
+                                <input type="text" id="itinerary${itineraryCount}-customNoteInput" placeholder="输入自定义备注" class="compact-input">
+                                <button type="button" class="add-custom-note compact-btn">添加</button>
                             </div>
                             <div class="selected-notes-display" id="itinerary${itineraryCount}-selectedNotesDisplay"></div>
                             <input type="hidden" id="itinerary${itineraryCount}-selectedNotes" value="">
@@ -1102,42 +1148,42 @@
             segmentDiv.id = `segment${itineraryId}-${segmentId}`;
             
             segmentDiv.innerHTML = `
-                <button class="remove-segment" data-segment-id="${itineraryId}-${segmentId}">× 删除</button>
+                <button class="remove-segment compact-btn" data-segment-id="${itineraryId}-${segmentId}">× 删除</button>
                 
-                <div class="flex-row">
+                <div class="compact-row">
                     <div class="form-group date-input-container">
                         <label>起飞日期:</label>
-                        <input type="text" id="segment${itineraryId}-${segmentId}-date" placeholder="例如: 0802">
-                        <button class="auto-fill-btn" data-segment="${itineraryId}-${segmentId}">自动填写</button>
+                        <input type="text" id="segment${itineraryId}-${segmentId}-date" placeholder="例如: 0802" class="compact-input">
+                        <button class="auto-fill-btn compact-btn" data-segment="${itineraryId}-${segmentId}">自动填写</button>
                     </div>
                     
                     <div class="form-group flight-no-section">
                         <label>航班号:</label>
                         <div class="airport-select-container">
-                            <select id="segment${itineraryId}-${segmentId}-flightNo-select">
+                            <select id="segment${itineraryId}-${segmentId}-flightNo-select" class="compact-select">
                                 <option value="">请选择</option>
                                 ${savedFlightNumbers.map(num => `<option value="${num}">${num}</option>`).join('')}
                             </select>
-                            <input type="text" id="segment${itineraryId}-${segmentId}-flightNo-input" placeholder="手动输入">
-                            <button data-save-flight="segment${itineraryId}-${segmentId}-flightNo-input">保存</button>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-flightNo-input" placeholder="手动输入" class="compact-input">
+                            <button data-save-flight="segment${itineraryId}-${segmentId}-flightNo-input" class="compact-btn">保存</button>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex-row">
+                <div class="compact-row">
                     <div class="form-group">
                         <label>起飞城市:</label>
                         <div class="airport-select-container">
-                            <select id="segment${itineraryId}-${segmentId}-departure-select" class="airport-select short-select-8">
+                            <select id="segment${itineraryId}-${segmentId}-departure-select" class="airport-select short-select-8 compact-select">
                                 <option value="">请选择</option>
                                 ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
                             </select>
-                            <input type="text" id="segment${itineraryId}-${segmentId}-departure-input" class="airport-input" placeholder="手动输入">
-                            <button>保存</button>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-departure-input" class="airport-input compact-input" placeholder="手动输入">
+                            <button class="compact-btn">保存</button>
                             <input type="hidden" id="segment${itineraryId}-${segmentId}-departure-output">
                         </div>
                         <label>起飞机场航站楼:</label>
-                        <select id="segment${itineraryId}-${segmentId}-departure-terminal" class="short-select-8">
+                        <select id="segment${itineraryId}-${segmentId}-departure-terminal" class="short-select-8 compact-select">
                             ${terminalList.map(terminal => `<option value="${terminal}">${terminal}</option>`).join('')}
                         </select>
                     </div>
@@ -1145,35 +1191,35 @@
                     <div class="form-group">
                         <label>到达城市:</label>
                         <div class="airport-select-container">
-                            <select id="segment${itineraryId}-${segmentId}-arrival-select" class="airport-select short-select-8">
+                            <select id="segment${itineraryId}-${segmentId}-arrival-select" class="airport-select short-select-8 compact-select">
                                 <option value="">请选择</option>
                                 ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
                             </select>
-                            <input type="text" id="segment${itineraryId}-${segmentId}-arrival-input" class="airport-input" placeholder="手动输入">
-                            <button>保存</button>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-arrival-input" class="airport-input compact-input" placeholder="手动输入">
+                            <button class="compact-btn">保存</button>
                             <input type="hidden" id="segment${itineraryId}-${segmentId}-arrival-output">
                         </div>
                         <label>到达机场航站楼:</label>
-                        <select id="segment${itineraryId}-${segmentId}-arrival-terminal" class="short-select-8">
+                        <select id="segment${itineraryId}-${segmentId}-arrival-terminal" class="short-select-8 compact-select">
                             ${terminalList.map(terminal => `<option value="${terminal}">${terminal}</option>`).join('')}
                         </select>
                     </div>
                 </div>
                 
-                <div class="flex-row">
+                <div class="compact-row">
                     <div class="form-group">
                         <label>起飞时间:</label>
                         <div class="time-input-container">
-                            <input type="text" id="segment${itineraryId}-${segmentId}-departure-time" class="time-input-equal" placeholder="例如: 1430">
-                            <button class="toggle-btn-equal toggle-btn-evening" data-time-type="evening">晚上</button>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-departure-time" class="time-input-equal compact-input" placeholder="例如: 1430">
+                            <button class="toggle-btn-equal toggle-btn-evening compact-btn" data-time-type="evening">晚上</button>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label>到达时间:</label>
                         <div class="time-input-container">
-                            <input type="text" id="segment${itineraryId}-${segmentId}-arrival-time" class="time-input-equal" placeholder="例如: 1845">
-                            <button class="toggle-btn-equal toggle-btn-next-day" data-time-type="next-day">次日</button>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-arrival-time" class="time-input-equal compact-input" placeholder="例如: 1845">
+                            <button class="toggle-btn-equal toggle-btn-next-day compact-btn" data-time-type="next-day">次日</button>
                         </div>
                     </div>
                 </div>
@@ -1181,7 +1227,7 @@
                 <div class="flight-time-row">
                     <div class="form-group">
                         <label>截止值机时间:</label>
-                        <select id="segment${itineraryId}-${segmentId}-flight-time" class="time-input-equal short-select-8">
+                        <select id="segment${itineraryId}-${segmentId}-flight-time" class="time-input-equal short-select-8 compact-select">
                             <option value="起飞前40分钟停办">起飞前40分钟停办</option>
                             <option value="起飞前1小时停办">起飞前1小时停办</option>
                         </select>
@@ -1189,12 +1235,12 @@
                     
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button class="toggle-btn-equal toggle-btn-yi-ri" data-time-type="yi-ri" style="margin-top: 8px;">翌日</button>
+                        <button class="toggle-btn-equal toggle-btn-yi-ri compact-btn" data-time-type="yi-ri" style="margin-top: 6px;">翌日</button>
                     </div>
                     
                     <div class="form-group transfer-container">
                         <label>中转与行李提示:</label>
-                        <select id="segment${itineraryId}-${segmentId}-transferBaggageNote">
+                        <select id="segment${itineraryId}-${segmentId}-transferBaggageNote" class="compact-select">
                             <option value="">无提示</option>
                             <option value="⚠️中转到*航站楼⚠️">⚠️中转到*航站楼⚠️</option>
                             <option value="⚠️中转到*机场⚠️">⚠️中转到*机场⚠️</option>
@@ -1209,13 +1255,13 @@
                     
                     <div class="form-group seat-container">
                         <label>选座：</label>
-                        <input type="text" id="segment${itineraryId}-${segmentId}-seat" placeholder="输入座位号，如6F" class="seat-input">
+                        <input type="text" id="segment${itineraryId}-${segmentId}-seat" placeholder="输入座位号，如6F" class="seat-input compact-input">
                     </div>
                 </div>
                 
-                <div id="segment${itineraryId}-${segmentId}-terminalDiv" class="hidden" style="margin-top: 8px;">
+                <div id="segment${itineraryId}-${segmentId}-terminalDiv" class="hidden" style="margin-top: 6px;">
                     <div class="terminal-input">
-                        <input type="text" id="segment${itineraryId}-${segmentId}-terminal" placeholder="输入航站楼或机场">
+                        <input type="text" id="segment${itineraryId}-${segmentId}-terminal" placeholder="输入航站楼或机场" class="compact-input">
                     </div>
                 </div>
             `;
@@ -1360,10 +1406,10 @@
             planDiv.id = `price${itineraryId}-${priceNum}`;
             
             planDiv.innerHTML = `
-                <button class="remove-segment" data-price-id="${itineraryId}-${priceNum}" style="background-color: #9b59b6;">× 删除</button>
+                <button class="remove-segment compact-btn" data-price-id="${itineraryId}-${priceNum}" style="background-color: #805ad5;">× 删除</button>
                 
                 <div class="ticket-price-row">
-                    <select id="price${itineraryId}-${priceNum}-option" class="short-select-8">
+                    <select id="price${itineraryId}-${priceNum}-option" class="short-select-8 compact-select">
                         <option value="无" selected>价格选项</option>
                         <option value="带托运">带托运</option>
                         <option value="无托运">无托运</option>
@@ -1373,8 +1419,8 @@
                         <option value="带1件10公斤托运">带1件10公斤托运</option>
                         <option value="带1件23公斤托运">带1件23公斤托运</option>
                     </select>
-                    <input type="text" id="price${itineraryId}-${priceNum}-value" placeholder="价格数值">
-                    <select id="price${itineraryId}-${priceNum}-currency" class="ticket-currency short-select-6">
+                    <input type="text" id="price${itineraryId}-${priceNum}-value" placeholder="价格数值" class="compact-input">
+                    <select id="price${itineraryId}-${priceNum}-currency" class="ticket-currency short-select-6 compact-select">
                         <option value="">币种</option>
                         <option value="卢布">卢布</option>
                         <option value="元">元</option>
