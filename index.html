@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航班信息生成器</title>
+    <style>
+        /* 样式保持不变 */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        select {
+            height: 38px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .flight-segment {
+            border: 1px solid #ddd;
+            padding: 18px;
+            margin-bottom: 22px;
+            border-radius: 6px;
+            position: relative;
+            background-color: #f9f9f9;
+        }
+        .add-segment {
+            background-color: #2ecc71;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .add-segment:hover {
+            background-color: #27ae60;
+        }
+        .ticket-price-btn {
+            background-color: #9b59b6;
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        .ticket-price-btn:hover {
+            background-color: #8e44ad;
+        }
+        .calculator-btn {
+            background-color: #1abc9c;
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        .calculator-btn:hover {
+            background-color: #16a085;
+        }
+        .notes-toggle-btn {
+            background-color: #f39c12;
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        .notes-toggle-btn:hover {
+            background-color: #e67e22;
+        }
+        .remove-segment {
+            background-color: #e74c3c;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 8px;
+            font-size: 13px;
+        }
+        .remove-segment:hover {
+            background-color: #c0392b;
+        }
+        .output {
+            margin-top: 25px;
+            white-space: pre-wrap;
+            background-color: #f0f7ff;
+            padding: 18px;
+            border-radius: 6px;
+            border: 1px solid #d6e4f0;
+            font-family: Consolas, monospace;
+            line-height: 1.5;
+        }
+        .copy-btn {
+            background-color: #9b59b6;
+            margin-top: 12px;
+        }
+        .ticket-info-btn {
+            background-color: #2ecc71;
+            margin-top: 12px;
+            margin-left: 10px;
+        }
+        .flex-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        .flex-row > div {
+            flex: 1;
+        }
+        .auto-fill-btn {
+            background-color: #f39c12;
+            width: 100%;
+            padding: 9px 10px;
+            font-size: 13px;
+            white-space: nowrap;
+            height: 38px;
+            box-sizing: border-box;
+            margin-top: 6px;
+        }
+        .auto-fill-btn:hover {
+            background-color: #d35400;
+        }
+        .ticket-price-plan {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+        .ticket-price-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        .ticket-price-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .ticket-price-row select {
+            flex: 1;
+            min-width: 20px;
+        }
+        .ticket-price-row input {
+            flex: 1;
+            min-width: 10px;
+        }
+        .ticket-currency {
+            flex: 1;
+            min-width: 6px;
+        }
+        .airport-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .airport-select, .airport-input {
+            flex: 1;
+            min-width: 15px;
+        }
+        .time-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .time-input-equal {
+            flex: 1;
+            height: 38px;
+            padding: 9px;
+            font-size: 14px;
+        }
+        .toggle-btn-equal {
+            height: 38px;
+            padding: 9px;
+            font-size: 14px;
+            background-color: #e0e0e0;
+            color: #333;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            text-align: center;
+            min-width: 70px;
+        }
+        .toggle-btn-evening, .toggle-btn-next-day, .toggle-btn-yi-ri {
+            flex: 0.5;
+        }
+        .toggle-btn-equal.active {
+            background-color: #2196f3;
+            color: white;
+            border-color: #1976d2;
+        }
+        .notes-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .note-tag {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .note-tag.selected {
+            background-color: #1976d2;
+            color: white;
+        }
+        .custom-note-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .custom-note-input input {
+            flex: 1;
+        }
+        .add-custom-note {
+            background-color: #4caf50;
+            padding: 5px 15px;
+            font-size: 13px;
+        }
+        .selected-notes-display {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            min-height: 30px;
+            font-size: 14px;
+        }
+        .ticket-price-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            position: relative;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .itinerary-toggle-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .itinerary-container {
+            margin-bottom: 30px;
+        }
+        .remove-itinerary {
+            background-color: #e74c3c;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .date-input-container {
+            width: 100%;
+            max-width: 200px;
+        }
+        .date-input-container input {
+            text-align: center;
+            padding: 9px 5px;
+            height: 38px;
+        }
+        .flight-no-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .airport-select-container {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            width: 100%;
+        }
+        .airport-select-container select, .airport-select-container input {
+            flex: 1;
+            font-size: 14px;
+        }
+        .airport-select-container button {
+            flex: 0.5;
+            padding: 9px;
+            font-size: 13px;
+        }
+        .notes-container {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .calculator-container {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 3px;
+        }
+        .calculator-inputs {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        .calculator-inputs input {
+            flex: 1;
+            min-width: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .button-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .date-format-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            text-align: center;
+        }
+        .baggage-select-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+        .baggage-select-wrapper {
+            flex: 1;
+        }
+        .baggage-select {
+            width: 100%;
+        }
+        .baggage-input-container {
+            margin: 10px 0 15px 0;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .baggage-input-container input {
+            width: 60px;
+            display: inline-block;
+        }
+        .calculator-operator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            min-width: 30px;
+        }
+        .note-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .note-option {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .note-option.selected {
+            background-color: #1976d2;
+            color: white;
+            border-color: #1565c0;
+        }
+        .bottom-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .bottom-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .passenger-info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            display: none;
+        }
+        .short-select {
+            width: 120px;
+        }
+        .output-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+        .short-select-8 {
+            width: 80px;
+        }
+        .short-select-6 {
+            width: 60px;
+        }
+        .stretched-input {
+            width: 100%;
+        }
+        .transfer-seat-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .transfer-container, .seat-container {
+            flex: 1;
+        }
+        .hidden {
+            display: none;
+        }
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terminal-input input {
+            flex: 1;
+        }
+        .city-input {
+            margin-top: 8px;
+        }
+        .flight-time-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-end;
+        }
+        .flight-time-row > div {
+            flex: 1;
+        }
+        .passenger-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .passenger-row > div {
+            flex: 1;
+        }
+        .baggage-location-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .baggage-location-item {
+            flex: 1;
+        }
+        .baggage-requirements-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .baggage-requirements-item {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✈️ 航班信息生成器 ✈️</h1>
+        
+        <button class="itinerary-toggle-btn" id="createItineraryBtn">
+            + 创建新行程方案
+        </button>
+        
+        <div id="itinerariesContainer"></div>
+        
+        <div style="margin-top: 25px; text-align: center;">
+            <button id="generateAllPlansBtn" style="background-color: #2ecc71;">生成所有方案</button>
+            <button id="resetAllBtn" style="background-color: #e74c3c;">重置所有</button>
+        </div>
+        
+        <div class="output" id="allPlansOutput"></div>
+        
+        <div class="output-buttons">
+            <button id="copyToClipboardBtn" class="copy-btn">复制到剪贴板</button>
+        </div>
+        
+        <button class="ticket-info-btn" id="togglePassengerInfoBtn">机票信息</button>
+        
+        <div class="passenger-info-section" id="passengerInfoSection">
+            <div class="passenger-row">
+                <div class="form-group">
+                    <label for="passengerNames">乘客姓名(格式：拼音字母):</label>
+                    <input type="text" id="passengerNames" placeholder="例如: WANG/YAMEI">
+                </div>
+
+                <div class="form-group">
+                    <label for="tripType">行程类型:</label>
+                    <select id="tripType">
+                        <option value="的行程如下:">单程</option>
+                        <option value="的往返行程如下:">往返</option>
+                        <option value="的行程更改如下:">更改行程</option>
+                        <option value="的往返行程更改如下:">往返行程更改</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="baggage-location-row">
+                <div class="baggage-location-item">
+                    <label>出发地:</label>
+                    <div class="airport-select-container">
+                        <select id="carryOnDeparture-select" class="airport-select short-select-8">
+                            <option value="">选择地点</option>
+                        </select>
+                        <input type="text" id="carryOnDeparture-input" class="airport-input" placeholder="手动输入">
+                        <button id="saveDepartureBtn">保存</button>
+                        <input type="hidden" id="carryOnDeparture-output">
+                    </div>
+                </div>
+                
+                <div class="baggage-location-item">
+                    <label>目的地:</label>
+                    <div class="airport-select-container">
+                        <select id="carryOnArrival-select" class="airport-select short-select-8">
+                            <option value="">选择地点</option>
+                        </select>
+                        <input type="text" id="carryOnArrival-input" class="airport-input" placeholder="手动输入">
+                        <button id="saveArrivalBtn">保存</button>
+                        <input type="hidden" id="carryOnArrival-output">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="baggage-requirements-row">
+                <div class="baggage-requirements-item">
+                    <label for="carryOnBaggage">手提行李要求:</label>
+                    <select id="carryOnBaggage" class="baggage-select">
+                        <option value="">请选择</option>
+                        <option value="❗️尺寸要求严格36*30*27厘米">❗️尺寸要求严格36*30*27厘米</option>
+                        <option value="❗️尺寸要求严格40*30*20厘米">❗️尺寸要求严格40*30*20厘米</option>
+                        <option value="5公斤">5公斤</option>
+                        <option value="7公斤">7公斤</option>
+                        <option value="10公斤">10公斤</option>
+                        <option value="各5公斤">各5公斤</option>
+                        <option value="各7公斤">各7公斤</option>
+                        <option value="各8公斤">各8公斤</option>
+                        <option value="各10公斤">各10公斤</option>
+                    </select>
+                </div>
+                
+                <div class="baggage-requirements-item">
+                    <label for="checkedBaggage">托运行李要求:</label>
+                    <select id="checkedBaggage" class="baggage-select">
+                        <option value="">请选择</option>
+                        <option value="无托运行李">无托运行李</option>
+                        <option value="1件，10公斤">1件，10公斤</option>
+                        <option value="1件，20公斤">1件，20公斤</option>
+                        <option value="1件，23公斤">1件，23公斤</option>
+                        <option value="各1件，每件10公斤">各1件，每件10公斤</option>
+                        <option value="各1件，每件20公斤">各1件，每件20公斤</option>
+                        <option value="各1件，每件23公斤">各1件，每件23公斤</option>
+                        <option value="共*件，每件10公斤" data-requires-input="true">共*件，每件10公斤</option>
+                        <option value="共*件，每件20公斤" data-requires-input="true">共*件，每件20公斤</option>
+                        <option value="共*件，每件23公斤" data-requires-input="true">共*件，每件23公斤</option>
+                    </select>
+                    <div class="baggage-input-container" id="checkedBaggageInputContainer">
+                        共 <input type="number" id="checkedBaggageCount" min="1" value="1"> 件行李
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="bottom-buttons">
+                <button id="generateTicketInfoBtn" style="background-color: #2ecc71;">生成表单</button>
+                <button id="resetOutputBtn" style="background-color: #e74c3c;">重置表单</button>
+            </div>
+            
+            <div class="output" id="ticketInfoOutput"></div>
+            
+            <div style="text-align: left;">
+                <button id="copyTicketInfoBtn" class="copy-btn">复制到剪贴板</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化变量
+        const airportList = [
+           "阿拉木图", "阿斯塔纳", "奥斯", "埃里温", "巴尔瑙尔", "布市", "车里亚宾", "格罗兹尼", "海参崴", "哈巴", "克市", "喀山", "马嘎斯", "马哈奇克拉", "莫斯科", "加里宁格勒", "塔什干",  
+            "圣彼得堡", "萨马拉", "斯塔夫", "索契", "乌尔根奇", "新西伯利亚", "伊斯坦布尔", "叶卡", "北京", "长春", "上海", "广州", "西安", "杭州", "沈阳", "哈尔滨", "重庆", 
+            "青岛", "成都", "三亚", "深圳", "乌鲁木齐"
+        ];
+        
+        const terminalList = [
+            "请选择", "Внуково", "Домодедово", "Жуковский", "伏努科沃", "德莫杰多沃", "茹科夫斯基", "谢列梅捷沃 B", "谢列梅捷沃 C", "谢列梅捷沃 D", "谢列梅捷沃 E", "谢列梅捷沃 F", 
+            "Шереметьево B", "Шереметьево C", "Шереметьево D", "Шереметьево E", "Шереметьево F", "大兴", "首都T1", "首都T2", "首都T3", "首都T4", "虹桥", "浦东", "国际", "Терминал A", "Терминал B", "Терминал C", "T1", "T2", "T3", "T4", "T5", "A", "B", "C", "D", "E", "F"
+
+        ];                     
+        
+        const locationList = [...airportList, "哈巴罗夫斯克", "车里雅宾斯克", "叶卡捷琳堡", "克拉斯诺亚尔斯克", "斯塔夫罗波尔", "布拉格维申斯克"];
+        
+        const presetNotes = [
+            "机场住一夜", "谢列梅捷沃机场俄语Аэропорт Шереметьево", "伏努科沃机场俄语Аэропорт Внуково", "德莫杰多沃机场俄文Аэропорт Домодедово"
+        ];
+        
+        const commonFlightNumbers = [
+           "C6", "SU", "S7", "U6", "UT", "DP", "WZ", "IO", "N4", "YC", "HZ", "5N", "A4", "HH", "HY", "3U", "8L", "9C", "BK", "CA", "CN", "CZ", "EU", "FM", "G5", "GS", "HO", "HU", "JD", "JR", "KN", "KY", "MF", "MU", "NS", "OQ", "PN", "SC", "TV", "ZH"
+        ];
+        
+        let savedFlightNumbers = [...commonFlightNumbers];
+        let savedLocations = [...locationList];
+        let itineraryCount = 0;
+        let segmentCounters = {};
+        let priceCounters = {};
+        let notesVisibility = {};
+        let calculatorVisibility = {};
+        let passengerInfoVisible = false;
+        
+        // 初始化页面加载
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化事件监听器
+            initEventListeners();
+            
+            // 初始化地点选择器
+            initLocationSelects();
+        });
+        
+        function initEventListeners() {
+            // 乘客姓名输入格式化
+            document.getElementById('passengerNames').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\s+/g, '/').toUpperCase();
+            });
+            
+            // 行李选择变化
+            document.getElementById('checkedBaggage').addEventListener('change', function() {
+                handleBaggageChange('checked');
+            });
+            
+            // 保存按钮
+            document.getElementById('saveDepartureBtn').addEventListener('click', function() {
+                saveAirport('carryOnDeparture-input');
+            });
+            
+            document.getElementById('saveArrivalBtn').addEventListener('click', function() {
+                saveAirport('carryOnArrival-input');
+            });
+            
+            // 主要功能按钮
+            document.getElementById('createItineraryBtn').addEventListener('click', addNewItinerary);
+            document.getElementById('generateAllPlansBtn').addEventListener('click', generateAllPlans);
+            document.getElementById('resetAllBtn').addEventListener('click', resetAll);
+            document.getElementById('copyToClipboardBtn').addEventListener('click', copyToClipboard);
+            document.getElementById('togglePassengerInfoBtn').addEventListener('click', togglePassengerInfo);
+            document.getElementById('generateTicketInfoBtn').addEventListener('click', generateTicketInfo);
+            document.getElementById('resetOutputBtn').addEventListener('click', resetOutput);
+            document.getElementById('copyTicketInfoBtn').addEventListener('click', copyTicketInfoToClipboard);
+            
+            // 机场选择变化
+            document.getElementById('carryOnDeparture-select').addEventListener('change', function() {
+                updateAirportInput('carryOnDeparture-select', 'carryOnDeparture-input', 'carryOnDeparture-output');
+            });
+            
+            document.getElementById('carryOnArrival-select').addEventListener('change', function() {
+                updateAirportInput('carryOnArrival-select', 'carryOnArrival-input', 'carryOnArrival-output');
+            });
+        }
+        
+        function handleBaggageChange(type) {
+            if (type === 'checked') {
+                const select = document.getElementById('checkedBaggage');
+                const selectedOption = select.options[select.selectedIndex];
+                const requiresInput = selectedOption.hasAttribute('data-requires-input');
+                
+                const inputContainer = document.getElementById('checkedBaggageInputContainer');
+                inputContainer.style.display = requiresInput ? 'flex' : 'none';
+            }
+        }
+        
+        function toggleTransferBaggageInput(segmentId) {
+            const select = document.getElementById(`${segmentId}-transferBaggageNote`);
+            const terminalDiv = document.getElementById(`${segmentId}-terminalDiv`);
+            
+            if (select && select.value.includes("中转到")) {
+                terminalDiv.style.display = 'block';
+            } else if (terminalDiv) {
+                terminalDiv.style.display = 'none';
+            }
+        }
+        
+        function initLocationSelects() {
+            const departureSelect = document.getElementById('carryOnDeparture-select');
+            const arrivalSelect = document.getElementById('carryOnArrival-select');
+            
+            if (departureSelect && arrivalSelect) {
+                departureSelect.innerHTML = '<option value="">选择地点</option>' + 
+                    savedLocations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+                
+                arrivalSelect.innerHTML = '<option value="">选择地点</option>' + 
+                    savedLocations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            }
+        }
+        
+        function saveAirport(inputId) {
+            const airport = document.getElementById(inputId).value.trim();
+            if (airport && !airportList.includes(airport)) {
+                airportList.push(airport);
+                // Update all airport selects
+                const selects = document.querySelectorAll('select[id$="-departure-select"], select[id$="-arrival-select"]');
+                selects.forEach(select => {
+                    const currentVal = select.value;
+                    select.innerHTML = '<option value="">选择城市</option>' + 
+                        airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('');
+                    if (currentVal && airportList.includes(currentVal)) {
+                        select.value = currentVal;
+                    }
+                });
+            }
+        }
+        
+        function saveLocation(inputId) {
+            const location = document.getElementById(inputId).value.trim();
+            if (location && !savedLocations.includes(location)) {
+                savedLocations.push(location);
+                initLocationSelects();
+            }
+        }
+        
+        function togglePassengerInfo() {
+            passengerInfoVisible = !passengerInfoVisible;
+            const passengerInfoSection = document.getElementById('passengerInfoSection');
+            passengerInfoSection.style.display = passengerInfoVisible ? 'block' : 'none';
+            
+            if (passengerInfoVisible) {
+                initLocationSelects();
+            }
+        }
+        
+        function formatDate(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 4) value = value.substr(0, 4);
+            
+            let formatted = value.substr(0, 2);
+            if (value.length > 2) formatted += '月' + value.substr(2, 2) + '日';
+            input.value = formatted;
+        }
+        
+        function formatTime(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 4) value = value.substr(0, 4);
+            
+            let formatted = value.substr(0, 2);
+            if (value.length > 2) formatted += ':' + value.substr(2, 2);
+            input.value = formatted;
+        }
+        
+        function getCityName(airport) {
+            if (!airport) return "未指定";
+            
+            // Extract city name (everything before the first space or special characters)
+            let city = airport.split(" ")[0];
+            city = city.replace("机场", "").replace("国际", "").replace("首都", "").replace("太平", "").trim();
+            
+            // Special cases for Chinese cities
+            const chineseCities = ["北京", "上海", "广州", "西安", "杭州", "沈阳", "哈尔滨", "重庆", "青岛", "成都", "三亚", "深圳", "长春"];
+            for (const chineseCity of chineseCities) {
+                if (city.includes(chineseCity)) {
+                    return "中国";
+                }
+            }
+            
+            // Special cases for Russian cities
+            if (city === "莫斯科") return "莫斯科";
+            if (city === "圣彼得堡") return "圣彼得堡";
+            if (city === "格罗兹尼") return "格罗兹尼";
+            if (city === "哈巴") return "哈巴罗夫斯克";
+            if (city === "叶卡") return "叶卡捷琳堡";
+            if (city === "克市") return "克拉斯诺亚尔斯克";
+            if (city === "布市") return "布拉格维申斯克";
+            
+            return city;
+        }
+        
+        function updateCityInput(airportSelectId, cityInputId) {
+            const select = document.getElementById(airportSelectId);
+            const cityInput = document.getElementById(cityInputId);
+            
+            if (select && cityInput) {
+                const selectedAirport = select.value;
+                const cityName = getCityName(selectedAirport);
+                cityInput.value = cityName;
+            }
+        }
+        
+        function updateAirportInput(selectId, inputId, outputId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            const selectVal = select.value;
+            document.getElementById(inputId).value = selectVal || '';
+            if (document.getElementById(outputId)) {
+                document.getElementById(outputId).value = selectVal || document.getElementById(inputId).value;
+            }
+            
+            // Update city input when airport is selected
+            if (selectId.includes('departure-select')) {
+                const segmentId = selectId.split('-')[1];
+                const itineraryId = selectId.split('-')[0].replace('segment', '');
+                updateCityInput(selectId, `segment${itineraryId}-${segmentId}-departure-city`);
+            } else if (selectId.includes('arrival-select')) {
+                const segmentId = selectId.split('-')[1];
+                const itineraryId = selectId.split('-')[0].replace('segment', '');
+                updateCityInput(selectId, `segment${itineraryId}-${segmentId}-arrival-city`);
+            }
+        }
+
+        function updateFlightNoInput(inputId, value) {
+            if (value && document.getElementById(inputId)) {
+                document.getElementById(inputId).value = value;
+            }
+        }
+
+        function saveFlightNo(inputId) {
+            const flightNo = document.getElementById(inputId).value.trim();
+            if (flightNo && !savedFlightNumbers.includes(flightNo)) {
+                savedFlightNumbers.push(flightNo);
+                updateFlightNoSelects();
+            }
+        }
+
+        function updateFlightNoSelects() {
+            const selects = document.querySelectorAll('select[id$="-flightNo-select"]');
+            selects.forEach(select => {
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">请选择</option>' + 
+                    savedFlightNumbers.map(num => `<option value="${num}">${num}</option>`).join('');
+                if (currentVal && savedFlightNumbers.includes(currentVal)) {
+                    select.value = currentVal;
+                }
+            });
+        }
+        
+        function toggleTimeFlag(el) {
+            el.classList.toggle('active');
+        }
+        
+        function toggleNote(el, itineraryId) {
+            const noteText = el.textContent;
+            const selectedNotesInput = document.getElementById(`itinerary${itineraryId}-selectedNotes`);
+            const selectedNotesDisplay = document.getElementById(`itinerary${itineraryId}-selectedNotesDisplay`);
+            
+            if (!selectedNotesInput || !selectedNotesDisplay) return;
+            
+            let notes = selectedNotesInput.value ? selectedNotesInput.value.split(',') : [];
+            const index = notes.indexOf(noteText);
+            
+            if (index > -1) {
+                notes.splice(index, 1);
+                el.classList.remove('selected');
+            } else {
+                notes.push(noteText);
+                el.classList.add('selected');
+            }
+            
+            selectedNotesInput.value = notes.join(',');
+            selectedNotesDisplay.textContent = notes.join(', ');
+        }
+        
+        function addCustomNote(itineraryId) {
+            const input = document.getElementById(`itinerary${itineraryId}-customNoteInput`);
+            if (!input) return;
+            
+            const noteText = input.value.trim();
+            if (!noteText) return;
+            
+            const selectedNotesInput = document.getElementById(`itinerary${itineraryId}-selectedNotes`);
+            const selectedNotesDisplay = document.getElementById(`itinerary${itineraryId}-selectedNotesDisplay`);
+            
+            if (!selectedNotesInput || !selectedNotesDisplay) return;
+            
+            let notes = selectedNotesInput.value ? selectedNotesInput.value.split(',') : [];
+            if (!notes.includes(noteText)) {
+                notes.push(noteText);
+                selectedNotesInput.value = notes.join(',');
+                selectedNotesDisplay.textContent = notes.join(', ');
+                input.value = '';
+            }
+        }
+        
+        function addNewItinerary() {
+            itineraryCount++;
+            segmentCounters[itineraryCount] = 0;
+            priceCounters[itineraryCount] = 0;
+            notesVisibility[itineraryCount] = false;
+            calculatorVisibility[itineraryCount] = false;
+            
+            const container = document.getElementById('itinerariesContainer');
+            const itineraryDiv = document.createElement('div');
+            itineraryDiv.className = 'itinerary-container';
+            itineraryDiv.id = `itinerary${itineraryCount}`;
+            
+            itineraryDiv.innerHTML = `
+                <div class="ticket-price-section">
+                    <button class="remove-itinerary" data-itinerary-id="${itineraryCount}">× 删除此方案</button>
+                    <div class="section-title">行程方案 ${itineraryCount}</div>
+                    
+                    <div id="flightSegments${itineraryCount}"></div>
+                    
+                    <div class="button-group">
+                        <button class="add-segment" data-itinerary="${itineraryCount}">+ 添加新航段</button>
+                        <button class="calculator-btn" data-itinerary="${itineraryCount}">计算</button>
+                        <button class="ticket-price-btn" id="ticketPriceBtn${itineraryCount}" style="display: none;">+ 机票价格</button>
+                        <button class="notes-toggle-btn" data-itinerary="${itineraryCount}">备注信息</button>
+                    </div>
+                    
+                    <div class="calculator-container" id="itinerary${itineraryCount}-calculatorContainer">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="number" placeholder="人民币" style="flex: 1;" />
+                            <div class="calculator-operator">×</div>
+                            <input type="number" placeholder="汇率" style="flex: 1;" />
+                            <div class="calculator-operator">+</div>
+                            <input type="number" placeholder="卢布1" style="flex: 1;" />
+                            <div class="calculator-operator">+</div>
+                            <input type="number" placeholder="卢布2" style="flex: 1;" />
+                            <div class="calculator-operator">=</div>
+                            <input type="number" placeholder="总计卢布" style="flex: 1;" readonly />
+                        </div>
+                    </div>
+                    
+                    <div id="ticketPricePlans${itineraryCount}"></div>
+                    
+                    <div class="notes-container" id="itinerary${itineraryCount}-notesContainer">
+                        <div class="form-group">
+                            <label>关键词 (点击选择，可多选):</label>
+                            <div class="notes-options" id="itinerary${itineraryCount}-notesOptions">
+                                ${presetNotes.map(note => `<div class="note-tag">${note}</div>`).join('')}
+                            </div>
+                            <div class="custom-note-input">
+                                <input type="text" id="itinerary${itineraryCount}-customNoteInput" placeholder="输入自定义备注">
+                                <button type="button" class="add-custom-note">添加</button>
+                            </div>
+                            <div class="selected-notes-display" id="itinerary${itineraryCount}-selectedNotesDisplay"></div>
+                            <input type="hidden" id="itinerary${itineraryCount}-selectedNotes" value="">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(itineraryDiv);
+            
+            // 添加事件监听器
+            const addSegmentBtn = itineraryDiv.querySelector('.add-segment');
+            const calculatorBtn = itineraryDiv.querySelector('.calculator-btn');
+            const ticketPriceBtn = itineraryDiv.querySelector('.ticket-price-btn');
+            const notesToggleBtn = itineraryDiv.querySelector('.notes-toggle-btn');
+            const addCustomNoteBtn = itineraryDiv.querySelector('.add-custom-note');
+            const removeItineraryBtn = itineraryDiv.querySelector('.remove-itinerary');
+            
+            addSegmentBtn.addEventListener('click', function() {
+                addFlightSegment(itineraryCount);
+            });
+            
+            calculatorBtn.addEventListener('click', function() {
+                toggleCalculator(itineraryCount);
+            });
+            
+            ticketPriceBtn.addEventListener('click', function() {
+                addTicketPricePlan(itineraryCount);
+            });
+            
+            notesToggleBtn.addEventListener('click', function() {
+                toggleNotesContainer(itineraryCount);
+            });
+            
+            addCustomNoteBtn.addEventListener('click', function() {
+                addCustomNote(itineraryCount);
+            });
+            
+            removeItineraryBtn.addEventListener('click', function() {
+                removeItinerary(itineraryCount);
+            });
+            
+            // 为备注标签添加点击事件
+            const noteTags = itineraryDiv.querySelectorAll('.note-tag');
+            noteTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    toggleNote(this, itineraryCount);
+                });
+            });
+            
+            setupCalculatorInputs(itineraryCount);
+        }
+        
+        function removeItinerary(itineraryId) {
+            const itinerary = document.getElementById(`itinerary${itineraryId}`);
+            if (itinerary) {
+                itinerary.remove();
+                delete notesVisibility[itineraryId];
+                delete calculatorVisibility[itineraryId];
+            }
+        }
+        
+        function toggleCalculator(itineraryId) {
+            if (calculatorVisibility[itineraryId] === undefined) {
+                calculatorVisibility[itineraryId] = false;
+            }
+            
+            calculatorVisibility[itineraryId] = !calculatorVisibility[itineraryId];
+            
+            const container = document.getElementById(`itinerary${itineraryId}-calculatorContainer`);
+            if (container) {
+                container.style.display = calculatorVisibility[itineraryId] ? 'block' : 'none';
+            }
+        }
+        
+        function calculateCurrency(itineraryId) {
+            const inputs = document.querySelectorAll(`#itinerary${itineraryId}-calculatorContainer input`);
+            if (inputs.length < 5) return;
+            
+            const rmb = parseFloat(inputs[0].value) || 0;
+            const rate = parseFloat(inputs[1].value) || 0;
+            const rub1 = parseFloat(inputs[2].value) || 0;
+            const rub2 = parseFloat(inputs[3].value) || 0;
+            
+            const total = (rmb * rate) + rub1 + rub2;
+            inputs[4].value = Math.round(total);
+        }
+        
+        function setupCalculatorInputs(itineraryId) {
+            const inputs = document.querySelectorAll(`#itinerary${itineraryId}-calculatorContainer input`);
+            inputs.forEach((input, index) => {
+                input.removeEventListener('input', input.calculatorHandler);
+                
+                input.calculatorHandler = function() {
+                    calculateCurrency(itineraryId);
+                };
+                input.addEventListener('input', input.calculatorHandler);
+            });
+        }
+        
+        function toggleNotesContainer(itineraryId) {
+            if (notesVisibility[itineraryId] === undefined) {
+                notesVisibility[itineraryId] = false;
+            }
+            
+            notesVisibility[itineraryId] = !notesVisibility[itineraryId];
+            
+            const container = document.getElementById(`itinerary${itineraryId}-notesContainer`);
+            if (container) {
+                container.style.display = notesVisibility[itineraryId] ? 'block' : 'none';
+            }
+        }
+        
+        function addFlightSegment(itineraryId) {
+            segmentCounters[itineraryId] = (segmentCounters[itineraryId] || 0) + 1;
+            const segmentId = segmentCounters[itineraryId];
+            const container = document.getElementById(`flightSegments${itineraryId}`);
+            
+            const segmentDiv = document.createElement('div');
+            segmentDiv.className = 'flight-segment';
+            segmentDiv.id = `segment${itineraryId}-${segmentId}`;
+            
+            segmentDiv.innerHTML = `
+                <button class="remove-segment" data-segment-id="${itineraryId}-${segmentId}">× 删除</button>
+                
+                <div class="flex-row">
+                    <div class="form-group date-input-container">
+                        <label>起飞日期:</label>
+                        <input type="text" id="segment${itineraryId}-${segmentId}-date" placeholder="例如: 0802">
+                        <button class="auto-fill-btn" data-segment="${itineraryId}-${segmentId}">自动填写</button>
+                    </div>
+                    
+                    <div class="form-group flight-no-section">
+                        <label>航班号:</label>
+                        <div class="airport-select-container">
+                            <select id="segment${itineraryId}-${segmentId}-flightNo-select">
+                                <option value="">请选择</option>
+                                ${savedFlightNumbers.map(num => `<option value="${num}">${num}</option>`).join('')}
+                            </select>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-flightNo-input" placeholder="手动输入">
+                            <button data-save-flight="segment${itineraryId}-${segmentId}-flightNo-input">保存</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex-row">
+                    <div class="form-group">
+                        <label>起飞城市:</label>
+                        <div class="airport-select-container">
+                            <select id="segment${itineraryId}-${segmentId}-departure-select" class="airport-select short-select-8">
+                                <option value="">请选择</option>
+                                ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
+                            </select>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-departure-input" class="airport-input" placeholder="手动输入">
+                            <button>保存</button>
+                            <input type="hidden" id="segment${itineraryId}-${segmentId}-departure-output">
+                        </div>
+                        <label>起飞机场航站楼:</label>
+                        <select id="segment${itineraryId}-${segmentId}-departure-terminal" class="short-select-8">
+                            ${terminalList.map(terminal => `<option value="${terminal}">${terminal}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>到达城市:</label>
+                        <div class="airport-select-container">
+                            <select id="segment${itineraryId}-${segmentId}-arrival-select" class="airport-select short-select-8">
+                                <option value="">请选择</option>
+                                ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
+                            </select>
+                            <input type="text" id="segment${itineraryId}-${segmentId}-arrival-input" class="airport-input" placeholder="手动输入">
+                            <button>保存</button>
+                            <input type="hidden" id="segment${itineraryId}-${segmentId}-arrival-output">
+                        </div>
+                        <label>到达机场航站楼:</label>
+                        <select id="segment${itineraryId}-${segmentId}-arrival-terminal" class="short-select-8">
+                            ${terminalList.map(terminal => `<option value="${terminal}">${terminal}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex-row">
+                    <div class="form-group">
+                        <label>起飞时间:</label>
+                        <div class="time-input-container">
+                            <input type="text" id="segment${itineraryId}-${segmentId}-departure-time" class="time-input-equal" placeholder="例如: 1430">
+                            <button class="toggle-btn-equal toggle-btn-evening" data-time-type="evening">晚上</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>到达时间:</label>
+                        <div class="time-input-container">
+                            <input type="text" id="segment${itineraryId}-${segmentId}-arrival-time" class="time-input-equal" placeholder="例如: 1845">
+                            <button class="toggle-btn-equal toggle-btn-next-day" data-time-type="next-day">次日</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flight-time-row">
+                    <div class="form-group">
+                        <label>截止值机时间:</label>
+                        <select id="segment${itineraryId}-${segmentId}-flight-time" class="time-input-equal short-select-8">
+                            <option value="起飞前40分钟停办">起飞前40分钟停办</option>
+                            <option value="起飞前1小时停办">起飞前1小时停办</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="toggle-btn-equal toggle-btn-yi-ri" data-time-type="yi-ri" style="margin-top: 8px;">翌日</button>
+                    </div>
+                    
+                    <div class="form-group transfer-container">
+                        <label>中转与行李提示:</label>
+                        <select id="segment${itineraryId}-${segmentId}-transferBaggageNote">
+                            <option value="">无提示</option>
+                            <option value="⚠️中转到*航站楼⚠️">⚠️中转到*航站楼⚠️</option>
+                            <option value="⚠️中转到*机场⚠️">⚠️中转到*机场⚠️</option>
+                            <option value="⚠️无需提取行李⚠️">⚠️无需提取行李⚠️</option>
+                            <option value="⚠️无需提取行李，直挂目的地⚠️">⚠️无需提取行李，直挂目的地⚠️</option>
+                            <option value="⚠️无需提取行李，中转到*航站楼⚠️">⚠️无需提取行李，中转到*航站楼⚠️</option>
+                            <option value="⚠️提取行李，重新办理值机⚠️">⚠️提取行李，重新办理值机⚠️</option>
+                            <option value="⚠️提取行李，中转到*航站楼⚠️">⚠️提取行李，中转到*航站楼⚠️</option>
+                            <option value="⚠️提取行李，中转到*机场⚠️">⚠️提取行李，中转到*机场⚠️</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group seat-container">
+                        <label>选座：</label>
+                        <input type="text" id="segment${itineraryId}-${segmentId}-seat" placeholder="输入座位号，如6F" class="seat-input">
+                    </div>
+                </div>
+                
+                <div id="segment${itineraryId}-${segmentId}-terminalDiv" class="hidden" style="margin-top: 8px;">
+                    <div class="terminal-input">
+                        <input type="text" id="segment${itineraryId}-${segmentId}-terminal" placeholder="输入航站楼或机场">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(segmentDiv);
+            document.getElementById(`ticketPriceBtn${itineraryId}`).style.display = 'inline-block';
+            
+            // 添加事件监听器
+            const dateInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-date`);
+            const departureTimeInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-departure-time`);
+            const arrivalTimeInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-arrival-time`);
+            const seatInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-seat`);
+            const autoFillBtn = segmentDiv.querySelector('.auto-fill-btn');
+            const removeBtn = segmentDiv.querySelector('.remove-segment');
+            const flightNoSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-flightNo-select`);
+            const saveFlightBtn = segmentDiv.querySelector('[data-save-flight]');
+            const departureSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-departure-select`);
+            const arrivalSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-arrival-select`);
+            const saveDepartureBtn = segmentDiv.querySelectorAll('button')[3];
+            const saveArrivalBtn = segmentDiv.querySelectorAll('button')[4];
+            const eveningBtn = segmentDiv.querySelector('.toggle-btn-evening');
+            const nextDayBtn = segmentDiv.querySelector('.toggle-btn-next-day');
+            const yiRiBtn = segmentDiv.querySelector('.toggle-btn-yi-ri');
+            const transferSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-transferBaggageNote`);
+            
+            dateInput.addEventListener('input', function() { formatDate(this); });
+            departureTimeInput.addEventListener('input', function() { formatTime(this); });
+            arrivalTimeInput.addEventListener('input', function() { formatTime(this); });
+            seatInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+            
+            autoFillBtn.addEventListener('click', function() {
+                autoFillFlightInfo(itineraryId, segmentId);
+            });
+            
+            removeBtn.addEventListener('click', function() {
+                removeSegment(itineraryId, segmentId);
+            });
+            
+            flightNoSelect.addEventListener('change', function() {
+                updateFlightNoInput(`segment${itineraryId}-${segmentId}-flightNo-input`, this.value);
+            });
+            
+            saveFlightBtn.addEventListener('click', function() {
+                saveFlightNo(this.getAttribute('data-save-flight'));
+            });
+            
+            departureSelect.addEventListener('change', function() {
+                updateAirportInput(`segment${itineraryId}-${segmentId}-departure-select`, `segment${itineraryId}-${segmentId}-departure-input`, `segment${itineraryId}-${segmentId}-departure-output`);
+            });
+            
+            arrivalSelect.addEventListener('change', function() {
+                updateAirportInput(`segment${itineraryId}-${segmentId}-arrival-select`, `segment${itineraryId}-${segmentId}-arrival-input`, `segment${itineraryId}-${segmentId}-arrival-output`);
+            });
+            
+            saveDepartureBtn.addEventListener('click', function() {
+                saveAirport(`segment${itineraryId}-${segmentId}-departure-input`);
+            });
+            
+            saveArrivalBtn.addEventListener('click', function() {
+                saveAirport(`segment${itineraryId}-${segmentId}-arrival-input`);
+            });
+            
+            eveningBtn.addEventListener('click', function() { toggleTimeFlag(this); });
+            nextDayBtn.addEventListener('click', function() { toggleTimeFlag(this); });
+            yiRiBtn.addEventListener('click', function() { toggleTimeFlag(this); });
+            
+            transferSelect.addEventListener('change', function() {
+                toggleTransferBaggageInput(`segment${itineraryId}-${segmentId}`);
+            });
+        }
+        
+        function removeSegment(itineraryId, segmentId) {
+            const segment = document.getElementById(`segment${itineraryId}-${segmentId}`);
+            if (segment) segment.remove();
+            
+            const segmentsContainer = document.getElementById(`flightSegments${itineraryId}`);
+            if (segmentsContainer && segmentsContainer.children.length === 0) {
+                const ticketPriceBtn = document.getElementById(`ticketPriceBtn${itineraryId}`);
+                if (ticketPriceBtn) ticketPriceBtn.style.display = 'none';
+            }
+        }
+        
+        function autoFillFlightInfo(itineraryId, segmentId) {
+            const departureSelect = document.getElementById(`segment${itineraryId}-${segmentId}-departure-select`);
+            const arrivalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-select`);
+            const flightNoInput = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-input`);
+            const departureTime = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`);
+            const arrivalTime = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
+            const flightTime = document.getElementById(`segment${itineraryId}-${segmentId}-flight-time`);
+            
+            if (!departureSelect || !arrivalSelect || !flightNoInput) return;
+            
+            if (segmentId == 1) {
+                departureSelect.value = "莫斯科";
+                arrivalSelect.value = "北京";
+                flightNoInput.value = "SU-204";
+                if (departureTime) departureTime.value = "15:55";
+                if (arrivalTime) arrivalTime.value = "05:45";
+                if (flightTime) flightTime.value = "起飞前40分钟停办";
+                
+                updateAirportInput(
+                    `segment${itineraryId}-${segmentId}-departure-select`,
+                    `segment${itineraryId}-${segmentId}-departure-input`,
+                    `segment${itineraryId}-${segmentId}-departure-output`
+                );
+                updateAirportInput(
+                    `segment${itineraryId}-${segmentId}-arrival-select`,
+                    `segment${itineraryId}-${segmentId}-arrival-input`,
+                    `segment${itineraryId}-${segmentId}-arrival-output`
+                );
+                
+                const nextDayBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
+                if (nextDayBtn) nextDayBtn.classList.add('active');
+            } else {
+                departureSelect.value = "北京";
+                arrivalSelect.value = "莫斯科";
+                flightNoInput.value = "SU-208";
+                if (departureTime) departureTime.value = "11:35";
+                if (arrivalTime) arrivalTime.value = "15:25";
+                if (flightTime) flightTime.value = "起飞前1小时停办";
+                
+                updateAirportInput(
+                    `segment${itineraryId}-${segmentId}-departure-select`,
+                    `segment${itineraryId}-${segmentId}-departure-input`,
+                    `segment${itineraryId}-${segmentId}-departure-output`
+                );
+                updateAirportInput(
+                    `segment${itineraryId}-${segmentId}-arrival-select`,
+                    `segment${itineraryId}-${segmentId}-arrival-input`,
+                    `segment${itineraryId}-${segmentId}-arrival-output`
+                );
+            }
+        }
+        
+        function addTicketPricePlan(itineraryId) {
+            priceCounters[itineraryId] = (priceCounters[itineraryId] || 0) + 1;
+            const priceNum = priceCounters[itineraryId];
+            const container = document.getElementById(`ticketPricePlans${itineraryId}`);
+            
+            const planDiv = document.createElement('div');
+            planDiv.className = 'ticket-price-plan';
+            planDiv.id = `price${itineraryId}-${priceNum}`;
+            
+            planDiv.innerHTML = `
+                <button class="remove-segment" data-price-id="${itineraryId}-${priceNum}" style="background-color: #9b59b6;">× 删除</button>
+                
+                <div class="ticket-price-row">
+                    <select id="price${itineraryId}-${priceNum}-option" class="short-select-8">
+                        <option value="无" selected>价格选项</option>
+                        <option value="带托运">带托运</option>
+                        <option value="无托运">无托运</option>
+                        <option value="无托运减">无托运减</option>
+                        <option value="带托运加">带托运加</option>
+                        <option value="带1件20公斤托运">带1件20公斤托运</option>
+                        <option value="带1件10公斤托运">带1件10公斤托运</option>
+                        <option value="带1件23公斤托运">带1件23公斤托运</option>
+                    </select>
+                    <input type="text" id="price${itineraryId}-${priceNum}-value" placeholder="价格数值">
+                    <select id="price${itineraryId}-${priceNum}-currency" class="ticket-currency short-select-6">
+                        <option value="">币种</option>
+                        <option value="卢布">卢布</option>
+                        <option value="元">元</option>
+                    </select>
+                </div>
+            `;
+            
+            container.appendChild(planDiv);
+            
+            // 添加删除按钮事件
+            const removeBtn = planDiv.querySelector('.remove-segment');
+            removeBtn.addEventListener('click', function() {
+                removePricePlan(itineraryId, priceNum);
+            });
+        }
+
+        function removePricePlan(itineraryId, priceNum) {
+            const plan = document.getElementById(`price${itineraryId}-${priceNum}`);
+            if (plan) plan.remove();
+        }
+        
+        function generateAllPlans() {
+            const output = document.getElementById('allPlansOutput');
+            const itineraries = document.querySelectorAll('.itinerary-container');
+            
+            if (itineraries.length === 0) {
+                output.textContent = "没有可显示的行程方案";
+                return;
+            }
+            
+            let outputText = "🔍查询结果如下：\n";
+            
+            itineraries.forEach((itinerary, index) => {
+                const itineraryId = itinerary.id.replace('itinerary', '');
+                const segments = document.querySelectorAll(`#flightSegments${itineraryId} .flight-segment`);
+                
+                if (segments.length === 0) {
+                    outputText += `方案${index + 1}.\n暂无航段信息\n\n`;
+                    return;
+                }
+                
+                if (itineraries.length > 1) {
+                    outputText += `方案${index + 1}.\n`;
+                }
+                
+                // 生成航段信息
+                let segmentTexts = [];
+                let prevDate = '';
+                
+                segments.forEach((segment, segmentIndex) => {
+                    const segmentId = segment.id.replace(`segment${itineraryId}-`, '');
+                    
+                    const dateInput = document.getElementById(`segment${itineraryId}-${segmentId}-date`);
+                    const date = dateInput ? dateInput.value : "";
+                    
+                    const departureOutput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-output`);
+                    const departure = departureOutput ? departureOutput.value : "起飞城市未指定";
+                    
+                    const departureTimeInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`);
+                    const departureTime = departureTimeInput ? departureTimeInput.value : "时间未指定";
+                    
+                    const arrivalOutput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-output`);
+                    const arrival = arrivalOutput ? arrivalOutput.value : "到达城市未指定";
+                    
+                    const arrivalTimeInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
+                    const arrivalTime = arrivalTimeInput ? arrivalTimeInput.value : "时间未指定";
+                    
+                    let segmentText = '';
+                    
+                    // Add date if different from previous segment
+                    if (date && date !== prevDate) {
+                        segmentText += `${date}`;
+                    } else if (segmentIndex > 0 && !date) {
+                        segmentText += '当日';
+                    }
+                    
+                    // Add departure info
+                    segmentText += `${departure}${departureTime}飞`;
+                    
+                    // Add arrival info
+                    segmentText += `，${arrivalTime}到达${arrival}`;
+                    
+                    // Add separator if not last segment
+                    if (segmentIndex < segments.length - 1) {
+                        segmentText += "；\n";
+                    }
+                    
+                    segmentTexts.push(segmentText);
+                    prevDate = date;
+                });
+                
+                // 添加价格信息
+                const pricePlans = document.querySelectorAll(`#ticketPricePlans${itineraryId} .ticket-price-plan`);
+                let priceTexts = [];
+                
+                pricePlans.forEach(plan => {
+                    const planId = plan.id.replace(`price${itineraryId}-`, '');
+                    const option = document.getElementById(`price${itineraryId}-${planId}-option`);
+                    const value = document.getElementById(`price${itineraryId}-${planId}-value`);
+                    const currency = document.getElementById(`price${itineraryId}-${planId}-currency`);
+                    
+                    if (option && value && currency) {
+                        priceTexts.push(`${option.value}${value.value}${currency.value}`);
+                    }
+                });
+                
+                // 合并所有文本
+                outputText += segmentTexts.join('');
+                if (priceTexts.length > 0) {
+                    outputText += '；' + priceTexts.join('，');
+                }
+                
+                // 添加备注
+                const selectedNotes = document.getElementById(`itinerary${itineraryId}-selectedNotes`);
+                if (selectedNotes && selectedNotes.value) {
+                    outputText += '\n' + selectedNotes.value.replace(/,/g, '，');
+                }
+                
+                outputText += '\n\n';
+            });
+            
+            outputText += '🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n绑定手机号：\n+7(912)891 58 82\n\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️';
+            output.textContent = outputText.trim();
+        }
+
+        function generateTicketInfo() {
+            const output = document.getElementById('ticketInfoOutput');
+            const passengerName = document.getElementById('passengerNames').value;
+            const tripType = document.getElementById('tripType').value;
+            const carryOnBaggage = document.getElementById('carryOnBaggage').value;
+            const checkedBaggage = document.getElementById('checkedBaggage').value;
+            const departure = document.getElementById('carryOnDeparture-output').value;
+            const arrival = document.getElementById('carryOnArrival-output').value;
+            
+            // 检查是否有行程
+            const itineraries = document.querySelectorAll('.itinerary-container');
+            if (itineraries.length === 0) {
+                // 简单行李信息格式
+                let baggageInfo = '';
+                if (departure || arrival) {
+                    baggageInfo += `行程: ${departure || '未指定'} → ${arrival || '未指定'}\n`;
+                }
+                if (carryOnBaggage) baggageInfo += `手提行李: ${carryOnBaggage}\n`;
+                
+                if (checkedBaggage) {
+                    let checkedBaggageText = checkedBaggage;
+                    if (checkedBaggage.includes('*')) {
+                        const count = document.getElementById('checkedBaggageCount').value;
+                        checkedBaggageText = checkedBaggage.replace('*', count);
+                    }
+                    baggageInfo += `托运行李: ${checkedBaggageText}\n`;
+                }
+                
+                output.textContent = `${passengerName} ${tripType}\n${baggageInfo}`;
+                return;
+            }
+            
+            // 复杂航班行程格式
+            let outputText = `乘客${passengerName}您好：\n`;
+            outputText += `${departure || '未指定'}➡️${arrival || '未指定'}${tripType}\n\n`;
+            
+            // 生成每个行程的航班信息
+            itineraries.forEach((itinerary, itineraryIndex) => {
+                const itineraryId = itinerary.id.replace('itinerary', '');
+                const segments = document.querySelectorAll(`#flightSegments${itineraryId} .flight-segment`);
+                
+                segments.forEach((segment, segmentIndex) => {
+                    const segmentId = segment.id.replace(`segment${itineraryId}-`, '');
+                    
+                    const dateInput = document.getElementById(`segment${itineraryId}-${segmentId}-date`);
+                    const date = dateInput ? dateInput.value : "";
+                    
+                    const departureOutput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-output`);
+                    const departure = departureOutput ? departureOutput.value : "起飞城市未指定";
+                    const departureCity = getCityName(departure);
+                    
+                    const departureTerminalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-departure-terminal`);
+                    const departureTerminal = departureTerminalSelect ? departureTerminalSelect.value : "";
+                    
+                    const departureTimeInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`);
+                    let departureTime = departureTimeInput ? departureTimeInput.value : "时间未指定";
+                    
+                    const arrivalOutput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-output`);
+                    const arrival = arrivalOutput ? arrivalOutput.value : "到达城市未指定";
+                    const arrivalCity = getCityName(arrival);
+                    
+                    const arrivalTerminalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`);
+                    const arrivalTerminal = arrivalTerminalSelect ? arrivalTerminalSelect.value : "";
+                    
+                    const arrivalTimeInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
+                    let arrivalTime = arrivalTimeInput ? arrivalTimeInput.value : "时间未指定";
+                    
+                    const flightNoInput = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-input`);
+                    const flightNo = flightNoInput ? flightNoInput.value : "航班号未指定";
+                    
+                    const flightTimeSelect = document.getElementById(`segment${itineraryId}-${segmentId}-flight-time`);
+                    const flightTime = flightTimeSelect ? flightTimeSelect.value : "值机时间未指定";
+                    
+                    const transferSelect = document.getElementById(`segment${itineraryId}-${segmentId}-transferBaggageNote`);
+                    const transferNote = transferSelect ? transferSelect.value : "";
+                    
+                    const seatInput = document.getElementById(`segment${itineraryId}-${segmentId}-seat`);
+                    const seat = seatInput ? seatInput.value : "";
+                    
+                    const eveningBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-evening`);
+                    const nextDayBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
+                    const yiRiBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-yi-ri`);
+                    
+                    // 处理时间标记
+                    if (eveningBtn && eveningBtn.classList.contains('active')) {
+                        departureTime += "(晚上)";
+                    }
+                    
+                    if (nextDayBtn && nextDayBtn.classList.contains('active')) {
+                        arrivalTime += "(次日)";
+                    }
+                    
+                    if (yiRiBtn && yiRiBtn.classList.contains('active')) {
+                        arrivalTime += "(次日)";
+                    }
+                    
+                    // Only show date if it exists and it's not a continuation of the same day
+                    if (date && (segmentIndex === 0 || date !== segments[segmentIndex - 1].querySelector('[id$="-date"]').value)) {
+                        outputText += `${date}\n`;
+                    }
+                    
+                    outputText += `${departure}${departureTerminal && departureTerminal !== "请选择" ? departureTerminal : ""}➡️${arrival}${arrivalTerminal && arrivalTerminal !== "请选择" ? arrivalTerminal : ""}\n`;
+                    outputText += `航班号:【${flightNo}】\n`;
+                    outputText += `🛫起飞:${departureCity}时间${departureTime}\n`;
+                    outputText += `🎫值机:${flightTime}\n`;
+                    outputText += `🛬抵达:${arrivalCity}时间${arrivalTime}\n`;
+                    
+                    // 添加中转和行李提示
+                    if (transferNote) {
+                        let transferText = transferNote;
+                        if (transferNote.includes("*")) {
+                            const terminalInput = document.getElementById(`segment${itineraryId}-${segmentId}-terminal`);
+                            const terminal = terminalInput ? terminalInput.value : "";
+                            transferText = transferNote.replace("*", terminal);
+                        }
+                        outputText += `${transferText}\n`;
+                    }
+                    
+                    // 添加选座信息
+                    if (seat) {
+                        outputText += `💺座位: ${seat}\n`;
+                    }
+                    
+                    // Only add separator if not last segment
+                    if (segmentIndex < segments.length - 1) {
+                        outputText += `\n`;
+                    }
+                });
+            });
+            
+            // 添加行李信息
+            if (carryOnBaggage) {
+                outputText += `手提要求：${carryOnBaggage}\n`;
+            }
+            
+            if (checkedBaggage) {
+                let checkedBaggageText = checkedBaggage;
+                if (checkedBaggage.includes('*')) {
+                    const count = document.getElementById('checkedBaggageCount').value;
+                    checkedBaggageText = checkedBaggage.replace('*', count);
+                }
+                outputText += `托运要求：${checkedBaggageText}\n`;
+            }
+            
+            // 添加页脚
+            outputText += `\n🔔温馨提示：\n起降时间均为当地时间；\n时间为24小时制；\n凭护照办理值机。\n长城票务：89128915882\n✈️祝您旅途愉快！✈️`;
+            
+            output.textContent = outputText;
+        }
+        
+        function resetAll() {
+            if (confirm('确定要重置所有信息吗？')) {
+                document.getElementById('itinerariesContainer').innerHTML = '';
+                document.getElementById('allPlansOutput').textContent = '';
+                document.getElementById('ticketInfoOutput').textContent = '';
+                document.getElementById('passengerNames').value = '';
+                document.getElementById('tripType').selectedIndex = 0;
+                document.getElementById('carryOnBaggage').selectedIndex = 0;
+                document.getElementById('checkedBaggage').selectedIndex = 0;
+                document.getElementById('checkedBaggageInputContainer').style.display = 'none';
+                document.getElementById('carryOnDeparture-input').value = '';
+                document.getElementById('carryOnArrival-input').value = '';
+                document.getElementById('carryOnDeparture-select').selectedIndex = 0;
+                document.getElementById('carryOnArrival-select').selectedIndex = 0;
+                
+                itineraryCount = 0;
+                segmentCounters = {};
+                priceCounters = {};
+                notesVisibility = {};
+                calculatorVisibility = {};
+            }
+        }
+        
+        function resetOutput() {
+            document.getElementById('ticketInfoOutput').textContent = '';
+        }
+        
+        function copyTicketInfoToClipboard() {
+            const output = document.getElementById('ticketInfoOutput');
+            navigator.clipboard.writeText(output.textContent)
+                .then(() => alert('已复制到剪贴板!'))
+                .catch(err => alert('复制失败: ' + err));
+        }
+        
+        function copyToClipboard() {
+            const output = document.getElementById('allPlansOutput');
+            navigator.clipboard.writeText(output.textContent)
+                .then(() => alert('已复制到剪贴板!'))
+                .catch(err => alert('复制失败: ' + err));
+        }
+    </script>
+</body>
+</html>
