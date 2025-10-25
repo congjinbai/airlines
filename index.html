@@ -1309,11 +1309,11 @@
             if (!departureSelect || !arrivalSelect || !flightNoInput) return;
             
             if (segmentId == 1) {
-                departureSelect.value = "莫斯科";
-                arrivalSelect.value = "北京";
-                flightNoInput.value = "SU-204";
-                if (departureTime) departureTime.value = "15:55";
-                if (arrivalTime) arrivalTime.value = "05:45";
+                departureSelect.value = "格罗兹尼";
+                arrivalSelect.value = "莫斯科";
+                flightNoInput.value = "SU1499";
+                if (departureTime) departureTime.value = "12:55";
+                if (arrivalTime) arrivalTime.value = "15:50";
                 if (flightTime) flightTime.value = "起飞前40分钟停办";
                 
                 updateAirportInput(
@@ -1330,12 +1330,12 @@
                 const nextDayBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
                 if (nextDayBtn) nextDayBtn.classList.add('active');
             } else {
-                departureSelect.value = "北京";
-                arrivalSelect.value = "莫斯科";
-                flightNoInput.value = "SU-208";
-                if (departureTime) departureTime.value = "11:35";
-                if (arrivalTime) arrivalTime.value = "15:25";
-                if (flightTime) flightTime.value = "起飞前1小时停办";
+                departureSelect.value = "莫斯科";
+                arrivalSelect.value = "格罗兹尼";
+                flightNoInput.value = "SU1498";
+                if (departureTime) departureTime.value = "08:45";
+                if (arrivalTime) arrivalTime.value = "11:55";
+                if (flightTime) flightTime.value = "起飞前40分钟停办";
                 
                 updateAirportInput(
                     `segment${itineraryId}-${segmentId}-departure-select`,
