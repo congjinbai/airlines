@@ -581,6 +581,127 @@
         .swap-btn:hover {
             background-color: #2c5aa0;
         }
+        
+        /* 布局调整 */
+        /* 1. 航班号部分调整 - 防止在窄屏幕上溢出 */
+        .flight-no-section {
+            flex: 1;
+            min-width: 0; /* 允许在窄屏幕上收缩 */
+        }
+        
+        /* 2. 航班号选择框和输入框调整 */
+        .flight-no-select-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+        }
+        .flight-no-select-container select {
+            flex: 1;
+            min-width: 80px; /* 设置最小宽度 */
+        }
+        .flight-no-select-container input {
+            flex: 1;
+            min-width: 0; /* 允许在窄屏幕上收缩 */
+        }
+        
+        /* 3. 常用航线选择框宽度调整 */
+        .route-select {
+            flex: 1;
+            min-width: 0; /* 允许在窄屏幕上收缩 */
+        }
+        
+        /* 4. 截止值机时间选择框宽度调整 */
+        .check-in-time-select {
+            width: 100%;
+        }
+        
+        /* 5. 中转与行李提示标签不换行 */
+        .transfer-container label {
+            white-space: nowrap;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .compact-row {
+                flex-wrap: wrap;
+            }
+            
+            .flight-no-section {
+                flex: 1 1 100%;
+            }
+            
+            .flight-time-row {
+                flex-wrap: wrap;
+            }
+            
+            .flight-time-row > div {
+                flex: 1 1 100%;
+                margin-bottom: 8px;
+            }
+            
+            .transfer-seat-container {
+                flex-wrap: wrap;
+            }
+            
+            .transfer-container, .seat-container {
+                flex: 1 1 100%;
+                margin-bottom: 8px;
+            }
+        }
+        
+        /* 新增调整样式 */
+        /* 统一日期、航班号选择框和输入框的宽度 */
+        .date-flight-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .date-flight-container > div {
+            flex: 1;
+        }
+        
+        .date-container {
+            flex: 1;
+        }
+        
+        .flight-no-container {
+            flex: 2;
+        }
+        
+        .flight-no-select-container {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .flight-no-select-container select,
+        .flight-no-select-container input {
+            flex: 1;
+        }
+        
+        /* 调整截止值机时间、中转行李提示和选座输入框的布局 */
+        .flight-options-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .flight-options-row > div {
+            flex: 1;
+        }
+        
+        .check-in-time-container,
+        .transfer-container,
+        .seat-container {
+            flex: 1;
+        }
+        
+        /* 调整中转行李提示标签 */
+        .transfer-container label {
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -1237,8 +1358,8 @@
             segmentDiv.innerHTML = `
                 <button class="remove-segment compact-btn" onclick="removeSegment(${itineraryId}, ${segmentId})">× 删除</button>
                 
-                <div class="compact-row">
-                    <div class="form-group date-input-container">
+                <div class="date-flight-container">
+                    <div class="form-group date-container">
                         <label>起飞日期:</label>
                         <input type="text" id="segment${itineraryId}-${segmentId}-date" placeholder="例如: 0802" class="compact-input">
                         <div class="route-select-container">
@@ -1250,15 +1371,14 @@
                         </div>
                     </div>
                     
-                    <div class="form-group flight-no-section">
+                    <div class="form-group flight-no-container">
                         <label>航班号:</label>
-                        <div class="airport-select-container">
+                        <div class="flight-no-select-container">
                             <select id="segment${itineraryId}-${segmentId}-flightNo-select" class="compact-select">
                                 <option value="">请选择</option>
                                 ${savedFlightNumbers.map(num => `<option value="${num}">${num}</option>`).join('')}
                             </select>
                             <input type="text" id="segment${itineraryId}-${segmentId}-flightNo-input" placeholder="手动输入" class="compact-input">
-                            <!-- 删除了保存按钮 -->
                         </div>
                     </div>
                 </div>
@@ -1272,7 +1392,6 @@
                                 ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
                             </select>
                             <input type="text" id="segment${itineraryId}-${segmentId}-departure-input" class="airport-input compact-input" placeholder="手动输入" list="cityList">
-                            <!-- 删除了保存按钮 -->
                             <input type="hidden" id="segment${itineraryId}-${segmentId}-departure-output">
                         </div>
                         <label>起飞机场航站楼:</label>
@@ -1289,7 +1408,6 @@
                                 ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
                             </select>
                             <input type="text" id="segment${itineraryId}-${segmentId}-arrival-input" class="airport-input compact-input" placeholder="手动输入" list="cityList">
-                            <!-- 删除了保存按钮 -->
                             <input type="hidden" id="segment${itineraryId}-${segmentId}-arrival-output">
                         </div>
                         <label>到达机场航站楼:</label>
@@ -1313,22 +1431,21 @@
                         <div class="time-input-container">
                             <input type="text" id="segment${itineraryId}-${segmentId}-arrival-time" class="time-input-equal compact-input" placeholder="例如: 1845">
                             <button class="toggle-btn-equal toggle-btn-next-day compact-btn" data-time-type="next-day">次日</button>
-                            <!-- 删除了翌日按钮 -->
                         </div>
                     </div>
                 </div>
                 
-                <div class="flight-time-row">
-                    <div class="form-group">
+                <div class="flight-options-row">
+                    <div class="form-group check-in-time-container">
                         <label>截止值机时间:</label>
-                        <select id="segment${itineraryId}-${segmentId}-flight-time" class="time-input-equal short-select-8 compact-select">
+                        <select id="segment${itineraryId}-${segmentId}-flight-time" class="check-in-time-select compact-select">
                             <option value="起飞前40分钟停办">起飞前40分钟停办</option>
                             <option value="起飞前1小时停办">起飞前1小时停办</option>
                         </select>
                     </div>
                     
                     <div class="form-group transfer-container">
-                        <label>中转与行李提示:</label>
+                        <label>中转与行李:</label>
                         <select id="segment${itineraryId}-${segmentId}-transferBaggageNote" class="compact-select" style="width: 100%;">
                             <option value="">无提示</option>
                             <option value="⚠️无需提取行李⚠️">⚠️无需提取行李⚠️</option>
