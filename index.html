@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1085,7 +1084,7 @@
             
             itineraryDiv.innerHTML = `
                 <div class="ticket-price-section compact-section">
-                    <button class="remove-itinerary compact-btn" data-itinerary-id="${itineraryCount}">× 删除此方案</button>
+                    <button class="remove-itinerary compact-btn" onclick="removeItinerary(${itineraryCount})">× 删除此方案</button>
                     <div class="section-title">行程方案 ${itineraryCount}</div>
                     
                     <div id="flightSegments${itineraryCount}"></div>
@@ -1138,7 +1137,6 @@
             const ticketPriceBtn = itineraryDiv.querySelector('.ticket-price-btn');
             const notesToggleBtn = itineraryDiv.querySelector('.notes-toggle-btn');
             const addCustomNoteBtn = itineraryDiv.querySelector('.add-custom-note');
-            const removeItineraryBtn = itineraryDiv.querySelector('.remove-itinerary');
             
             addSegmentBtn.addEventListener('click', function() {
                 addFlightSegment(itineraryCount);
@@ -1160,10 +1158,6 @@
                 addCustomNote(itineraryCount);
             });
             
-            removeItineraryBtn.addEventListener('click', function() {
-                removeItinerary(itineraryCount);
-            });
-            
             // 为备注标签添加点击事件
             const noteTags = itineraryDiv.querySelectorAll('.note-tag');
             noteTags.forEach(tag => {
@@ -1179,6 +1173,8 @@
             const itinerary = document.getElementById(`itinerary${itineraryId}`);
             if (itinerary) {
                 itinerary.remove();
+                delete segmentCounters[itineraryId];
+                delete priceCounters[itineraryId];
                 delete notesVisibility[itineraryId];
                 delete calculatorVisibility[itineraryId];
             }
@@ -1245,7 +1241,7 @@
             segmentDiv.id = `segment${itineraryId}-${segmentId}`;
             
             segmentDiv.innerHTML = `
-                <button class="remove-segment compact-btn" data-segment-id="${itineraryId}-${segmentId}">× 删除</button>
+                <button class="remove-segment compact-btn" onclick="removeSegment(${itineraryId}, ${segmentId})">× 删除</button>
                 
                 <div class="compact-row">
                     <div class="form-group date-input-container">
@@ -1282,7 +1278,7 @@
                                 ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
                             </select>
                             <input type="text" id="segment${itineraryId}-${segmentId}-departure-input" class="airport-input compact-input" placeholder="手动输入" list="cityList">
-                            <button class="compact-btn">保存</button>
+                            <button class="compact-btn" onclick="saveAirport('segment${itineraryId}-${segmentId}-departure-input')">保存</button>
                             <input type="hidden" id="segment${itineraryId}-${segmentId}-departure-output">
                         </div>
                         <label>起飞机场航站楼:</label>
@@ -1299,7 +1295,7 @@
                                 ${airportList.map(airport => `<option value="${airport}">${airport}</option>`).join('')}
                             </select>
                             <input type="text" id="segment${itineraryId}-${segmentId}-arrival-input" class="airport-input compact-input" placeholder="手动输入" list="cityList">
-                            <button class="compact-btn">保存</button>
+                            <button class="compact-btn" onclick="saveAirport('segment${itineraryId}-${segmentId}-arrival-input')">保存</button>
                             <input type="hidden" id="segment${itineraryId}-${segmentId}-arrival-output">
                         </div>
                         <label>到达机场航站楼:</label>
@@ -1379,13 +1375,10 @@
             const seatInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-seat`);
             const routeSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-route`);
             const swapBtn = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-swap`);
-            const removeBtn = segmentDiv.querySelector('.remove-segment');
             const flightNoSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-flightNo-select`);
             const saveFlightBtn = segmentDiv.querySelector('[data-save-flight]');
             const departureSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-departure-select`);
             const arrivalSelect = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-arrival-select`);
-            const saveDepartureBtn = segmentDiv.querySelectorAll('button')[4];
-            const saveArrivalBtn = segmentDiv.querySelectorAll('button')[5];
             const eveningBtn = segmentDiv.querySelector('.toggle-btn-evening');
             const nextDayBtn = segmentDiv.querySelector('.toggle-btn-next-day');
             const yiRiBtn = segmentDiv.querySelector('.toggle-btn-yi-ri');
@@ -1421,10 +1414,6 @@
                 arrivalSelect.value = arrivalInput.value;
             });
             
-            removeBtn.addEventListener('click', function() {
-                removeSegment(itineraryId, segmentId);
-            });
-            
             flightNoSelect.addEventListener('change', function() {
                 updateFlightNoInput(`segment${itineraryId}-${segmentId}-flightNo-input`, this.value);
             });
@@ -1439,14 +1428,6 @@
             
             arrivalSelect.addEventListener('change', function() {
                 updateAirportInput(`segment${itineraryId}-${segmentId}-arrival-select`, `segment${itineraryId}-${segmentId}-arrival-input`, `segment${itineraryId}-${segmentId}-arrival-output`);
-            });
-            
-            saveDepartureBtn.addEventListener('click', function() {
-                saveAirport(`segment${itineraryId}-${segmentId}-departure-input`);
-            });
-            
-            saveArrivalBtn.addEventListener('click', function() {
-                saveAirport(`segment${itineraryId}-${segmentId}-arrival-input`);
             });
             
             eveningBtn.addEventListener('click', function() { toggleTimeFlag(this); });
@@ -1479,7 +1460,7 @@
             planDiv.id = `price${itineraryId}-${priceNum}`;
             
             planDiv.innerHTML = `
-                <button class="remove-segment compact-btn" data-price-id="${itineraryId}-${priceNum}" style="background-color: #805ad5;">× 删除</button>
+                <button class="remove-segment compact-btn" onclick="removePricePlan(${itineraryId}, ${priceNum})" style="background-color: #805ad5;">× 删除</button>
                 
                 <div class="ticket-price-row">
                     <select id="price${itineraryId}-${priceNum}-option" class="short-select-8 compact-select">
@@ -1504,12 +1485,6 @@
             `;
             
             container.appendChild(planDiv);
-            
-            // 添加删除按钮事件
-            const removeBtn = planDiv.querySelector('.remove-segment');
-            removeBtn.addEventListener('click', function() {
-                removePricePlan(itineraryId, priceNum);
-            });
         }
 
         function removePricePlan(itineraryId, priceNum) {
@@ -1706,50 +1681,51 @@
             let outputText = `乘客${passengerName}您好：\n`;
             outputText += `${departure || '未指定'}➡️${arrival || '未指定'}${tripType}\n\n`;
             
-            // 生成每个行程的航班信息
-            const segments = document.querySelectorAll(`#flightSegments${itineraries[0].id.replace('itinerary', '')} .flight-segment`);
+            // 获取第一个行程方案（排在最上面的）
+            const firstItineraryId = itineraries[0].id.replace('itinerary', '');
+            const segments = document.querySelectorAll(`#flightSegments${firstItineraryId} .flight-segment`);
             
             // 单段行程和多段行程格式
             if (segments.length === 1) {
                 // 单段行程格式
                 const segment = segments[0];
-                const segmentId = segment.id.replace(`segment${itineraries[0].id.replace('itinerary', '')}-`, '');
+                const segmentId = segment.id.replace(`segment${firstItineraryId}-`, '');
                 
-                const dateInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-date`);
+                const dateInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-date`);
                 const date = dateInput ? dateInput.value : "";
                 
-                const departureInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-departure-input`);
+                const departureInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-input`);
                 const departure = departureInput ? departureInput.value : "起飞城市未指定";
                 
-                const departureTerminalSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-departure-terminal`);
+                const departureTerminalSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-terminal`);
                 const departureTerminal = departureTerminalSelect ? departureTerminalSelect.value : "";
                 
-                const departureTimeInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-departure-time`);
+                const departureTimeInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-time`);
                 let departureTime = departureTimeInput ? departureTimeInput.value : "时间未指定";
                 
-                const arrivalInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-arrival-input`);
+                const arrivalInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-input`);
                 const arrival = arrivalInput ? arrivalInput.value : "到达城市未指定";
                 
-                const arrivalTerminalSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-arrival-terminal`);
+                const arrivalTerminalSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-terminal`);
                 const arrivalTerminal = arrivalTerminalSelect ? arrivalTerminalSelect.value : "";
                 
-                const arrivalTimeInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-arrival-time`);
+                const arrivalTimeInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-time`);
                 let arrivalTime = arrivalTimeInput ? arrivalTimeInput.value : "时间未指定";
                 
-                const flightNoInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-flightNo-input`);
+                const flightNoInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-flightNo-input`);
                 const flightNo = flightNoInput ? flightNoInput.value : "航班号未指定";
                 
-                const flightTimeSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-flight-time`);
+                const flightTimeSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-flight-time`);
                 const flightTime = flightTimeSelect ? flightTimeSelect.value : "值机时间未指定";
                 
-                const transferSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-transferBaggageNote`);
+                const transferSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-transferBaggageNote`);
                 const transferNote = transferSelect ? transferSelect.value : "";
                 
-                const seatInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-seat`);
+                const seatInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-seat`);
                 const seat = seatInput ? seatInput.value : "";
                 
-                const eveningBtn = document.querySelector(`#segment${itineraries[0].id.replace('itinerary', '')}-${segmentId} .toggle-btn-evening`);
-                const nextDayBtn = document.querySelector(`#segment${itineraries[0].id.replace('itinerary', '')}-${segmentId} .toggle-btn-next-day`);
+                const eveningBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-evening`);
+                const nextDayBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-next-day`);
                 
                 // 处理时间标记
                 let eveningText = "";
@@ -1798,7 +1774,7 @@
                 if (transferNote) {
                     let transferText = transferNote;
                     if (transferNote.includes("*")) {
-                        const terminalInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-terminal`);
+                        const terminalInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-terminal`);
                         const terminal = terminalInput ? terminalInput.value : "";
                         transferText = transferNote.replace("*", terminal);
                     }
@@ -1821,43 +1797,43 @@
             } else {
                 // 多段行程格式
                 segments.forEach((segment, segmentIndex) => {
-                    const segmentId = segment.id.replace(`segment${itineraries[0].id.replace('itinerary', '')}-`, '');
+                    const segmentId = segment.id.replace(`segment${firstItineraryId}-`, '');
                     
-                    const dateInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-date`);
+                    const dateInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-date`);
                     const date = dateInput ? dateInput.value : "";
                     
-                    const departureInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-departure-input`);
+                    const departureInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-input`);
                     const departure = departureInput ? departureInput.value : "起飞城市未指定";
                     
-                    const departureTerminalSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-departure-terminal`);
+                    const departureTerminalSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-terminal`);
                     const departureTerminal = departureTerminalSelect ? departureTerminalSelect.value : "";
                     
-                    const departureTimeInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-departure-time`);
+                    const departureTimeInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-time`);
                     let departureTime = departureTimeInput ? departureTimeInput.value : "时间未指定";
                     
-                    const arrivalInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-arrival-input`);
+                    const arrivalInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-input`);
                     const arrival = arrivalInput ? arrivalInput.value : "到达城市未指定";
                     
-                    const arrivalTerminalSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-arrival-terminal`);
+                    const arrivalTerminalSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-terminal`);
                     const arrivalTerminal = arrivalTerminalSelect ? arrivalTerminalSelect.value : "";
                     
-                    const arrivalTimeInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-arrival-time`);
+                    const arrivalTimeInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-time`);
                     let arrivalTime = arrivalTimeInput ? arrivalTimeInput.value : "时间未指定";
                     
-                    const flightNoInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-flightNo-input`);
+                    const flightNoInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-flightNo-input`);
                     const flightNo = flightNoInput ? flightNoInput.value : "航班号未指定";
                     
-                    const flightTimeSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-flight-time`);
+                    const flightTimeSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-flight-time`);
                     const flightTime = flightTimeSelect ? flightTimeSelect.value : "值机时间未指定";
                     
-                    const transferSelect = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-transferBaggageNote`);
+                    const transferSelect = document.getElementById(`segment${firstItineraryId}-${segmentId}-transferBaggageNote`);
                     const transferNote = transferSelect ? transferSelect.value : "";
                     
-                    const seatInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-seat`);
+                    const seatInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-seat`);
                     const seat = seatInput ? seatInput.value : "";
                     
-                    const eveningBtn = document.querySelector(`#segment${itineraries[0].id.replace('itinerary', '')}-${segmentId} .toggle-btn-evening`);
-                    const nextDayBtn = document.querySelector(`#segment${itineraries[0].id.replace('itinerary', '')}-${segmentId} .toggle-btn-next-day`);
+                    const eveningBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-evening`);
+                    const nextDayBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-next-day`);
                     
                     // 处理时间标记
                     let eveningText = "";
@@ -1906,7 +1882,7 @@
                     if (transferNote) {
                         let transferText = transferNote;
                         if (transferNote.includes("*")) {
-                            const terminalInput = document.getElementById(`segment${itineraries[0].id.replace('itinerary', '')}-${segmentId}-terminal`);
+                            const terminalInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-terminal`);
                             const terminal = terminalInput ? terminalInput.value : "";
                             transferText = transferNote.replace("*", terminal);
                         }
