@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -722,8 +723,7 @@
         ];
         
         const terminalList = [
-            "请选择", "Внуково", "Домодедово", "Жуковский", "伏努科沃", "德莫杰多沃", "茹科夫斯基", "谢列梅捷沃 B", "谢列梅捷沃 C", "谢列梅捷沃 D", "谢列梅捷沃 E", "谢列梅捷沃 F", 
-            "Шереметьево B", "Шереметьево C", "Шереметьево D", "Шереметьево E", "Шереметьево F", "T1", "T2", "T3", "T4", "T5", "A", "B", "C", "D", "E", "F", "大兴", "首都T1", "首都T2", "首都T3", "首都T4", "虹桥", "浦东", "国际", "Терминал A", "Терминал B", "Терминал C"
+            "请选择", "Внуково", "Домодедово", "Жуковский", "Шереметьево B", "Шереметьево C", "Шереметьево D", "Шереметьево E", "Шереметьево F", "T1", "T2", "T3", "T4", "T5", "大兴", "首都T1", "首都T2", "首都T3", "首都T4", "虹桥", "浦东", "国际", "A", "B", "C", "D", "E", "F", "Терминал A", "Терминал B", "Терминал C"
         ];                     
         
         const locationList = [...airportList, "布拉格维申斯克", "车里雅宾斯克", "伏尔加格勒", "哈巴罗夫斯克", "克拉斯诺亚尔斯克", "克拉斯诺达尔", "斯塔夫罗波尔", "叶卡捷琳堡", "伊尔库茨克"];
@@ -749,10 +749,10 @@
             { name: "莫斯科-哈巴", departure: "莫斯科", arrival: "哈巴" },
             { name: "莫斯科-布市", departure: "莫斯科", arrival: "布市" },
             { name: "莫斯科-塔什干", departure: "莫斯科", arrival: "塔什干" },
+            { name: "莫斯科-埃里温", departure: "莫斯科", arrival: "埃里温" },
             { name: "莫斯科-索契", departure: "莫斯科", arrival: "索契" },
             { name: "莫斯科-伏尔加", departure: "莫斯科", arrival: "伏尔加" },
             { name: "莫斯科-矿泉水城", departure: "莫斯科", arrival: "矿泉水城" },
-            { name: "莫斯科-埃里温", departure: "莫斯科", arrival: "埃里温" },
             { name: "莫斯科-北京", departure: "莫斯科", arrival: "北京" },
             { name: "莫斯科-上海", departure: "莫斯科", arrival: "上海" },
             { name: "莫斯科-成都", departure: "莫斯科", arrival: "成都" },
@@ -761,13 +761,17 @@
             { name: "莫斯科-广州", departure: "莫斯科", arrival: "广州" },
             { name: "莫斯科-深圳", departure: "莫斯科", arrival: "深圳" },
             { name: "莫斯科-武汉", departure: "莫斯科", arrival: "武汉" },
+            { name: "莫斯科-重庆", departure: "莫斯科", arrival: "重庆" },
             { name: "莫斯科-西安", departure: "莫斯科", arrival: "西安" },
             { name: "莫斯科-三亚", departure: "莫斯科", arrival: "三亚" },
             { name: "莫斯科-沈阳", departure: "莫斯科", arrival: "沈阳" },
+            { name: "格罗兹尼-塔什干", departure: "格罗兹尼", arrival: "塔什干" },
+            { name: "莫斯科-乌鲁木齐", departure: "莫斯科", arrival: "乌鲁木齐" },
             { name: "车宾-海参崴", departure: "车宾", arrival: "海参崴" },
             { name: "车宾-新西伯利亚", departure: "车宾", arrival: "新西伯利亚" },
             { name: "车宾-奥斯", departure: "车宾", arrival: "奥斯" },
             { name: "叶卡-海参崴", departure: "叶卡", arrival: "海参崴" },
+            { name: "叶卡-北京", departure: "叶卡", arrival: "北京" },
             { name: "叶卡-新西伯利亚", departure: "叶卡", arrival: "新西伯利亚" }
         ];
         
@@ -1341,11 +1345,11 @@
                         <label>中转与行李提示:</label>
                         <select id="segment${itineraryId}-${segmentId}-transferBaggageNote" class="compact-select">
                             <option value="">无提示</option>
-                            <option value="⚠️中转到*航站楼⚠️">⚠️中转到*航站楼⚠️</option>
-                            <option value="⚠️中转到*机场⚠️">⚠️中转到*机场⚠️</option>
                             <option value="⚠️无需提取行李⚠️">⚠️无需提取行李⚠️</option>
                             <option value="⚠️无需提取行李，直挂目的地⚠️">⚠️无需提取行李，直挂目的地⚠️</option>
                             <option value="⚠️无需提取行李，中转到*航站楼⚠️">⚠️无需提取行李，中转到*航站楼⚠️</option>
+                            <option value="⚠️中转到*航站楼⚠️">⚠️中转到*航站楼⚠️</option>
+                            <option value="⚠️中转到*机场⚠️">⚠️中转到*机场⚠️</option>
                             <option value="⚠️提取行李，重新办理值机⚠️">⚠️提取行李，重新办理值机⚠️</option>
                             <option value="⚠️提取行李，中转到*航站楼⚠️">⚠️提取行李，中转到*航站楼⚠️</option>
                             <option value="⚠️提取行李，中转到*机场⚠️">⚠️提取行李，中转到*机场⚠️</option>
