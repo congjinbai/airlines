@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -904,6 +903,56 @@
         let calculatorVisibility = {};
         let passengerInfoVisible = false;
         
+        // 新增函数：根据月份获取前一个月的天数
+        function getPreviousMonthDays(month) {
+            const monthDays = {
+                1: 31,   // 1月 -> 12月31日
+                2: 31,   // 2月 -> 1月31日
+                3: 28,   // 3月 -> 2月28日（非闰年）
+                4: 31,   // 4月 -> 3月31日
+                5: 30,   // 5月 -> 4月30日
+                6: 31,   // 6月 -> 5月31日
+                7: 30,   // 7月 -> 6月30日
+                8: 31,   // 8月 -> 7月31日
+                9: 31,   // 9月 -> 8月31日
+                10: 30,  // 10月 -> 9月30日
+                11: 31,  // 11月 -> 10月31日
+                12: 30   // 12月 -> 11月30日
+            };
+            return monthDays[month] || 31;
+        }
+        
+        // 新增函数：格式化晚上文本
+        function formatEveningText(date) {
+            if (!date) return "(前一日晚上)";
+            
+            let day = null;
+            let month = null;
+            
+            // 第一种格式: "08月02日"
+            let match = date.match(/(\d{1,2})月(\d{1,2})日/);
+            if (match) {
+                month = parseInt(match[1]);
+                day = parseInt(match[2]);
+            } else {
+                // 第二种格式: 纯数字4位，如"0802"
+                if (date.length === 4) {
+                    month = parseInt(date.substring(0, 2));
+                    day = parseInt(date.substring(2));
+                }
+            }
+            
+            if (day && day > 1) {
+                return `(${day-1}日晚上)`;
+            } else if (day === 1 && month) {
+                // 如果是每个月的第一天，使用前一个月的最后一天
+                const prevDay = getPreviousMonthDays(month);
+                return `(${prevDay}日晚上)`;
+            } else {
+                return "(前一日晚上)";
+            }
+        }
+        
         // 初始化页面加载
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化事件监听器
@@ -1669,31 +1718,9 @@
                     segmentText += `${departureTime}`;
                 }
                 
-                // 添加晚上标记
+                // 添加晚上标记 - 使用新的formatEveningText函数
                 if (eveningBtn && eveningBtn.classList.contains('active')) {
-                    let eveningText = "";
-                    if (date) {
-                        // 尝试从日期中提取天数
-                        let day = null;
-                        // 第一种格式: "08月02日"
-                        let match = date.match(/(\d{1,2})月(\d{1,2})日/);
-                        if (match) {
-                            day = parseInt(match[2]);
-                        } else {
-                            // 第二种格式: 纯数字4位，如"0802"
-                            if (date.length === 4) {
-                                day = parseInt(date.substring(2));
-                            }
-                        }
-                        if (day && day > 1) {
-                            eveningText = `(${day-1}日晚上)`;
-                        } else {
-                            eveningText = `(前一日晚上)`;
-                        }
-                    } else {
-                        eveningText = `(前一日晚上)`;
-                    }
-                    segmentText += eveningText;
+                    segmentText += formatEveningText(date);
                 }
                 
                 segmentText += "飞，"; // 修复：添加逗号
@@ -1827,30 +1854,10 @@
                 const eveningBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-evening`);
                 const nextDayBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-next-day`);
                 
-                // 处理时间标记
+                // 处理时间标记 - 使用新的formatEveningText函数
                 let eveningText = "";
                 if (eveningBtn && eveningBtn.classList.contains('active')) {
-                    if (date) {
-                        // 尝试从日期中提取天数
-                        let day = null;
-                        // 第一种格式: "08月02日"
-                        let match = date.match(/(\d{1,2})月(\d{1,2})日/);
-                        if (match) {
-                            day = parseInt(match[2]);
-                        } else {
-                            // 第二种格式: 纯数字4位，如"0802"
-                            if (date.length === 4) {
-                                day = parseInt(date.substring(2));
-                            }
-                        }
-                        if (day && day > 1) {
-                            eveningText = `(${day-1}日晚上)`;
-                        } else {
-                            eveningText = `(前一日晚上)`;
-                        }
-                    } else {
-                        eveningText = `(前一日晚上)`;
-                    }
+                    eveningText = formatEveningText(date);
                 }
                 
                 let nextDayText = "";
@@ -1935,30 +1942,10 @@
                     const eveningBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-evening`);
                     const nextDayBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-next-day`);
                     
-                    // 处理时间标记
+                    // 处理时间标记 - 使用新的formatEveningText函数
                     let eveningText = "";
                     if (eveningBtn && eveningBtn.classList.contains('active')) {
-                        if (date) {
-                            // 尝试从日期中提取天数
-                            let day = null;
-                            // 第一种格式: "08月02日"
-                            let match = date.match(/(\d{1,2})月(\d{1,2})日/);
-                            if (match) {
-                                day = parseInt(match[2]);
-                            } else {
-                                // 第二种格式: 纯数字4位，如"0802"
-                                if (date.length === 4) {
-                                    day = parseInt(date.substring(2));
-                                }
-                            }
-                            if (day && day > 1) {
-                                eveningText = `(${day-1}日晚上)`;
-                            } else {
-                                eveningText = `(前一日晚上)`;
-                            }
-                        } else {
-                            eveningText = `(前一日晚上)`;
-                        }
+                        eveningText = formatEveningText(date);
                     }
                     
                     let nextDayText = "";
