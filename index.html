@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1451,7 +1450,7 @@
     <script>
         // 初始化变量
         const airportList = [
-           "莫斯科", "阿拉木图", "阿斯塔纳", "埃里温", "奥斯", "奥伦堡", "巴尔瑙尔", "布市", "彼尔姆", "车里亚宾", "赤塔", "达尔", "第比利斯", "杜尚别", "伏尔加", "格罗兹尼", "海参崴", "哈巴", "加里宁格勒", "克市", "喀山", "矿泉水城", "马嘎斯", "马哈奇克拉", "明斯克", "欧姆斯克", "塔什干",  
+           "莫斯科", "福怒噶哇机场", "谁列灭接哇机场", "大妈解答哇机场", "阿拉木图", "阿斯塔纳", "埃里温", "奥斯", "奥伦堡", "巴尔瑙尔", "布市", "彼尔姆", "车里亚宾", "赤塔", "达尔", "第比利斯", "杜尚别", "伏尔加", "格罗兹尼", "海参崴", "哈巴", "加里宁格勒", "克市", "喀山", "矿泉水城", "马嘎斯", "马哈奇克拉", "明斯克", "欧姆斯克", "塔什干",  
             "圣彼得堡", "萨马拉", "斯塔夫", "索契", "乌尔根奇", "乌法", "乌兰乌德", "新西伯利亚", "雅库茨克", "叶卡", "伊尔库", "伊斯坦布尔", "北京", "长春", "重庆", "广州", "西安", "杭州", "沈阳", "哈尔滨", "海口", 
             "青岛", "成都", "牡丹江", "佳木斯", "三亚", "上海", "深圳", "乌鲁木齐"
         ];
@@ -2534,11 +2533,19 @@
                 const departureInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`);
                 const departure = departureInput ? departureInput.value : "起飞城市未指定";
                 
+                // 获取起飞机场航站楼
+                const departureTerminalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-departure-terminal`);
+                const departureTerminal = departureTerminalSelect ? departureTerminalSelect.value : "";
+                
                 const departureTimeInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`);
                 const departureTime = departureTimeInput ? departureTimeInput.value : "";
                 
                 const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`);
                 const arrival = arrivalInput ? arrivalInput.value : "到达城市未指定";
+                
+                // 获取到达机场航站楼
+                const arrivalTerminalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`);
+                const arrivalTerminal = arrivalTerminalSelect ? arrivalTerminalSelect.value : "";
                 
                 const arrivalTimeInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
                 const arrivalTime = arrivalTimeInput ? arrivalTimeInput.value : "";
@@ -2556,8 +2563,11 @@
                     segmentText += "再";
                 }
                 
-                // 添加起飞城市
+                // 添加起飞城市和航站楼
                 segmentText += `${departure}`;
+                if (departureTerminal && departureTerminal !== "请选择") {
+                    segmentText += `${departureTerminal}`;
+                }
                 
                 // 添加起飞时间
                 if (departureTime) {
@@ -2581,6 +2591,11 @@
                     segmentText += `${arrivalTime}`;
                 }
                 segmentText += `到达${arrival}`;
+                
+                // 添加到达航站楼
+                if (arrivalTerminal && arrivalTerminal !== "请选择") {
+                    segmentText += `${arrivalTerminal}`;
+                }
                 
                 // 添加分号
                 if (segmentIndex < segments.length - 1) {
@@ -2843,6 +2858,18 @@
                         outputText += `\n`;
                     }
                 });
+            }
+            
+            // 获取航班信息页中的备注信息
+            let flightNotes = "";
+            const selectedNotes = document.getElementById(`itinerary${firstItineraryId}-selectedNotes`);
+            if (selectedNotes && selectedNotes.value) {
+                flightNotes = `注：${selectedNotes.value.replace(/,/g, '，')}\n`;
+            }
+            
+            // 添加备注信息（如果有的话）
+            if (flightNotes) {
+                outputText += `\n${flightNotes}`;
             }
             
             // 添加页脚
