@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -2384,6 +2385,12 @@
             arrivalTimeInput.addEventListener('input', function() { formatTime(this); });
             seatInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
             
+            // 新增：航班号手动输入框小写字母自动转大写
+            const flightNoInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-flightNo-input`);
+            flightNoInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+            
             routeSelect.addEventListener('change', function() {
                 const selectedRoute = commonRoutes.find(route => route.name === this.value);
                 if (selectedRoute) {
@@ -2512,7 +2519,7 @@
             }
             
             // 添加页脚
-            outputText += "\n🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n绑定手机号：\n+7(912)891 58 82\n\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️";
+            outputText += "\n🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n+79128915882\n手机号绑定银行卡\nСбер,Тинкофф, Альфа\n\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️";
             output.textContent = outputText.trim();
         }
         
