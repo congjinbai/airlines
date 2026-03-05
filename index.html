@@ -1,11 +1,10 @@
 
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>航班信息生成器</title>
+    <title>航班信息生成器 v1.0.5.05</title>
     <style>
         /* 基础样式 */
         body {
@@ -76,7 +75,6 @@
             margin-bottom: 16px;
             border-radius: 5px;
             position: relative;
-            background-color: #f7fafc;
         }
         .add-segment {
             background-color: #38a169;
@@ -168,7 +166,6 @@
             padding: 12px;
             margin-bottom: 12px;
             border-radius: 4px;
-            background-color: #f7fafc;
             position: relative;
         }
         .ticket-price-details {
@@ -275,7 +272,6 @@
         .ticket-price-section {
             margin-bottom: 20px;
             padding: 12px;
-            background-color: #f7fafc;
             border-radius: 6px;
             position: relative;
         }
@@ -306,6 +302,14 @@
             position: absolute;
             top: 12px;
             right: 12px;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        .copy-itinerary {
+            background-color: #805ad5;
+            position: absolute;
+            top: 12px;
+            right: 100px;
             padding: 4px 8px;
             font-size: 12px;
         }
@@ -341,14 +345,12 @@
             display: none;
             margin-top: 12px;
             padding: 12px;
-            background-color: #f7fafc;
             border-radius: 4px;
         }
         .calculator-container {
             display: none;
             margin-top: 12px;
             padding: 12px;
-            background-color: #f7fafc;
             border-radius: 3px;
         }
         .calculator-inputs {
@@ -412,7 +414,6 @@
             margin-bottom: 8px;
         }
         .note-option {
-            background-color: #f7fafc;
             border: 1px solid #e2e8f0;
             border-radius: 3px;
             padding: 4px 8px;
@@ -438,7 +439,6 @@
         .passenger-info-section {
             margin-bottom: 16px;
             padding: 12px;
-            background-color: #f7fafc;
             border-radius: 6px;
             display: none;
         }
@@ -704,14 +704,16 @@
         }
         
         .page-tab {
-            padding: 10px 20px;
+            padding: 8px 16px;
             background-color: #f7fafc;
             border: 1px solid #e2e8f0;
             border-bottom: none;
             border-radius: 4px 4px 0 0;
             cursor: pointer;
             margin-right: 5px;
+            font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .page-tab.active {
@@ -733,7 +735,6 @@
         .settings-section {
             margin-bottom: 20px;
             padding: 15px;
-            background-color: #f7fafc;
             border-radius: 6px;
         }
         
@@ -766,6 +767,7 @@
             align-items: center;
             padding: 6px 8px;
             border-bottom: 1px solid #f0f0f0;
+            font-size: 11px;
         }
         
         .settings-list-item:last-child {
@@ -811,12 +813,17 @@
             font-weight: bold;
             margin-bottom: 5px;
             color: #3182ce;
+            font-size: 13px; /* 增加字号 */
+            white-space: nowrap;
         }
         
         .history-item-content {
-            font-size: 11px;
+            font-size: 10px;
             color: #4a5568;
             flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .save-btn-container {
@@ -850,6 +857,7 @@
             padding: 8px;
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
+            font-size: 11px;
         }
         
         .autocomplete-item:hover {
@@ -864,12 +872,12 @@
             position: relative;
         }
         
-        /* 历史记录编辑样式 */
+        /* 历史记录编辑样式 - 修复：增加编辑按钮宽度 */
         .history-actions {
             display: flex;
             gap: 5px;
             align-items: center;
-            white-space: nowrap; /* 防止文字换行 */
+            white-space: nowrap;
         }
         
         .edit-history-btn {
@@ -877,10 +885,12 @@
             color: white;
             border: none;
             border-radius: 3px;
-            padding: 4px 8px;
-            font-size: 10px;
+            padding: 4px 12px;
+            font-size: 11px;
             cursor: pointer;
-            white-space: nowrap; /* 防止文字换行 */
+            white-space: nowrap;
+            min-width: 45px; /* 增加最小宽度，确保文字完整显示 */
+            text-align: center;
         }
         
         .history-checkbox {
@@ -894,9 +904,17 @@
             margin-bottom: 10px;
         }
         
+        .history-header h3 {
+            font-size: 14px;
+            margin: 0;
+            white-space: nowrap;
+        }
+        
         /* 付款状态页面样式 */
         .payment-table-container {
             overflow-x: auto;
+            max-height: 500px;
+            position: relative;
         }
         
         .payment-table {
@@ -910,13 +928,17 @@
             border: 1px solid #e2e8f0;
             padding: 8px;
             text-align: left;
-            white-space: nowrap; /* 防止文字换行 */
+            white-space: nowrap;
+            font-size: 11px;
         }
         
-        .payment-table th {
+        .payment-table thead th {
             background-color: #f7fafc;
             font-weight: 600;
-            position: relative;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 11px;
         }
         
         .payment-table th .filter-btn {
@@ -927,15 +949,15 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 12px;
-            color: #000; /* 黑色筛选符号 */
+            font-size: 10px;
+            color: #000;
         }
         
-        .payment-table tr:nth-child(even) {
+        .payment-table tbody tr:nth-child(even) {
             background-color: #f7fafc;
         }
         
-        .payment-table tr:hover {
+        .payment-table tbody tr:hover {
             background-color: #ebf8ff;
         }
         
@@ -996,6 +1018,7 @@
         .filter-item {
             padding: 5px 8px;
             cursor: pointer;
+            font-size: 11px;
         }
         
         .filter-item:hover {
@@ -1018,6 +1041,7 @@
             align-items: center;
             padding: 6px 8px;
             border-bottom: 1px solid #f0f0f0;
+            font-size: 11px;
         }
         
         .editable-list-item:last-child {
@@ -1030,6 +1054,7 @@
             border: 1px solid #cbd5e0;
             border-radius: 3px;
             padding: 4px;
+            font-size: 11px;
         }
         
         .editable-list-actions {
@@ -1056,7 +1081,7 @@
             white-space: nowrap;
         }
         
-        /* 设置页面样式 - 与账簿系统保持一致 */
+        /* 设置页面样式 */
         .settings-row {
             margin-bottom: 20px;
         }
@@ -1068,7 +1093,9 @@
         .settings-group h3 {
             margin-bottom: 10px;
             color: #2d3748;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
         }
         
         .settings-group label {
@@ -1076,6 +1103,7 @@
             margin-bottom: 5px;
             font-weight: 600;
             color: #4a5568;
+            font-size: 11px;
         }
         
         .settings-group textarea {
@@ -1083,7 +1111,7 @@
             padding: 8px;
             border: 1px solid #cbd5e0;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             resize: vertical;
             min-height: 100px;
             box-sizing: border-box;
@@ -1100,7 +1128,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
         }
         
         .btn-success:hover {
@@ -1114,7 +1142,7 @@
             background-color: #ebf8ff;
             border-radius: 4px;
             border: 1px solid #bee3f8;
-            font-size: 12px;
+            font-size: 11px;
         }
         
         .filter-tag {
@@ -1124,7 +1152,8 @@
             padding: 3px 8px;
             border-radius: 12px;
             margin-right: 5px;
-            font-size: 11px;
+            font-size: 10px;
+            white-space: nowrap;
         }
         
         .clear-filter {
@@ -1132,12 +1161,469 @@
             cursor: pointer;
             margin-left: 10px;
             font-weight: bold;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        
+        /* 多选筛选样式 */
+        .filter-checkbox {
+            margin-right: 8px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        
+        .filter-apply-btn {
+            margin-top: 5px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 10px;
+            width: 48%;
+            margin-right: 2%;
+        }
+        
+        .filter-apply-btn:hover {
+            background-color: #2c5aa0;
+        }
+        
+        .filter-clear-btn {
+            margin-top: 5px;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 10px;
+            width: 48%;
+            margin-left: 2%;
+        }
+        
+        .filter-clear-btn:hover {
+            background-color: #c53030;
+        }
+        
+        /* 筛选下拉框对齐样式 */
+        .filter-option {
+            display: flex;
+            align-items: center;
+            margin: 3px 0;
+            padding: 2px 5px;
+        }
+        
+        .filter-option label {
+            margin: 0;
+            flex: 1;
+            font-weight: normal;
+            cursor: pointer;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        
+        .filter-section {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .filter-section-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 10px;
+            color: #4a5568;
+            white-space: nowrap;
+        }
+        
+        .filter-buttons {
+            padding: 8px;
+            text-align: center;
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+        }
+        
+        /* 更小的勾选框样式 */
+        .small-checkbox {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+        }
+        
+        /* 筛选下拉框容器 */
+        .multi-filter-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            min-width: 180px;
+        }
+        
+        /* 版本页面样式 */
+        .version-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .version-info {
+            margin-bottom: 25px;
+        }
+        
+        .version-title {
+            font-size: 20px;
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .version-date {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+        
+        .version-time {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 20px;
+            white-space: nowrap;
+        }
+        
+        .update-instructions {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #ebf8ff;
+            border-radius: 6px;
+            border: 1px solid #bee3f8;
+        }
+        
+        .update-instructions h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .instructions-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions-list li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-size: 11px;
+        }
+        
+        .update-note {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff5f5;
+            border-radius: 6px;
+            border: 1px solid #fed7d7;
+            font-size: 11px;
+            color: #c53030;
+        }
+        
+        .update-note strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        /* ==================== 新增：版本管理样式 ==================== */
+        .version-badge {
+            display: inline-block;
+            background: #3182ce;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        .version-badge.new {
+            background: #38a169;
+        }
+        
+        .version-display {
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .version-check {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .version-current {
+            display: inline-block;
+            background-color: #38a169;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .version-history {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .version-history h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .version-history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            background-color: white;
+        }
+        
+        .version-history-item {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .version-history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .version-history-date {
+            color: #4a5568;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        
+        .version-history-desc {
+            color: #718096;
+            font-size: 10px;
+        }
+        
+        /* 新增：确保所有按钮文本不换行 */
+        .page-tab, 
+        .compact-btn, 
+        button, 
+        .btn-success, 
+        .save-history-btn,
+        .itinerary-toggle-btn,
+        .remove-itinerary,
+        .copy-itinerary,
+        .add-segment,
+        .ticket-price-btn,
+        .calculator-btn,
+        .notes-toggle-btn,
+        .remove-segment,
+        .copy-btn,
+        .ticket-info-btn,
+        .auto-fill-btn,
+        .add-custom-note,
+        .swap-btn,
+        .edit-history-btn,
+        .delete-item-btn,
+        .filter-apply-btn,
+        .filter-clear-btn,
+        .filter-btn {
+            white-space: nowrap !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 新增：确保所有输入框、选择框和标签不换行 */
+        input, 
+        select, 
+        label, 
+        .form-group, 
+        .settings-item, 
+        .settings-group label,
+        .history-item-header,
+        .history-item-content,
+        .version-title,
+        .version-date,
+        .version-time,
+        .update-instructions h3,
+        .version-history h3,
+        .settings-group h3 {
+            white-space: nowrap !important;
+        }
+        
+        /* 新增：确保表格内容不换行 */
+        .payment-table th,
+        .payment-table td,
+        .payment-table input,
+        .payment-table select {
+            white-space: nowrap !important;
+        }
+        
+        /* 新增：确保筛选标签不换行 */
+        .filter-tag,
+        .clear-filter {
+            white-space: nowrap !important;
+        }
+        
+        /* 新增更新状态样式 */
+        .update-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        .update-status.success {
+            background-color: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+        
+        .update-status.error {
+            background-color: #fff5f5;
+            border: 1px solid #fc8181;
+            color: #742a2a;
+        }
+        
+        .update-status.info {
+            background-color: #ebf8ff;
+            border: 1px solid #90cdf4;
+            color: #2c5282;
+        }
+        
+        .update-log {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #2d3748;
+            color: #e2e8f0;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+        
+        .update-command {
+            background-color: #4a5568;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin: 5px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            color: #e2e8f0;
+        }
+        
+        .command-step {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #3182ce;
+        }
+        
+        .step-number {
+            background: #3182ce;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* ==================== 新增：排序相关样式 ==================== */
+        .sortable-item {
+            cursor: move;
+        }
+        
+        .sortable-item.dragging {
+            opacity: 0.5;
+            background-color: #ebf8ff;
+        }
+        
+        .history-item.dragging-over {
+            background-color: #e6fffa;
+        }
+        
+        .drag-handle {
+            cursor: move;
+            padding: 4px 8px;
+            margin-right: 5px;
+            background-color: #a0aec0;
+            color: white;
+            border-radius: 3px;
+            font-size: 12px;
+            user-select: none;
+        }
+        
+        .drag-handle:hover {
+            background-color: #718096;
+        }
+        
+        /* 新增：历史记录航段标题样式 */
+        .history-route-title {
+            font-weight: bold;
+            font-size: 13px;
+            color: #2d3748;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* ==================== 新增：行程方案交替背景色 ==================== */
+        .itinerary-container:nth-child(odd) .ticket-price-section {
+            background-color: #f7fafc; /* 浅灰色 */
+        }
+        
+        .itinerary-container:nth-child(even) .ticket-price-section {
+            background-color: #ebf8ff; /* 浅蓝色 */
+        }
+        
+        /* 机票信息页面的背景色 */
+        .passenger-info-section {
+            background-color: #f7fafc;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>✈️ 航班信息生成器 ✈️</h1>
+        <h1>✈️ 航班信息生成器 ✈️ 
+            <span class="version-badge" id="currentVersionBadge">v1.0.5.05</span>
+        </h1>
+        <div style="text-align: center; margin-bottom: 10px;">
+            <div class="version-current" id="currentVersionText">当前版本：1.0.5.05</div>
+        </div>
         
         <!-- 页面切换标签 -->
         <div class="page-tabs">
@@ -1146,6 +1632,7 @@
             <div class="page-tab" data-page="payment-status">付款状态</div>
             <div class="page-tab" data-page="settings">设置</div>
             <div class="page-tab" data-page="history">历史记录</div>
+            <div class="page-tab" data-page="version">版本</div>
         </div>
         
         <!-- 航班信息页面 -->
@@ -1181,7 +1668,6 @@
                     <div class="form-group">
                         <label for="tripType">行程类型:</label>
                         <select id="tripType" class="compact-select">
-                            <!-- 选项将通过JavaScript动态添加 -->
                         </select>
                     </div>
                 </div>
@@ -1212,14 +1698,12 @@
                     <div class="baggage-requirements-item">
                         <label for="carryOnBaggage">手提行李要求:</label>
                         <select id="carryOnBaggage" class="baggage-select compact-select">
-                            <!-- 选项将通过JavaScript动态添加 -->
                         </select>
                     </div>
                     
                     <div class="baggage-requirements-item">
                         <label for="checkedBaggage">托运行李要求:</label>
                         <select id="checkedBaggage" class="baggage-select compact-select">
-                            <!-- 选项将通过JavaScript动态添加 -->
                         </select>
                         <div class="baggage-input-container" id="checkedBaggageInputContainer">
                             共 <input type="number" id="checkedBaggageCount" min="1" value="1" class="compact-input"> 件行李
@@ -1245,11 +1729,11 @@
         <!-- 付款状态页面 -->
         <div id="payment-status-page" class="page-content">
             <div class="payment-actions">
-                <button id="deletePaymentBtn" style="background-color: #e53e3e;" class="compact-btn">删除选中</button>
                 <button id="addPaymentBtn" style="background-color: #38a169;" class="compact-btn">添加记录</button>
+                <button id="deletePaymentBtn" style="background-color: #e53e3e;" class="compact-btn">删除选中</button>
+                <button id="clearSelectionBtn" style="background-color: #ed8936;" class="compact-btn">取消筛选</button>
             </div>
             
-            <!-- 筛选状态显示 -->
             <div class="filter-status" id="filterStatus" style="display: none;">
                 当前筛选条件: <span id="filterTags"></span>
                 <span class="clear-filter" id="clearFilter">清除筛选</span>
@@ -1289,7 +1773,6 @@
                         </tr>
                     </thead>
                     <tbody id="paymentTableBody">
-                        <!-- 付款记录将通过JavaScript动态添加 -->
                     </tbody>
                     <tfoot>
                         <tr class="payment-total-row" id="totalRow">
@@ -1367,7 +1850,7 @@
                 <h3>中转与行李设置</h3>
                 <div class="settings-group">
                     <label for="setting-transfer-notes">中转行李提示列表 (每行一个)</label>
-                    <textarea id="setting-transfer-notes" rows="5" placeholder="例如：⚠️无需提取行李⚠️&#10;⚠️重新办理值机⚠️"></textarea>
+                    <textarea id="setting-transfer-notes" rows="5" placeholder="例如：⚠️无需提取行李⚠️&#10;⚠️无需提取行李，直挂目的地⚠️"></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1393,7 +1876,7 @@
                 <h3>行程类型设置</h3>
                 <div class="settings-group">
                     <label for="setting-trip-types">行程类型列表 (每行一个)</label>
-                    <textarea id="setting-trip-types" rows="5" placeholder="例如：单程&#10;往返"></textarea>
+                    <textarea id="setting-trip-types" rows="5" placeholder="例如：单程&#10;往返&#10;联程航班"></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1439,29 +1922,182 @@
                 </div>
             </div>
             <div class="history-list" id="historyList">
-                <!-- 历史记录将通过JavaScript动态添加 -->
+            </div>
+        </div>
+        
+        <!-- 版本页面 -->
+        <div id="version-page" class="page-content">
+            <div class="version-section">
+                <div class="version-info">
+                    <div class="version-title">航班信息生成器</div>
+                    <div class="version-display" id="versionDisplay">
+                        当前版本：<strong>1.0.5.05</strong>
+                        <span class="version-badge" id="versionStatus">最新版</span>
+                    </div>
+                    <div class="version-date" id="lastUpdateDate">更新于2026年01月28日</div>
+                    <div class="version-time" id="lastUpdateTime">10:00:00</div>
+                </div>
+                
+                <div class="update-instructions">
+                    <h3>更新版本说明</h3>
+                    <p><strong>准备新版本：</strong></p>
+                    <ol class="instructions-list">
+                        <li>将最新的 index.html 文件保存到桌面上</li>
+                        <li>插入外接移动硬盘</li>
+                        <li>打开终端，将下方的命令复制粘贴到终端内，按回车执行</li>
+                    </ol>
+                    
+                    <div class="command-step">
+                        <span class="step-number">1</span> 一键更新命令
+                        <div class="update-command">bash -c 'cd "/Volumes/Lexar/航班信息生成器源文件/flight-info-generator" && cp ~/Desktop/index.html ./ && npm run build && open dist/'</div>
+                    </div>
+                    <div class="command-step">
+                        <span class="step-number">2</span> 在打开的 dist 文件夹中，找到新的"航班信息生成器-1.0.0.dmg"文件，双击安装
+                    </div>
+                    
+                    <div class="update-note">
+                        <strong>⚠️ 重要提示：</strong>
+                        <p>1. 请确保桌面上有最新的 index.html 文件</p>
+                        <p>2. 请确保移动硬盘已经连接，并且"更新航班信息生成器.sh"脚本文件和"flight-info-generator"文件夹在"航班信息生成器源文件"夹里</p>
+                        <p>3. 更新前会自动备份当前版本，备份文件为 index.html.backup.时间戳</p>
+                        <p>4. 更新完成后需要手动安装新的 DMG 文件</p>
+                        <p>5. 所有已保存的数据（设置、历史记录、付款状态）将保持不变</p>
+                    </div>
+                </div>
+                
+                <div class="version-history">
+                    <h3>版本历史</h3>
+                    <div style="text-align: right; margin-bottom: 10px;">
+                        <button id="deleteVersionHistoryBtn" style="background-color: #e53e3e; font-size: 11px;">删除版本历史</button>
+                    </div>
+                    <div class="version-history-list" id="versionHistoryList">
+                        <!-- 版本历史将由JavaScript动态生成 -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- 城市自动完成列表 -->
     <datalist id="cityList">
-        <!-- 城市选项将通过JavaScript动态添加 -->
     </datalist>
 
     <script>
-        // 初始化变量
+        // ==================== 版本管理系统 ====================
+        // 定义当前版本 - 改为1.0.5.05
+        const APP_VERSION = '1.0.5.05';
+        
+        // 版本历史数据
+        const VERSION_HISTORY = [
+            {
+                version: '1.0.5.05',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('zh-CN'),
+                description: '1. 根据航线格式智能设置行程类型和目的地 2. 城市简称转全称显示 3. 确保创建新行程方案按钮正常工作'
+            },
+            {
+                version: '1.0.5.03',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('zh-CN'),
+                description: '改进历史记录回填逻辑：智能判断行程方案是否为空，避免覆盖已有数据'
+            },
+            {
+                version: '1.0.5.02',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('zh-CN'),
+                description: '在历史记录页面添加航段小标题，优化显示效果'
+            },
+            {
+                version: '1.0.5.01',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('zh-CN'),
+                description: '修复付款状态表格首行冻结功能，优化表格滚动体验'
+            },
+            {
+                version: '1.0.5',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('zh-CN'),
+                description: '修复多段航线选择问题：现在从当前选择的航段开始添加，而不是替换所有航段'
+            },
+            {
+                version: '1.0.4',
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('zh-CN'),
+                description: '增加多段航线功能，优化城市显示，改进历史记录回填后自动跳转'
+            },
+            {
+                version: '1.0.3',
+                date: '2026-01-25',
+                time: '00:38:34',
+                description: '更新版本说明，修复创建行程方案功能，自动更新日期时间显示'
+            },
+            {
+                version: '1.0.2',
+                date: '2026-01-23',
+                time: '03:27:41',
+                description: '增加复制行程功能，修复时间显示格式，移除版本页面按钮'
+            },
+            {
+                version: '1.0.1',
+                date: '2026-01-23',
+                time: '03:27:41',
+                description: '修复历史记录页面编辑按钮显示问题'
+            },
+            {
+                version: '1.0.0',
+                date: '2026-01-23',
+                time: '03:27:41',
+                description: '初始版本发布，包含完整的航班信息生成、机票信息、付款状态和历史记录功能'
+            }
+        ];
+        
+        // 版本数据结构
+        let versionData = {
+            currentVersion: APP_VERSION,
+            lastUpdate: new Date().toISOString(),
+            versionHistory: VERSION_HISTORY,
+            updateAvailable: false,
+            newVersion: null,
+            updateInfo: null
+        };
+        
+        // ==================== 初始化变量 ====================
         const airportList = [
-           "莫斯科", "福怒噶哇机场", "谁列灭接哇机场", "大妈解答哇机场", "阿拉木图", "阿斯塔纳", "埃里温", "奥斯", "奥伦堡", "巴尔瑙尔", "布市", "彼尔姆", "车里亚宾", "赤塔", "达尔", "第比利斯", "杜尚别", "伏尔加", "格罗兹尼", "海参崴", "哈巴", "加里宁格勒", "克市", "喀山", "矿泉水城", "马嘎斯", "马哈奇克拉", "明斯克", "欧姆斯克", "塔什干",  
-            "圣彼得堡", "萨马拉", "斯塔夫", "索契", "乌尔根奇", "乌法", "乌兰乌德", "新西伯利亚", "雅库茨克", "叶卡", "伊尔库", "伊斯坦布尔", "北京", "长春", "重庆", "广州", "西安", "杭州", "沈阳", "哈尔滨", "海口", 
-            "青岛", "成都", "牡丹江", "佳木斯", "三亚", "上海", "深圳", "乌鲁木齐"
+            "莫斯科", "阿拉木图", "阿斯塔纳", "埃里温", "奥斯", "奥伦堡", "巴尔瑙尔", "布市", "彼尔姆", "车里亚宾", "赤塔", "达尔", "第比利斯", "杜尚别", "伏尔加", "格罗兹尼", "海参崴", "哈巴", "加里宁格勒", "克市", "喀山", "矿泉水城", "马嘎斯", "马哈奇克拉", "明斯克", "欧姆斯克", "塔什干", "圣彼得堡", "萨马拉", "斯塔夫", "索契", "乌尔根奇", "乌法", "乌兰乌德", "新西伯利亚", "雅库茨克", "叶卡", "伊尔库", "伊斯坦布尔", "北京", "长春", "重庆", "广州", "西安", "杭州", "沈阳", "哈尔滨", "海口", "青岛", "成都", "牡丹江", "佳木斯", "三亚", "上海", "深圳", "乌鲁木齐"
         ];
         
         const terminalList = [
-            "请选择", "Внуково", "Домодедово", "Жуковский", "Шереметьево B", "Шереметьево C", "Шереметьево D", "Шереметьево E", "Шереметьево F", "T1", "T2", "T3", "T4", "T5", "大兴", "首都T1", "首都T2", "首都T3", "首都T4", "虹桥", "浦东", "国际", "A", "B", "C", "D", "E", "F", "Терминал A", "Терминал B", "Терминал C"
+            "请选择", "Шереметьево B", "Шереметьево C", "Шереметьево D", "Шереметьево E", "Шереметьево F", "谢列梅捷沃机场B航站楼", "谢列梅捷沃机场C航站楼", "谢列梅捷沃机场D航站楼", "谢列梅捷沃机场E航站楼", "谢列梅捷沃机场F航站楼", "谁列灭接哇机场", "Домодедово", "德莫杰多沃机场", "大妈解答哇机场", "Внуково", "伏努科沃机场", "福怒噶哇机场", "Жуковский", "茹科夫斯基机场", "T1", "T2", "T3", "T4", "T5", "大兴", "首都T1", "首都T2", "首都T3", "首都T4", "虹桥", "浦东", "国际", "A", "B", "C", "D", "E", "F", "Терминал A", "Терминал B", "Терминал C"
         ];                     
         
         const locationList = [...airportList, "布拉格维申斯克", "车里雅宾斯克", "伏尔加格勒", "哈巴罗夫斯克", "克拉斯诺亚尔斯克", "克拉斯诺达尔", "斯塔夫罗波尔", "叶卡捷琳堡", "伊尔库茨克"];
+        
+        // 城市简称到全称的映射
+        const cityAbbreviationMap = {
+            "布市": "布拉格维申斯克",
+            "车里亚宾": "车里雅宾斯克",
+            "车里雅宾": "车里雅宾斯克", // 新增全称映射
+            "伏尔加": "伏尔加格勒",
+            "哈巴": "哈巴罗夫斯克",
+            "克市": "克拉斯诺亚尔斯克",
+            "达尔": "克拉斯诺达尔",
+            "斯塔夫": "斯塔夫罗波尔",
+            "叶卡": "叶卡捷琳堡",
+            "伊尔库": "伊尔库茨克"
+        };
+        
+        // 城市全称到简称的映射
+        const cityFullNameMap = {
+            "布拉格维申斯克": "布市",
+            "车里雅宾斯克": "车里亚宾",
+            "伏尔加格勒": "伏尔加",
+            "哈巴罗夫斯克": "哈巴",
+            "克拉斯诺亚尔斯克": "克市",
+            "克拉斯诺达尔": "达尔",
+            "斯塔夫罗波尔": "斯塔夫",
+            "叶卡捷琳堡": "叶卡",
+            "伊尔库茨克": "伊尔库"
+        };
         
         // 预设值机时间选项
         const checkinTimeOptions = [
@@ -1471,6 +2107,7 @@
         
         // 预设中转行李提示选项
         const transferNoteOptions = [
+            "⚠️隔日中转航班⚠️",
             "⚠️无需提取行李⚠️",
             "⚠️无需提取行李，直挂目的地⚠️",
             "⚠️无需提取行李，中转到*航站楼⚠️",
@@ -1484,7 +2121,7 @@
         
         // 预设备注关键词
         const presetNotes = [
-            "隔天中转航班", "隔夜中转航班", "中转免费住宿", "手提5公斤", "手提7公斤", "手提8公斤", "手提10公斤", "手提尺寸要求严格36*30*27厘米", "手提尺寸要求严格40*30*20厘米", "托运10公斤", "托运20公斤", "托运23公斤", "托运32公斤"
+            "隔天中转航班", "青岛中转免费住宿", "杭州中转免费住宿", "手提5公斤", "手提7公斤", "手提8公斤", "手提10公斤", "手提尺寸要求55*40*25厘米", "手提尺寸要求严格36*30*27厘米", "手提尺寸要求严格40*30*20厘米", "手提儿童推车要求不超过42*50*20厘米", "托运10公斤", "托运20公斤", "托运23公斤", "托运32公斤"
         ];
         
         // 预设行程类型
@@ -1492,7 +2129,8 @@
             "单程",
             "往返",
             "更改行程",
-            "往返行程更改"
+            "往返行程更改",
+            "联程航班"
         ];
         
         // 预设手提行李要求
@@ -1503,6 +2141,7 @@
             "7公斤",
             "8公斤",
             "10公斤",
+            "10公斤，尺寸不超过55*40*25厘米",
             "各5公斤",
             "各7公斤",
             "各8公斤",
@@ -1530,10 +2169,10 @@
         ];
         
         const commonFlightNumbers = [
-           "C6", "SU", "S7", "U6", "UT", "DP", "WZ", "IO", "N4", "YC", "HZ", "5N", "A4", "HH", "HY", "3U", "8L", "9C", "BK", "CA", "CN", "CZ", "EU", "FM", "G5", "GS", "HO", "HU", "JD", "JR", "KN", "KY", "MF", "MU", "NS", "OQ", "PN", "SC", "TV", "ZH"
+            "C6", "SU", "S7", "U6", "UT", "DP", "WZ", "IO", "N4", "YC", "HZ", "5N", "A4", "HH", "HY", "3U", "8L", "9C", "BK", "CA", "CN", "CZ", "EU", "FM", "G5", "GS", "HO", "HU", "JD", "JR", "KN", "KY", "MF", "MU", "NS", "OQ", "PN", "SC", "TV", "ZH"
         ];
         
-        // 常用航线
+        // 常用航线 - 只保留原始的10个多段航线
         const commonRoutes = [
             { name: "莫斯科-格罗兹尼", departure: "莫斯科", arrival: "格罗兹尼" },
             { name: "莫斯科-马嘎斯", departure: "莫斯科", arrival: "马嘎斯" },
@@ -1570,7 +2209,48 @@
             { name: "叶卡-海参崴", departure: "叶卡", arrival: "海参崴" },
             { name: "叶卡-北京", departure: "叶卡", arrival: "北京" },
             { name: "叶卡-新西伯利亚", departure: "叶卡", arrival: "新西伯利亚" },
-            { name: "叶卡-伊尔库", departure: "叶卡", arrival: "伊尔库" }
+            { name: "叶卡-伊尔库", departure: "叶卡", arrival: "伊尔库" },
+            // 新增多段航线 - 只有10个
+            { name: "莫斯科-青岛-哈尔滨", segments: [
+                { departure: "莫斯科", arrival: "青岛" },
+                { departure: "青岛", arrival: "哈尔滨" }
+            ]},
+            { name: "哈尔滨-青岛-莫斯科", segments: [
+                { departure: "哈尔滨", arrival: "青岛" },
+                { departure: "青岛", arrival: "莫斯科" }
+            ]},
+            { name: "莫斯科-北京-哈尔滨", segments: [
+                { departure: "莫斯科", arrival: "北京" },
+                { departure: "北京", arrival: "哈尔滨" }
+            ]},
+            { name: "哈尔滨-北京-莫斯科", segments: [
+                { departure: "哈尔滨", arrival: "北京" },
+                { departure: "北京", arrival: "莫斯科" }
+            ]},
+            { name: "莫斯科-杭州-哈尔滨", segments: [
+                { departure: "莫斯科", arrival: "杭州" },
+                { departure: "杭州", arrival: "哈尔滨" }
+            ]},
+            { name: "哈尔滨-杭州-莫斯科", segments: [
+                { departure: "哈尔滨", arrival: "杭州" },
+                { departure: "杭州", arrival: "莫斯科" }
+            ]},
+            { name: "格罗兹尼-莫斯科-车里亚宾", segments: [
+                { departure: "格罗兹尼", arrival: "莫斯科" },
+                { departure: "莫斯科", arrival: "车里亚宾" }
+            ]},
+            { name: "车里亚宾-莫斯科-格罗兹尼", segments: [
+                { departure: "车里亚宾", arrival: "莫斯科" },
+                { departure: "莫斯科", arrival: "格罗兹尼" }
+            ]},
+            { name: "格罗兹尼-莫斯科-海参崴", segments: [
+                { departure: "格罗兹尼", arrival: "莫斯科" },
+                { departure: "莫斯科", arrival: "海参崴" }
+            ]},
+            { name: "海参崴-莫斯科-格罗兹尼", segments: [
+                { departure: "海参崴", arrival: "莫斯科" },
+                { departure: "莫斯科", arrival: "格罗兹尼" }
+            ]}
         ];
         
         let savedFlightNumbers = [...commonFlightNumbers];
@@ -1586,63 +2266,20 @@
         let paymentData = [];
         let filteredPaymentData = null;
         let currentFilters = {
-            year: null,
-            month: null,
-            day: null
+            date: [],
+            passenger: [],
+            amount: [],
+            difference: [],
+            settlement: [],
+            notes: []
         };
+        let activeFilterColumn = null;
 
-        // 新增函数：根据月份获取前一个月的天数
-        function getPreviousMonthDays(month) {
-            const monthDays = {
-                1: 31,   // 1月 -> 12月31日
-                2: 31,   // 2月 -> 1月31日
-                3: 28,   // 3月 -> 2月28日（非闰年）
-                4: 31,   // 4月 -> 3月31日
-                5: 30,   // 5月 -> 4月30日
-                6: 31,   // 6月 -> 5月31日
-                7: 30,   // 7月 -> 6月30日
-                8: 31,   // 8月 -> 7月31日
-                9: 31,   // 9月 -> 8月31日
-                10: 30,  // 10月 -> 9月30日
-                11: 31,  // 11月 -> 10月31日
-                12: 30   // 12月 -> 11月30日
-            };
-            return monthDays[month] || 31;
-        }
-        
-        // 新增函数：格式化晚上文本
-        function formatEveningText(date) {
-            if (!date) return "(前一日晚上)";
-            
-            let day = null;
-            let month = null;
-            
-            // 第一种格式: "08月02日"
-            let match = date.match(/(\d{1,2})月(\d{1,2})日/);
-            if (match) {
-                month = parseInt(match[1]);
-                day = parseInt(match[2]);
-            } else {
-                // 第二种格式: 纯数字4位，如"0802"
-                if (date.length === 4) {
-                    month = parseInt(date.substring(0, 2));
-                    day = parseInt(date.substring(2));
-                }
-            }
-            
-            if (day && day > 1) {
-                return `(${day-1}日晚上)`;
-            } else if (day === 1 && month) {
-                // 如果是每个月的第一天，使用前一个月的最后一天
-                const prevDay = getPreviousMonthDays(month);
-                return `(${prevDay}日晚上)`;
-            } else {
-                return "(前一日晚上)";
-            }
-        }
-        
-        // 初始化页面加载
+        // ==================== 初始化页面加载 ====================
         document.addEventListener('DOMContentLoaded', function() {
+            // 初始化版本管理
+            initVersionManagement();
+            
             // 初始化事件监听器
             initEventListeners();
             
@@ -1670,25 +2307,324 @@
             updateCheckedBaggageOptions();
         });
         
-        // 初始化页面切换
-        function initPageTabs() {
-            const tabs = document.querySelectorAll('.page-tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const pageId = this.getAttribute('data-page');
-                    
-                    // 更新标签状态
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // 更新页面内容
-                    const pages = document.querySelectorAll('.page-content');
-                    pages.forEach(page => page.classList.remove('active'));
-                    document.getElementById(`${pageId}-page`).classList.add('active');
-                });
+        // ==================== 版本管理函数 ====================
+        function initVersionManagement() {
+            // 设置当前版本
+            document.getElementById('currentVersionBadge').textContent = `v${APP_VERSION}`;
+            document.getElementById('currentVersionText').textContent = `当前版本：${APP_VERSION}`;
+            document.getElementById('versionDisplay').innerHTML = `当前版本：<strong>${APP_VERSION}</strong>`;
+            
+            // 加载版本数据
+            loadVersionData();
+            
+            // 渲染版本信息 - 使用当前时间
+            renderVersionInfo();
+            renderVersionHistory();
+            
+            // 检查更新
+            checkForUpdates();
+            
+            // 绑定删除版本历史按钮
+            document.getElementById('deleteVersionHistoryBtn').addEventListener('click', function() {
+                if (confirm('确定要删除所有版本历史记录吗？此操作不可恢复！')) {
+                    versionData.versionHistory = [{
+                        version: APP_VERSION,
+                        date: new Date().toISOString().split('T')[0],
+                        time: new Date().toLocaleTimeString('zh-CN'),
+                        description: '删除历史记录后保留的当前版本'
+                    }];
+                    saveVersionData();
+                    renderVersionHistory();
+                    alert('版本历史记录已删除，仅保留当前版本信息');
+                }
             });
         }
         
+        // 加载版本数据
+        function loadVersionData() {
+            const saved = localStorage.getItem('flightInfoVersionData');
+            if (saved) {
+                const savedData = JSON.parse(saved);
+                // 合并数据，保留重要的版本历史
+                versionData.lastUpdate = new Date().toISOString(); // 总是使用当前时间
+                versionData.versionHistory = savedData.versionHistory || versionData.versionHistory;
+                versionData.updateAvailable = savedData.updateAvailable || false;
+                versionData.newVersion = savedData.newVersion || null;
+                versionData.updateInfo = savedData.updateInfo || null;
+                
+                // 自动添加当前版本到历史记录（如果不存在）
+                addCurrentVersionToHistory();
+            } else {
+                // 首次加载，确保当前版本在历史中
+                addCurrentVersionToHistory();
+            }
+            
+            // 确保当前版本是最新的
+            versionData.currentVersion = APP_VERSION;
+            
+            // 更新时间
+            versionData.lastUpdate = new Date().toISOString();
+            
+            saveVersionData();
+        }
+        
+        // 添加当前版本到历史记录
+        function addCurrentVersionToHistory() {
+            const currentVersionExists = versionData.versionHistory.some(item => item.version === APP_VERSION);
+            
+            if (!currentVersionExists) {
+                versionData.versionHistory.unshift({
+                    version: APP_VERSION,
+                    date: new Date().toISOString().split('T')[0],
+                    time: new Date().toLocaleTimeString('zh-CN'),
+                    description: '当前版本'
+                });
+            }
+        }
+        
+        // 保存版本数据
+        function saveVersionData() {
+            localStorage.setItem('flightInfoVersionData', JSON.stringify(versionData));
+        }
+        
+        // 渲染版本信息 - 使用当前时间
+        function renderVersionInfo() {
+            const now = new Date();
+            const dateElement = document.getElementById('lastUpdateDate');
+            const timeElement = document.getElementById('lastUpdateTime');
+            const versionStatus = document.getElementById('versionStatus');
+            
+            if (dateElement && timeElement) {
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                
+                dateElement.textContent = `更新于${year}年${month}月${day}日`;
+                timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            
+            // 更新版本状态
+            if (versionStatus) {
+                if (versionData.updateAvailable && versionData.newVersion) {
+                    versionStatus.textContent = '有更新';
+                    versionStatus.className = 'version-badge new';
+                } else {
+                    versionStatus.textContent = '最新版';
+                    versionStatus.className = 'version-badge';
+                }
+            }
+        }
+        
+        // 渲染版本历史
+        function renderVersionHistory() {
+            const historyList = document.getElementById('versionHistoryList');
+            if (!historyList) return;
+            
+            historyList.innerHTML = '';
+            
+            // 按版本号排序（从新到旧）
+            const sortedHistory = [...versionData.versionHistory].sort((a, b) => {
+                return compareVersions(b.version, a.version);
+            });
+            
+            sortedHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'version-history-item';
+                
+                // 格式化日期
+                const date = new Date(item.date);
+                const dateStr = `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+                
+                historyItem.innerHTML = `
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-weight: bold; color: #2d3748; font-size: 12px;">
+                                v${item.version}
+                                ${item.version === APP_VERSION ? '<span style="color: #38a169; margin-left: 5px;">(当前版本)</span>' : ''}
+                            </div>
+                            <div style="color: #718096; font-size: 11px;">${dateStr} ${item.time || ''}</div>
+                        </div>
+                        <div style="color: #4a5568; font-size: 11px; margin-top: 5px;">${item.description}</div>
+                    </div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // 版本号比较函数
+        function compareVersions(v1, v2) {
+            const parts1 = v1.split('.').map(Number);
+            const parts2 = v2.split('.').map(Number);
+            
+            for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+                const num1 = parts1[i] || 0;
+                const num2 = parts2[i] || 0;
+                
+                if (num1 > num2) return 1;
+                if (num1 < num2) return -1;
+            }
+            
+            return 0;
+        }
+        
+        // 检查更新
+        function checkForUpdates() {
+            // 这里可以添加远程检查更新的逻辑
+            // 暂时只检查本地是否有新版本通知
+            // 版本页面不再显示更新按钮，仅显示版本信息
+        }
+
+        // ==================== 新增：复制行程功能 ====================
+        function copyItinerary(itineraryId) {
+            // 获取原始行程数据
+            const originalItinerary = document.getElementById(`itinerary${itineraryId}`);
+            if (!originalItinerary) {
+                alert('无法找到原始行程方案');
+                return;
+            }
+            
+            // 创建新行程
+            addNewItinerary();
+            
+            // 获取新行程的ID
+            const newItineraryId = itineraryCount;
+            
+            // 复制航段信息
+            const originalSegments = originalItinerary.querySelectorAll('.flight-segment');
+            const newSegmentsContainer = document.getElementById(`flightSegments${newItineraryId}`);
+            
+            // 清空新行程的航段容器
+            newSegmentsContainer.innerHTML = '';
+            
+            // 复制每个航段
+            originalSegments.forEach((segment, index) => {
+                const segmentId = segment.id.replace(`segment${itineraryId}-`, '');
+                
+                // 获取原始航段的数据
+                const date = document.getElementById(`segment${itineraryId}-${segmentId}-date`).value;
+                const routeSelect = document.getElementById(`segment${itineraryId}-${segmentId}-route`).value;
+                const flightNoSelect = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-select`).value;
+                const flightNoInput = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-input`).value;
+                const departureSelect = document.getElementById(`segment${itineraryId}-${segmentId}-departure-select`).value;
+                const departureInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`).value;
+                const departureTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-departure-terminal`).value;
+                const arrivalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-select`).value;
+                const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`).value;
+                const arrivalTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`).value;
+                const departureTime = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`).value;
+                const arrivalTime = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`).value;
+                const eveningBtn = originalItinerary.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-evening`);
+                const isEvening = eveningBtn && eveningBtn.classList.contains('active');
+                const nextDayBtn = originalItinerary.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
+                const isNextDay = nextDayBtn && nextDayBtn.classList.contains('active');
+                const flightTime = document.getElementById(`segment${itineraryId}-${segmentId}-flight-time`).value;
+                const transferBaggageNote = document.getElementById(`segment${itineraryId}-${segmentId}-transferBaggageNote`).value;
+                const seat = document.getElementById(`segment${itineraryId}-${segmentId}-seat`).value;
+                const terminal = document.getElementById(`segment${itineraryId}-${segmentId}-terminal`).value;
+                
+                // 添加新航段
+                addFlightSegment(newItineraryId);
+                const newSegmentId = segmentCounters[newItineraryId];
+                
+                // 设置新航段的数据
+                setTimeout(() => {
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-date`).value = date;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-route`).value = routeSelect;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-flightNo-select`).value = flightNoSelect;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-flightNo-input`).value = flightNoInput;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-departure-select`).value = departureSelect;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-departure-input`).value = departureInput;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-departure-terminal`).value = departureTerminal;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-arrival-select`).value = arrivalSelect;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-arrival-input`).value = arrivalInput;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-arrival-terminal`).value = arrivalTerminal;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-departure-time`).value = departureTime;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-arrival-time`).value = arrivalTime;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-flight-time`).value = flightTime;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-transferBaggageNote`).value = transferBaggageNote;
+                    document.getElementById(`segment${newItineraryId}-${newSegmentId}-seat`).value = seat;
+                    
+                    if (terminal) {
+                        document.getElementById(`segment${newItineraryId}-${newSegmentId}-terminal`).value = terminal;
+                    }
+                    
+                    // 设置时间标记
+                    const newEveningBtn = document.querySelector(`#segment${newItineraryId}-${newSegmentId} .toggle-btn-evening`);
+                    const newNextDayBtn = document.querySelector(`#segment${newItineraryId}-${newSegmentId} .toggle-btn-next-day`);
+                    
+                    if (isEvening && newEveningBtn) {
+                        newEveningBtn.classList.add('active');
+                    }
+                    if (isNextDay && newNextDayBtn) {
+                        newNextDayBtn.classList.add('active');
+                    }
+                    
+                    // 显示中转行李输入框
+                    if (transferBaggageNote.includes("中转到")) {
+                        document.getElementById(`segment${newItineraryId}-${newSegmentId}-terminalDiv`).classList.remove('hidden');
+                    }
+                }, 100);
+            });
+            
+            // 复制机票价格信息
+            const originalPricePlans = originalItinerary.querySelectorAll('.ticket-price-plan');
+            const newPricePlansContainer = document.getElementById(`ticketPricePlans${newItineraryId}`);
+            
+            // 清空新行程的价格容器
+            newPricePlansContainer.innerHTML = '';
+            
+            // 复制每个价格方案
+            originalPricePlans.forEach(plan => {
+                const planId = plan.id.replace(`price${itineraryId}-`, '');
+                
+                const option = document.getElementById(`price${itineraryId}-${planId}-option`).value;
+                const value = document.getElementById(`price${itineraryId}-${planId}-value`).value;
+                const currency = document.getElementById(`price${itineraryId}-${planId}-currency`).value;
+                
+                // 添加新价格方案
+                addTicketPricePlan(newItineraryId);
+                const newPlanId = priceCounters[newItineraryId];
+                
+                // 设置新价格方案的数据
+                setTimeout(() => {
+                    document.getElementById(`price${newItineraryId}-${newPlanId}-option`).value = option;
+                    document.getElementById(`price${newItineraryId}-${newPlanId}-value`).value = value;
+                    document.getElementById(`price${newItineraryId}-${newPlanId}-currency`).value = currency;
+                }, 100);
+            });
+            
+            // 复制备注信息
+            const originalSelectedNotes = document.getElementById(`itinerary${itineraryId}-selectedNotes`).value;
+            document.getElementById(`itinerary${newItineraryId}-selectedNotes`).value = originalSelectedNotes;
+            document.getElementById(`itinerary${newItineraryId}-selectedNotesDisplay`).textContent = originalSelectedNotes;
+            
+            // 更新备注标签选择状态
+            const originalNoteTags = originalItinerary.querySelectorAll('.note-tag.selected');
+            originalNoteTags.forEach(tag => {
+                const noteText = tag.textContent;
+                const newNoteTags = document.querySelectorAll(`#itinerary${newItineraryId}-notesOptions .note-tag`);
+                newNoteTags.forEach(newTag => {
+                    if (newTag.textContent === noteText) {
+                        newTag.classList.add('selected');
+                    }
+                });
+            });
+            
+            // 滚动到新创建的行程
+            const newItineraryElement = document.getElementById(`itinerary${newItineraryId}`);
+            if (newItineraryElement) {
+                newItineraryElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            alert(`已复制行程方案${itineraryId}为行程方案${newItineraryId}，请根据需要进行调整。`);
+        }
+
+        // ==================== 原有航班信息生成器功能 ====================
         function initEventListeners() {
             // 乘客姓名输入格式化
             document.getElementById('passengerNames').addEventListener('input', function(e) {
@@ -1705,10 +2641,10 @@
             document.getElementById('generateAllPlansBtn').addEventListener('click', generateAllPlans);
             document.getElementById('resetAllBtn').addEventListener('click', resetAll);
             document.getElementById('copyToClipboardBtn').addEventListener('click', copyToClipboard);
+            document.getElementById('saveToHistoryBtn').addEventListener('click', saveToHistory);
             document.getElementById('generateTicketInfoBtn').addEventListener('click', generateTicketInfo);
             document.getElementById('resetOutputBtn').addEventListener('click', resetOutput);
             document.getElementById('copyTicketInfoBtn').addEventListener('click', copyTicketInfoToClipboard);
-            document.getElementById('saveToHistoryBtn').addEventListener('click', saveToHistory);
             
             // 机场选择变化
             document.getElementById('carryOnDeparture-select').addEventListener('change', function() {
@@ -1723,133 +2659,6 @@
             initSmartInput('passengerNames', 'passengerNamesList');
             initSmartInput('carryOnDeparture-input', 'citiesList');
             initSmartInput('carryOnArrival-input', 'citiesList');
-        }
-        
-        // 初始化智能输入功能
-        function initSmartInput(inputId, settingsListId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            
-            let dropdown = null;
-            
-            input.addEventListener('input', function() {
-                const value = this.value.trim();
-                if (!value) {
-                    if (dropdown) {
-                        dropdown.remove();
-                        dropdown = null;
-                    }
-                    return;
-                }
-                
-                // 获取设置列表中的选项
-                const settingsList = document.getElementById(settingsListId);
-                if (!settingsList) return;
-                
-                const items = settingsList.querySelectorAll('.editable-list-item input');
-                const matches = [];
-                
-                items.forEach(item => {
-                    if (item.value.toLowerCase().includes(value.toLowerCase())) {
-                        matches.push(item.value);
-                    }
-                });
-                
-                // 移除现有下拉框
-                if (dropdown) {
-                    dropdown.remove();
-                }
-                
-                // 如果没有匹配项，不显示下拉框
-                if (matches.length === 0) {
-                    return;
-                }
-                
-                // 创建下拉框
-                dropdown = document.createElement('div');
-                dropdown.className = 'autocomplete-dropdown';
-                
-                matches.forEach(match => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.textContent = match;
-                    item.addEventListener('click', function() {
-                        input.value = match;
-                        dropdown.remove();
-                        dropdown = null;
-                    });
-                    dropdown.appendChild(item);
-                });
-                
-                // 定位下拉框
-                const rect = input.getBoundingClientRect();
-                dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
-                dropdown.style.left = (rect.left + window.scrollX) + 'px';
-                dropdown.style.width = rect.width + 'px';
-                
-                document.body.appendChild(dropdown);
-            });
-            
-            // 点击其他地方时关闭下拉框
-            document.addEventListener('click', function(e) {
-                if (dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.remove();
-                    dropdown = null;
-                }
-            });
-            
-            // 失去焦点时保存新值到设置
-            input.addEventListener('blur', function() {
-                const value = this.value.trim();
-                if (value && !isValueInSettingsList(value, settingsListId)) {
-                    addValueToSettingsList(value, settingsListId);
-                }
-            });
-        }
-        
-        // 检查值是否在设置列表中
-        function isValueInSettingsList(value, settingsListId) {
-            const settingsList = document.getElementById(settingsListId);
-            if (!settingsList) return false;
-            
-            const items = settingsList.querySelectorAll('.editable-list-item input');
-            for (let item of items) {
-                if (item.value === value) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        // 添加值到设置列表
-        function addValueToSettingsList(value, settingsListId) {
-            const settingsList = document.getElementById(settingsListId);
-            if (!settingsList) return;
-            
-            const item = document.createElement('div');
-            item.className = 'editable-list-item';
-            item.innerHTML = `
-                <input type="text" value="${value}">
-                <div class="editable-list-actions">
-                    <button class="delete-item-btn">删除</button>
-                </div>
-            `;
-            
-            // 添加删除事件
-            const deleteBtn = item.querySelector('.delete-item-btn');
-            deleteBtn.addEventListener('click', function() {
-                item.remove();
-                saveSettings();
-            });
-            
-            // 添加输入变化事件
-            const input = item.querySelector('input');
-            input.addEventListener('change', function() {
-                saveSettings();
-            });
-            
-            settingsList.appendChild(item);
-            saveSettings();
         }
         
         function initCityAutocomplete() {
@@ -1903,7 +2712,6 @@
             const airport = document.getElementById(inputId).value.trim();
             if (airport && !airportList.includes(airport)) {
                 airportList.push(airport);
-                // Update all airport selects
                 const selects = document.querySelectorAll('select[id$="-departure-select"], select[id$="-arrival-select"]');
                 selects.forEach(select => {
                     const currentVal = select.value;
@@ -1914,7 +2722,6 @@
                     }
                 });
                 
-                // 更新自动完成列表
                 initCityAutocomplete();
             }
         }
@@ -1948,11 +2755,9 @@
         function getCityName(airport) {
             if (!airport) return "未指定";
             
-            // Extract city name (everything before the first space or special characters)
             let city = airport.split(" ")[0];
             city = city.replace("机场", "").replace("国际", "").replace("首都", "").replace("太平", "").trim();
             
-            // Special cases for Chinese cities
             const chineseCities = ["北京", "长春", "重庆", "广州", "西安", "杭州", "沈阳", "哈尔滨", "海口", 
             "青岛", "成都", "牡丹江", "佳木斯", "三亚", "上海", "深圳", "乌鲁木齐"];
             for (const chineseCity of chineseCities) {
@@ -1961,16 +2766,7 @@
                 }
             }
             
-            // Special cases for Russian cities
-            if (city === "莫斯科") return "莫斯科";
-            if (city === "圣彼得堡") return "圣彼得堡";
-            if (city === "格罗兹尼") return "格罗兹尼";
-            if (city === "哈巴") return "哈巴罗夫斯克";
-            if (city === "叶卡") return "叶卡捷琳堡";
-            if (city === "克市") return "克拉斯诺亚尔斯克";
-            if (city === "达尔") return "克拉斯诺达尔";
-            if (city === "布市") return "布拉格维申斯克";
-            
+            // 删除无用的代码段
             return city;
         }
         
@@ -1995,7 +2791,6 @@
                 document.getElementById(outputId).value = selectVal || document.getElementById(inputId).value;
             }
             
-            // Update city input when airport is selected
             if (selectId.includes('departure-select')) {
                 const segmentId = selectId.split('-')[1];
                 const itineraryId = selectId.split('-')[0].replace('segment', '');
@@ -2095,6 +2890,7 @@
             itineraryDiv.innerHTML = `
                 <div class="ticket-price-section compact-section">
                     <button class="remove-itinerary compact-btn" onclick="removeItinerary(${itineraryCount})">× 删除此方案</button>
+                    <button class="copy-itinerary compact-btn" onclick="copyItinerary(${itineraryCount})">复制行程</button>
                     <div class="section-title">行程方案 ${itineraryCount}</div>
                     
                     <div id="flightSegments${itineraryCount}"></div>
@@ -2207,7 +3003,6 @@
             const container = document.getElementById(`itinerary${itineraryId}-calculatorContainer`);
             if (!container) return;
             
-            // 只操作当前行程方案的计算器
             const isVisible = container.style.display === 'block';
             container.style.display = isVisible ? 'none' : 'block';
         }
@@ -2241,7 +3036,6 @@
             const container = document.getElementById(`itinerary${itineraryId}-notesContainer`);
             if (!container) return;
             
-            // 只操作当前行程方案的备注容器
             const isVisible = container.style.display === 'block';
             container.style.display = isVisible ? 'none' : 'block';
         }
@@ -2386,21 +3180,63 @@
             arrivalTimeInput.addEventListener('input', function() { formatTime(this); });
             seatInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
             
-            // 新增：航班号手动输入框小写字母自动转大写
             const flightNoInput = segmentDiv.querySelector(`#segment${itineraryId}-${segmentId}-flightNo-input`);
             flightNoInput.addEventListener('input', function() {
                 this.value = this.value.toUpperCase();
             });
             
+            // ==================== 修复：支持从当前航段开始添加多段航线 ====================
             routeSelect.addEventListener('change', function() {
                 const selectedRoute = commonRoutes.find(route => route.name === this.value);
                 if (selectedRoute) {
-                    document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`).value = selectedRoute.departure;
-                    document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`).value = selectedRoute.arrival;
-                    
-                    // 更新选择框
-                    departureSelect.value = selectedRoute.departure;
-                    arrivalSelect.value = selectedRoute.arrival;
+                    if (selectedRoute.segments) {
+                        // 多段航线：从当前航段开始添加新航段
+                        const segmentsContainer = document.getElementById(`flightSegments${itineraryId}`);
+                        const currentSegments = segmentsContainer.querySelectorAll('.flight-segment');
+                        const currentSegmentIndex = Array.from(currentSegments).indexOf(segmentDiv);
+                        
+                        // 获取当前航段的索引
+                        let startIndex = currentSegmentIndex + 1;
+                        
+                        // 从当前航段开始，添加新航段
+                        selectedRoute.segments.forEach((segment, index) => {
+                            if (index === 0) {
+                                // 第一个航段填充到当前选择的航段
+                                document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`).value = segment.departure;
+                                document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`).value = segment.arrival;
+                                
+                                const departureSelectEl = document.getElementById(`segment${itineraryId}-${segmentId}-departure-select`);
+                                const arrivalSelectEl = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-select`);
+                                
+                                if (departureSelectEl) departureSelectEl.value = segment.departure;
+                                if (arrivalSelectEl) arrivalSelectEl.value = segment.arrival;
+                            } else {
+                                // 后续航段需要添加新航段
+                                setTimeout(() => {
+                                    addFlightSegment(itineraryId);
+                                    const newSegmentId = segmentCounters[itineraryId];
+                                    
+                                    setTimeout(() => {
+                                        document.getElementById(`segment${itineraryId}-${newSegmentId}-departure-input`).value = segment.departure;
+                                        document.getElementById(`segment${itineraryId}-${newSegmentId}-arrival-input`).value = segment.arrival;
+                                        
+                                        const departureSelectEl = document.getElementById(`segment${itineraryId}-${newSegmentId}-departure-select`);
+                                        const arrivalSelectEl = document.getElementById(`segment${itineraryId}-${newSegmentId}-arrival-select`);
+                                        
+                                        if (departureSelectEl) departureSelectEl.value = segment.departure;
+                                        if (arrivalSelectEl) arrivalSelectEl.value = segment.arrival;
+                                    }, 10);
+                                }, 10);
+                            }
+                        });
+                    } else {
+                        // 单段航线
+                        document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`).value = selectedRoute.departure;
+                        document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`).value = selectedRoute.arrival;
+                        
+                        if (departureSelect) departureSelect.value = selectedRoute.departure;
+                        if (arrivalSelect) arrivalSelect.value = selectedRoute.arrival;
+                    }
                 }
             });
             
@@ -2412,31 +3248,35 @@
                 departureInput.value = arrivalInput.value;
                 arrivalInput.value = temp;
                 
-                // 更新选择框
-                departureSelect.value = departureInput.value;
-                arrivalSelect.value = arrivalInput.value;
+                if (departureSelect) departureSelect.value = departureInput.value;
+                if (arrivalSelect) arrivalSelect.value = arrivalInput.value;
             });
             
             flightNoSelect.addEventListener('change', function() {
                 updateFlightNoInput(`segment${itineraryId}-${segmentId}-flightNo-input`, this.value);
             });
             
-            departureSelect.addEventListener('change', function() {
-                updateAirportInput(`segment${itineraryId}-${segmentId}-departure-select`, `segment${itineraryId}-${segmentId}-departure-input`, `segment${itineraryId}-${segmentId}-departure-output`);
-            });
+            if (departureSelect) {
+                departureSelect.addEventListener('change', function() {
+                    updateAirportInput(`segment${itineraryId}-${segmentId}-departure-select`, `segment${itineraryId}-${segmentId}-departure-input`, `segment${itineraryId}-${segmentId}-departure-output`);
+                });
+            }
             
-            arrivalSelect.addEventListener('change', function() {
-                updateAirportInput(`segment${itineraryId}-${segmentId}-arrival-select`, `segment${itineraryId}-${segmentId}-arrival-input`, `segment${itineraryId}-${segmentId}-arrival-output`);
-            });
+            if (arrivalSelect) {
+                arrivalSelect.addEventListener('change', function() {
+                    updateAirportInput(`segment${itineraryId}-${segmentId}-arrival-select`, `segment${itineraryId}-${segmentId}-arrival-input`, `segment${itineraryId}-${segmentId}-arrival-output`);
+                });
+            }
             
-            eveningBtn.addEventListener('click', function() { toggleTimeFlag(this); });
-            nextDayBtn.addEventListener('click', function() { toggleTimeFlag(this); });
+            if (eveningBtn) eveningBtn.addEventListener('click', function() { toggleTimeFlag(this); });
+            if (nextDayBtn) nextDayBtn.addEventListener('click', function() { toggleTimeFlag(this); });
             
-            transferSelect.addEventListener('change', function() {
-                toggleTransferBaggageInput(`segment${itineraryId}-${segmentId}`);
-            });
+            if (transferSelect) {
+                transferSelect.addEventListener('change', function() {
+                    toggleTransferBaggageInput(`segment${itineraryId}-${segmentId}`);
+                });
+            }
             
-            // 为起飞城市和到达城市手动输入框添加智能输入
             initSmartInput(`segment${itineraryId}-${segmentId}-departure-input`, 'citiesList');
             initSmartInput(`segment${itineraryId}-${segmentId}-arrival-input`, 'citiesList');
         }
@@ -2505,7 +3345,6 @@
             
             let outputText = "🔍查询结果如下：\n";
             
-            // 如果是多个行程方案，添加方案编号
             if (itineraries.length > 1) {
                 itineraries.forEach((itinerary, index) => {
                     const itineraryId = itinerary.id.replace('itinerary', '');
@@ -2514,12 +3353,10 @@
                     outputText += "\n";
                 });
             } else {
-                // 单个行程方案
                 const itineraryId = itineraries[0].id.replace('itinerary', '');
                 outputText += generateItineraryText(itineraryId);
             }
             
-            // 添加页脚
             outputText += "\n🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n+79128915882\n手机号绑定银行卡\nСбер,Тинкофф, Альфа\n\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️";
             output.textContent = outputText.trim();
         }
@@ -2530,7 +3367,6 @@
             const pricePlans = document.querySelectorAll(`#ticketPricePlans${itineraryId} .ticket-price-plan`);
             const selectedNotes = document.getElementById(`itinerary${itineraryId}-selectedNotes`);
             
-            // 生成航段信息
             let prevDate = '';
             segments.forEach((segment, segmentIndex) => {
                 const segmentId = segment.id.replace(`segment${itineraryId}-`, '');
@@ -2541,7 +3377,6 @@
                 const departureInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`);
                 const departure = departureInput ? departureInput.value : "起飞城市未指定";
                 
-                // 获取起飞机场航站楼
                 const departureTerminalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-departure-terminal`);
                 const departureTerminal = departureTerminalSelect ? departureTerminalSelect.value : "";
                 
@@ -2551,7 +3386,6 @@
                 const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`);
                 const arrival = arrivalInput ? arrivalInput.value : "到达城市未指定";
                 
-                // 获取到达机场航站楼
                 const arrivalTerminalSelect = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`);
                 const arrivalTerminal = arrivalTerminalSelect ? arrivalTerminalSelect.value : "";
                 
@@ -2561,51 +3395,35 @@
                 const eveningBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-evening`);
                 const nextDayBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
                 
-                // 构建航段文本
                 let segmentText = "";
                 
-                // 处理日期显示逻辑
                 if (date && date !== prevDate) {
                     segmentText += `${date}`;
                 } else if (!date && segmentIndex > 0) {
                     segmentText += "再";
                 }
                 
-                // 添加起飞城市和航站楼
                 segmentText += `${departure}`;
-                if (departureTerminal && departureTerminal !== "请选择") {
-                    segmentText += `${departureTerminal}`;
-                }
                 
-                // 添加起飞时间
                 if (departureTime) {
                     segmentText += `${departureTime}`;
                 }
                 
-                // 添加晚上标记 - 使用新的formatEveningText函数
                 if (eveningBtn && eveningBtn.classList.contains('active')) {
                     segmentText += formatEveningText(date);
                 }
                 
-                segmentText += "飞，"; // 修复：添加逗号
+                segmentText += "飞，";
                 
-                // 添加次日标记
                 if (nextDayBtn && nextDayBtn.classList.contains('active')) {
                     segmentText += "次日";
                 }
                 
-                // 添加到达时间和城市
                 if (arrivalTime) {
                     segmentText += `${arrivalTime}`;
                 }
                 segmentText += `到达${arrival}`;
                 
-                // 添加到达航站楼
-                if (arrivalTerminal && arrivalTerminal !== "请选择") {
-                    segmentText += `${arrivalTerminal}`;
-                }
-                
-                // 添加分号
                 if (segmentIndex < segments.length - 1) {
                     segmentText += "；\n";
                 } else {
@@ -2616,7 +3434,6 @@
                 prevDate = date;
             });
             
-            // 添加价格信息
             let priceTexts = [];
             pricePlans.forEach(plan => {
                 const planId = plan.id.replace(`price${itineraryId}-`, '');
@@ -2633,7 +3450,6 @@
                 text += priceTexts.join('，') + "；\n";
             }
             
-            // 添加备注信息
             if (selectedNotes && selectedNotes.value) {
                 text += `注：${selectedNotes.value.replace(/,/g, '，')}`;
             }
@@ -2650,10 +3466,8 @@
             const departure = document.getElementById('carryOnDeparture-input').value;
             const arrival = document.getElementById('carryOnArrival-input').value;
             
-            // 检查是否有行程
             const itineraries = document.querySelectorAll('.itinerary-container');
             if (itineraries.length === 0) {
-                // 简单行李信息格式
                 let baggageInfo = '';
                 if (departure || arrival) {
                     baggageInfo += `行程: ${departure || '未指定'} → ${arrival || '未指定'}\n`;
@@ -2673,17 +3487,13 @@
                 return;
             }
             
-            // 复杂航班行程格式
             let outputText = `乘客${passengerName}您好：\n`;
             outputText += `${departure || '未指定'}➡️${arrival || '未指定'}${tripType}\n\n`;
             
-            // 获取第一个行程方案（排在最上面的）
             const firstItineraryId = itineraries[0].id.replace('itinerary', '');
             const segments = document.querySelectorAll(`#flightSegments${firstItineraryId} .flight-segment`);
             
-            // 单段行程和多段行程格式
             if (segments.length === 1) {
-                // 单段行程格式
                 const segment = segments[0];
                 const segmentId = segment.id.replace(`segment${firstItineraryId}-`, '');
                 
@@ -2723,7 +3533,6 @@
                 const eveningBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-evening`);
                 const nextDayBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-next-day`);
                 
-                // 处理时间标记 - 使用新的formatEveningText函数
                 let eveningText = "";
                 if (eveningBtn && eveningBtn.classList.contains('active')) {
                     eveningText = formatEveningText(date);
@@ -2734,19 +3543,32 @@
                     nextDayText = "次日";
                 }
                 
-                // 构建单段行程文本
                 outputText += `${date}\n`;
                 outputText += `${departure}${departureTerminal && departureTerminal !== "请选择" ? departureTerminal : ""}➡️${arrival}${arrivalTerminal && arrivalTerminal !== "请选择" ? arrivalTerminal : ""}\n`;
                 outputText += `航班号:【${flightNo}】\n`;
-                // 使用getCityName函数处理起飞和到达城市
-                outputText += `🛫起飞:${getCityName(departure)}时间${departureTime}${eveningText}\n`;
+                
+                // 修正：显示正确的城市和时间格式，中国城市显示为"中国"
+                let departureCity = getCityName(departure);
+                let arrivalCity = getCityName(arrival);
+                
+                // 确保使用航班信息页面中手动输入框的内容
+                const departureManualInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-input`);
+                if (departureManualInput && departureManualInput.value) {
+                    departureCity = getCityName(departureManualInput.value);
+                }
+                
+                const arrivalManualInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-input`);
+                if (arrivalManualInput && arrivalManualInput.value) {
+                    arrivalCity = getCityName(arrivalManualInput.value);
+                }
+                
+                outputText += `🛫起飞:${departureCity}时间${departureTime}${eveningText}\n`;
                 outputText += `🎫值机:${flightTime}\n`;
                 if (seat) {
                     outputText += `💺座位: ${seat}\n`;
                 }
-                outputText += `🛬抵达:${nextDayText}${getCityName(arrival)}时间${arrivalTime}\n`;
+                outputText += `🛬抵达:${nextDayText}${arrivalCity}时间${arrivalTime}\n`;
                 
-                // 添加中转和行李提示
                 if (transferNote) {
                     let transferText = transferNote;
                     if (transferNote.includes("*")) {
@@ -2757,7 +3579,6 @@
                     outputText += `${transferText}\n`;
                 }
                 
-                // 添加行李信息
                 if (carryOnBaggage) {
                     outputText += `手提要求：${carryOnBaggage}\n`;
                 }
@@ -2771,7 +3592,6 @@
                     outputText += `托运要求：${checkedBaggageText}\n`;
                 }
             } else {
-                // 多段行程格式
                 segments.forEach((segment, segmentIndex) => {
                     const segmentId = segment.id.replace(`segment${firstItineraryId}-`, '');
                     
@@ -2811,7 +3631,6 @@
                     const eveningBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-evening`);
                     const nextDayBtn = document.querySelector(`#segment${firstItineraryId}-${segmentId} .toggle-btn-next-day`);
                     
-                    // 处理时间标记 - 使用新的formatEveningText函数
                     let eveningText = "";
                     if (eveningBtn && eveningBtn.classList.contains('active')) {
                         eveningText = formatEveningText(date);
@@ -2822,19 +3641,32 @@
                         nextDayText = "次日";
                     }
                     
-                    // 构建多段行程文本
                     outputText += `${date}\n`;
                     outputText += `${departure}${departureTerminal && departureTerminal !== "请选择" ? departureTerminal : ""}➡️${arrival}${arrivalTerminal && arrivalTerminal !== "请选择" ? arrivalTerminal : ""}\n`;
                     outputText += `航班号:【${flightNo}】\n`;
-                    // 使用getCityName函数处理起飞和到达城市
-                    outputText += `🛫起飞:${getCityName(departure)}时间${departureTime}${eveningText}\n`;
+                    
+                    // 修正：显示正确的城市和时间格式，中国城市显示为"中国"
+                    let departureCity = getCityName(departure);
+                    let arrivalCity = getCityName(arrival);
+                    
+                    // 确保使用航班信息页面中手动输入框的内容
+                    const departureManualInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-departure-input`);
+                    if (departureManualInput && departureManualInput.value) {
+                        departureCity = getCityName(departureManualInput.value);
+                    }
+                    
+                    const arrivalManualInput = document.getElementById(`segment${firstItineraryId}-${segmentId}-arrival-input`);
+                    if (arrivalManualInput && arrivalManualInput.value) {
+                        arrivalCity = getCityName(arrivalManualInput.value);
+                    }
+                    
+                    outputText += `🛫起飞:${departureCity}时间${departureTime}${eveningText}\n`;
                     outputText += `🎫值机:${flightTime}\n`;
                     if (seat) {
                         outputText += `💺座位: ${seat}\n`;
                     }
-                    outputText += `🛬抵达:${nextDayText}${getCityName(arrival)}时间${arrivalTime}\n`;
+                    outputText += `🛬抵达:${nextDayText}${arrivalCity}时间${arrivalTime}\n`;
                     
-                    // 添加中转和行李提示
                     if (transferNote) {
                         let transferText = transferNote;
                         if (transferNote.includes("*")) {
@@ -2845,7 +3677,6 @@
                         outputText += `${transferText}\n`;
                     }
                     
-                    // 如果是最后一段，添加行李信息
                     if (segmentIndex === segments.length - 1) {
                         if (carryOnBaggage) {
                             outputText += `手提要求：${carryOnBaggage}\n`;
@@ -2861,51 +3692,79 @@
                         }
                     }
                     
-                    // 添加空行分隔多段行程
                     if (segmentIndex < segments.length - 1) {
                         outputText += `\n`;
                     }
                 });
             }
             
-            // 获取航班信息页中的备注信息
             let flightNotes = "";
             const selectedNotes = document.getElementById(`itinerary${firstItineraryId}-selectedNotes`);
             if (selectedNotes && selectedNotes.value) {
                 flightNotes = `注：${selectedNotes.value.replace(/,/g, '，')}\n`;
             }
             
-            // 添加备注信息（如果有的话）
             if (flightNotes) {
                 outputText += `\n${flightNotes}`;
             }
             
-            // 添加页脚
             outputText += `\n🔔温馨提示：\n起降时间均为当地时间；\n时间为24小时制；\n凭护照办理值机。\n长城票务：89128915882\n✈️祝您旅途愉快！✈️`;
             
             output.textContent = outputText;
         }
         
+        // ==================== 修复：重置所有功能 ====================
         function resetAll() {
             if (confirm('确定要重置所有信息吗？')) {
+                // 清除行程方案
                 document.getElementById('itinerariesContainer').innerHTML = '';
                 document.getElementById('allPlansOutput').textContent = '';
+                
+                // 重置机票信息页面
                 document.getElementById('ticketInfoOutput').textContent = '';
                 document.getElementById('passengerNames').value = '';
-                document.getElementById('tripType').selectedIndex = 0;
-                document.getElementById('carryOnBaggage').selectedIndex = 0;
-                document.getElementById('checkedBaggage').selectedIndex = 0;
-                document.getElementById('checkedBaggageInputContainer').style.display = 'none';
-                document.getElementById('carryOnDeparture-input').value = '';
-                document.getElementById('carryOnArrival-input').value = '';
-                document.getElementById('carryOnDeparture-select').selectedIndex = 0;
-                document.getElementById('carryOnArrival-select').selectedIndex = 0;
                 
+                if (document.getElementById('tripType')) {
+                    document.getElementById('tripType').selectedIndex = 0;
+                }
+                
+                if (document.getElementById('carryOnBaggage')) {
+                    document.getElementById('carryOnBaggage').selectedIndex = 0;
+                }
+                
+                if (document.getElementById('checkedBaggage')) {
+                    document.getElementById('checkedBaggage').selectedIndex = 0;
+                }
+                
+                const checkedBaggageInputContainer = document.getElementById('checkedBaggageInputContainer');
+                if (checkedBaggageInputContainer) {
+                    checkedBaggageInputContainer.style.display = 'none';
+                }
+                
+                if (document.getElementById('carryOnDeparture-input')) {
+                    document.getElementById('carryOnDeparture-input').value = '';
+                }
+                
+                if (document.getElementById('carryOnArrival-input')) {
+                    document.getElementById('carryOnArrival-input').value = '';
+                }
+                
+                if (document.getElementById('carryOnDeparture-select')) {
+                    document.getElementById('carryOnDeparture-select').selectedIndex = 0;
+                }
+                
+                if (document.getElementById('carryOnArrival-select')) {
+                    document.getElementById('carryOnArrival-select').selectedIndex = 0;
+                }
+                
+                // 重置计数器
                 itineraryCount = 0;
                 segmentCounters = {};
                 priceCounters = {};
                 notesVisibility = {};
                 calculatorVisibility = {};
+                
+                alert('所有信息已重置！');
             }
         }
         
@@ -2927,7 +3786,71 @@
                 .catch(err => alert('复制失败: ' + err));
         }
         
-        // 新增：保存到历史记录功能
+        // 新增函数：根据月份获取前一个月的天数
+        function getPreviousMonthDays(month) {
+            const monthDays = {
+                1: 31,
+                2: 31,
+                3: 28,
+                4: 31,
+                5: 30,
+                6: 31,
+                7: 30,
+                8: 31,
+                9: 31,
+                10: 30,
+                11: 31,
+                12: 30
+            };
+            return monthDays[month] || 31;
+        }
+        
+        // 新增函数：格式化晚上文本
+        function formatEveningText(date) {
+            if (!date) return "(前一日晚上)";
+            
+            let day = null;
+            let month = null;
+            
+            let match = date.match(/(\d{1,2})月(\d{1,2})日/);
+            if (match) {
+                month = parseInt(match[1]);
+                day = parseInt(match[2]);
+            } else {
+                if (date.length === 4) {
+                    month = parseInt(date.substring(0, 2));
+                    day = parseInt(date.substring(2));
+                }
+            }
+            
+            if (day && day > 1) {
+                return `(${day-1}日晚上)`;
+            } else if (day === 1 && month) {
+                const prevDay = getPreviousMonthDays(month);
+                return `(${prevDay}日晚上)`;
+            } else {
+                return "(前一日晚上)";
+            }
+        }
+        
+        // 初始化页面切换
+        function initPageTabs() {
+            const tabs = document.querySelectorAll('.page-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const pages = document.querySelectorAll('.page-content');
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(`${pageId}-page`).classList.add('active');
+                });
+            });
+        }
+        
+        // ==================== 改进：保存历史记录功能 - 增加晚上/次日状态和截止值机时间 ====================
         function saveToHistory() {
             const itineraries = document.querySelectorAll('.itinerary-container');
             
@@ -2942,7 +3865,6 @@
                 }
             }
             
-            // 获取第一个行程方案的数据
             const itineraryId = itineraries[0].id.replace('itinerary', '');
             const segments = document.querySelectorAll(`#flightSegments${itineraryId} .flight-segment`);
             
@@ -2963,19 +3885,28 @@
                 const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`);
                 const arrivalTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`);
                 const arrivalTime = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
+                const flightTime = document.getElementById(`segment${itineraryId}-${segmentId}-flight-time`);
+                
+                // 获取晚上和次日按钮状态
+                const eveningBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-evening`);
+                const nextDayBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
+                const isEvening = eveningBtn && eveningBtn.classList.contains('active');
+                const isNextDay = nextDayBtn && nextDayBtn.classList.contains('active');
                 
                 flightData.push({
                     flightNo: flightNoInput ? flightNoInput.value : '',
                     departure: departureInput ? departureInput.value : '',
                     departureTerminal: departureTerminal ? departureTerminal.value : '',
                     departureTime: departureTime ? departureTime.value : '',
+                    isEvening: isEvening,
                     arrival: arrivalInput ? arrivalInput.value : '',
                     arrivalTerminal: arrivalTerminal ? arrivalTerminal.value : '',
-                    arrivalTime: arrivalTime ? arrivalTime.value : ''
+                    arrivalTime: arrivalTime ? arrivalTime.value : '',
+                    isNextDay: isNextDay,
+                    flightTime: flightTime ? flightTime.value : ''
                 });
             });
             
-            // 检查是否已存在相同记录
             const history = JSON.parse(localStorage.getItem('flightHistory') || '[]');
             const isDuplicate = history.some(item => {
                 if (item.data.length !== flightData.length) return false;
@@ -2988,9 +3919,12 @@
                         existing.departure !== current.departure ||
                         existing.departureTerminal !== current.departureTerminal ||
                         existing.departureTime !== current.departureTime ||
+                        existing.isEvening !== current.isEvening ||
                         existing.arrival !== current.arrival ||
                         existing.arrivalTerminal !== current.arrivalTerminal ||
-                        existing.arrivalTime !== current.arrivalTime) {
+                        existing.arrivalTime !== current.arrivalTime ||
+                        existing.isNextDay !== current.isNextDay ||
+                        existing.flightTime !== current.flightTime) {
                         return false;
                     }
                 }
@@ -3003,14 +3937,12 @@
                 return;
             }
             
-            // 保存到本地存储
             history.unshift({
                 id: Date.now(),
                 data: flightData,
                 timestamp: new Date().toLocaleString()
             });
             
-            // 只保留最近50条记录
             if (history.length > 50) {
                 history.pop();
             }
@@ -3018,13 +3950,310 @@
             localStorage.setItem('flightHistory', JSON.stringify(history));
             alert('已保存到历史记录');
             
-            // 刷新历史记录显示
             if (document.getElementById('historyList')) {
                 loadHistory();
             }
         }
 
-        // 新增：加载历史记录
+        // ==================== 改进：从历史记录回填功能 - 根据航线格式智能设置行程类型和目的地 ====================
+        function fillFromHistory(flightData) {
+            return new Promise((resolve) => {
+                // 获取所有行程方案
+                const itineraries = document.querySelectorAll('.itinerary-container');
+                let targetItineraryId = null;
+                
+                if (itineraries.length === 0) {
+                    // 没有行程方案，创建第一个
+                    addNewItinerary();
+                    targetItineraryId = 1;
+                } else {
+                    // 查找第一个空的行程方案
+                    for (let itinerary of itineraries) {
+                        const itineraryId = itinerary.id.replace('itinerary', '');
+                        if (isItineraryEmpty(itineraryId)) {
+                            targetItineraryId = itineraryId;
+                            break;
+                        }
+                    }
+                    
+                    // 如果没有空的行程方案，创建新的
+                    if (!targetItineraryId) {
+                        addNewItinerary();
+                        targetItineraryId = itineraryCount;
+                    }
+                }
+                
+                // 回填到目标行程方案
+                fillToSpecificItinerary(targetItineraryId, flightData).then(() => {
+                    // 根据航线格式智能设置行程类型和目的地
+                    setTicketInfoBasedOnRoute(flightData);
+                    resolve();
+                });
+            });
+        }
+        
+        // ==================== 新增：根据航线格式智能设置行程类型和目的地 ====================
+        function setTicketInfoBasedOnRoute(flightData) {
+            if (!flightData || flightData.length === 0) {
+                return;
+            }
+            
+            // 获取所有航段的出发地和目的地
+            const locations = flightData.map(segment => ({
+                departure: segment.departure || '',
+                arrival: segment.arrival || ''
+            }));
+            
+            // 转换城市名为全称
+            const convertedLocations = locations.map(loc => ({
+                departure: convertCityToFullName(loc.departure),
+                arrival: convertCityToFullName(loc.arrival)
+            }));
+            
+            // 提取城市序列
+            const citySequence = [];
+            if (convertedLocations.length > 0) {
+                citySequence.push(convertedLocations[0].departure);
+                convertedLocations.forEach(loc => {
+                    citySequence.push(loc.arrival);
+                });
+            }
+            
+            // 分析航线格式并设置行程类型和目的地
+            let tripType = "单程";
+            let destination = "";
+            let departure = "";
+            
+            if (citySequence.length > 0) {
+                departure = citySequence[0];
+            }
+            
+            if (citySequence.length === 1) {
+                // 只有出发地
+                destination = citySequence[0];
+                tripType = "单程";
+            } else if (citySequence.length === 2) {
+                // A-D 格式
+                destination = citySequence[1];
+                tripType = "单程";
+            } else if (citySequence.length === 3) {
+                if (citySequence[0] === citySequence[2]) {
+                    // A-D-A 格式（对称往返）
+                    destination = citySequence[1];
+                    tripType = "往返";
+                } else {
+                    // A-B-D 格式（非对称单程）
+                    destination = citySequence[2];
+                    tripType = "单程";
+                }
+            } else if (citySequence.length === 4) {
+                if (citySequence[0] === citySequence[3] && citySequence[1] === citySequence[2]) {
+                    // A-B-D-B-A 格式（对称往返）
+                    destination = citySequence[2];
+                    tripType = "往返";
+                } else if (citySequence[0] === citySequence[3]) {
+                    // A-B-C-D 格式（非对称单程，但回到A）
+                    destination = citySequence[3];
+                    tripType = "单程";
+                } else {
+                    // A-B-C-D 格式（非对称单程）
+                    destination = citySequence[3];
+                    tripType = "单程";
+                }
+            } else if (citySequence.length >= 5) {
+                // 检查是否是对称往返
+                let isSymmetric = true;
+                const n = citySequence.length;
+                for (let i = 0; i < Math.floor(n / 2); i++) {
+                    if (citySequence[i] !== citySequence[n - 1 - i]) {
+                        isSymmetric = false;
+                        break;
+                    }
+                }
+                
+                if (isSymmetric) {
+                    // A-B-C-D-C-B-A 格式（对称往返）
+                    destination = citySequence[Math.floor(n / 2)];
+                    tripType = "往返";
+                } else {
+                    // 复杂航线，取最后一个城市作为目的地
+                    destination = citySequence[citySequence.length - 1];
+                    tripType = "联程航班";
+                }
+            }
+            
+            // 设置行程类型
+            const tripTypeSelect = document.getElementById('tripType');
+            if (tripTypeSelect) {
+                // 找到对应的行程类型选项
+                for (let i = 0; i < tripTypeSelect.options.length; i++) {
+                    const option = tripTypeSelect.options[i];
+                    if (option.text === tripType) {
+                        tripTypeSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            // 设置出发地和目的地
+            const departureInput = document.getElementById('carryOnDeparture-input');
+            const arrivalInput = document.getElementById('carryOnArrival-input');
+            
+            if (departureInput) departureInput.value = departure;
+            if (arrivalInput) arrivalInput.value = destination;
+            
+            // 同时设置下拉选择框
+            const departureSelect = document.getElementById('carryOnDeparture-select');
+            const arrivalSelect = document.getElementById('carryOnArrival-select');
+            
+            if (departureSelect) {
+                // 尝试在现有选项中找到匹配的值
+                let found = false;
+                for (let i = 0; i < departureSelect.options.length; i++) {
+                    if (departureSelect.options[i].value === departure) {
+                        departureSelect.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                // 如果没有找到，设置值为空，用户会看到手动输入的值
+                if (!found) {
+                    departureSelect.selectedIndex = 0;
+                }
+            }
+            
+            if (arrivalSelect) {
+                // 尝试在现有选项中找到匹配的值
+                let found = false;
+                for (let i = 0; i < arrivalSelect.options.length; i++) {
+                    if (arrivalSelect.options[i].value === destination) {
+                        arrivalSelect.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                // 如果没有找到，设置值为空，用户会看到手动输入的值
+                if (!found) {
+                    arrivalSelect.selectedIndex = 0;
+                }
+            }
+        }
+        
+        // ==================== 新增：城市简称转全称函数 ====================
+        function convertCityToFullName(city) {
+            if (!city) return '';
+            
+            // 检查是否为简称
+            if (cityAbbreviationMap[city]) {
+                return cityAbbreviationMap[city];
+            }
+            
+            return city;
+        }
+        
+        // ==================== 新增：城市全称转简称函数 ====================
+        function convertCityToAbbreviation(city) {
+            if (!city) return '';
+            
+            // 检查是否为全称
+            if (cityFullNameMap[city]) {
+                return cityFullNameMap[city];
+            }
+            
+            return city;
+        }
+        
+        // 检查行程方案是否为空
+        function isItineraryEmpty(itineraryId) {
+            const segments = document.querySelectorAll(`#flightSegments${itineraryId} .flight-segment`);
+            if (segments.length === 0) {
+                return true;
+            }
+            
+            // 检查所有航段是否都有数据
+            for (let segment of segments) {
+                const segmentId = segment.id.replace(`segment${itineraryId}-`, '');
+                
+                const flightNoInput = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-input`);
+                const departureInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`);
+                const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`);
+                
+                if (flightNoInput && flightNoInput.value.trim() !== '') {
+                    return false;
+                }
+                if (departureInput && departureInput.value.trim() !== '') {
+                    return false;
+                }
+                if (arrivalInput && arrivalInput.value.trim() !== '') {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // 回填到指定的行程方案 - 改进版本，支持晚上/次日状态和截止值机时间
+        function fillToSpecificItinerary(itineraryId, flightData) {
+            return new Promise((resolve) => {
+                const segmentsContainer = document.getElementById(`flightSegments${itineraryId}`);
+                segmentsContainer.innerHTML = '';
+                
+                flightData.forEach((segment, index) => {
+                    addFlightSegment(itineraryId);
+                    const segmentId = segmentCounters[itineraryId];
+                    
+                    setTimeout(() => {
+                        const flightNoInput = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-input`);
+                        const departureInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`);
+                        const departureTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-departure-terminal`);
+                        const departureTime = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`);
+                        const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`);
+                        const arrivalTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`);
+                        const arrivalTime = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
+                        const flightTime = document.getElementById(`segment${itineraryId}-${segmentId}-flight-time`);
+                        const eveningBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-evening`);
+                        const nextDayBtn = document.querySelector(`#segment${itineraryId}-${segmentId} .toggle-btn-next-day`);
+                        
+                        if (flightNoInput) flightNoInput.value = segment.flightNo;
+                        if (departureInput) departureInput.value = segment.departure;
+                        if (departureTerminal) departureTerminal.value = segment.departureTerminal;
+                        if (departureTime) departureTime.value = segment.departureTime;
+                        if (arrivalInput) arrivalInput.value = segment.arrival;
+                        if (arrivalTerminal) arrivalTerminal.value = segment.arrivalTerminal;
+                        if (arrivalTime) arrivalTime.value = segment.arrivalTime;
+                        if (flightTime) flightTime.value = segment.flightTime;
+                        
+                        // 设置晚上按钮状态
+                        if (eveningBtn && segment.isEvening) {
+                            eveningBtn.classList.add('active');
+                        }
+                        
+                        // 设置次日按钮状态
+                        if (nextDayBtn && segment.isNextDay) {
+                            nextDayBtn.classList.add('active');
+                        }
+                        
+                        // 如果是最后一个航段，解析Promise
+                        if (index === flightData.length - 1) {
+                            setTimeout(() => {
+                                alert(`历史记录已回填到行程方案${itineraryId}中`);
+                                resolve();
+                            }, 100);
+                        }
+                    }, 100);
+                });
+                
+                // 如果没有航段数据，立即解析
+                if (flightData.length === 0) {
+                    setTimeout(() => {
+                        alert(`历史记录已回填到行程方案${itineraryId}中`);
+                        resolve();
+                    }, 100);
+                }
+            });
+        }
+        
+        // ==================== 修改：加载历史记录 - 显示完整信息 ====================
         function loadHistory() {
             const historyList = document.getElementById('historyList');
             if (!historyList) return;
@@ -3038,14 +4267,12 @@
                 return;
             }
             
-            // 去重处理 - 只显示唯一的历史记录
             const uniqueHistory = [];
             const seenKeys = new Set();
             
             history.forEach(item => {
-                // 创建一个唯一标识键
                 const key = item.data.map(segment => 
-                    `${segment.flightNo}|${segment.departure}|${segment.departureTerminal}|${segment.departureTime}|${segment.arrival}|${segment.arrivalTerminal}|${segment.arrivalTime}`
+                    `${segment.flightNo}|${segment.departure}|${segment.departureTerminal}|${segment.departureTime}|${segment.isEvening}|${segment.arrival}|${segment.arrivalTerminal}|${segment.arrivalTime}|${segment.isNextDay}|${segment.flightTime}`
                 ).join('||');
                 
                 if (!seenKeys.has(key)) {
@@ -3054,47 +4281,299 @@
                 }
             });
             
-            uniqueHistory.forEach(item => {
+            // 为每个历史记录项添加排序功能
+            uniqueHistory.forEach((item, index) => {
                 const historyItem = document.createElement('div');
-                historyItem.className = 'history-item';
+                historyItem.className = 'history-item sortable-item';
                 historyItem.setAttribute('data-id', item.id);
+                historyItem.setAttribute('data-index', index);
+                
+                // 生成航段小标题
+                let routeTitle = '';
+                if (item.data && item.data.length > 0) {
+                    // 收集所有出发地和目的地
+                    const locations = [];
+                    item.data.forEach((segment, idx) => {
+                        // 添加出发地（如果是第一个航段）
+                        if (idx === 0) {
+                            locations.push(segment.departure || '未指定');
+                        }
+                        // 添加目的地
+                        locations.push(segment.arrival || '未指定');
+                    });
+                    // 用"-"连接所有地点
+                    routeTitle = locations.join('-');
+                }
                 
                 let content = '';
+                if (routeTitle) {
+                    content += `<div class="history-route-title">${routeTitle}</div>`;
+                }
+                
                 item.data.forEach((segment, index) => {
-                    content += `航段${index + 1}: ${segment.flightNo} | ${segment.departure}${segment.departureTerminal ? '(' + segment.departureTerminal + ')' : ''} ${segment.departureTime} → ${segment.arrival}${segment.arrivalTerminal ? '(' + segment.arrivalTerminal + ')' : ''} ${segment.arrivalTime}<br>`;
+                    let segmentText = `航段${index + 1}: ${segment.flightNo} | ${segment.departure}${segment.departureTerminal && segment.departureTerminal !== "请选择" ? '(' + segment.departureTerminal + ')' : ''} ${segment.departureTime}`;
+                    
+                    // 添加晚上状态
+                    if (segment.isEvening) {
+                        segmentText += '(晚上)';
+                    }
+                    
+                    segmentText += ` → ${segment.arrival}${segment.arrivalTerminal && segment.arrivalTerminal !== "请选择" ? '(' + segment.arrivalTerminal + ')' : ''} ${segment.arrivalTime}`;
+                    
+                    // 添加次日状态
+                    if (segment.isNextDay) {
+                        segmentText += '(次日)';
+                    }
+                    
+                    // 添加截止值机时间
+                    if (segment.flightTime) {
+                        segmentText += ` | ${segment.flightTime}`;
+                    }
+                    
+                    segmentText += '<br>';
+                    content += segmentText;
                 });
                 
                 historyItem.innerHTML = `
+                    <div class="history-actions" style="display: flex; align-items: center;">
+                        <div class="drag-handle" title="按住拖动排序">≡</div>
+                        <input type="checkbox" class="history-checkbox" data-id="${item.id}">
+                    </div>
                     <div class="history-item-content">${content}</div>
                     <div class="history-actions">
-                        <input type="checkbox" class="history-checkbox" data-id="${item.id}">
                         <button class="edit-history-btn" data-id="${item.id}">编辑</button>
                     </div>
                 `;
                 
-                // 双击回填功能
+                // 修改：双击回填后自动跳转到航班信息页面
                 historyItem.addEventListener('dblclick', function() {
-                    fillFromHistory(item.data);
+                    const fillPromise = fillFromHistory(item.data);
+                    if (fillPromise && fillPromise.then) {
+                        fillPromise.then(() => {
+                            // 回填完成后自动跳转到航班信息页面
+                            const flightInfoTab = document.querySelector('.page-tab[data-page="flight-info"]');
+                            if (flightInfoTab) {
+                                flightInfoTab.click();
+                            }
+                        });
+                    } else {
+                        // 如果不是Promise，直接跳转
+                        const flightInfoTab = document.querySelector('.page-tab[data-page="flight-info"]');
+                        if (flightInfoTab) {
+                            flightInfoTab.click();
+                        }
+                    }
                 });
                 
-                // 编辑按钮事件
+                // 添加拖拽排序功能
+                const dragHandle = historyItem.querySelector('.drag-handle');
+                if (dragHandle) {
+                    dragHandle.addEventListener('mousedown', function(e) {
+                        startDrag(historyItem, e);
+                    });
+                }
+                
                 const editBtn = historyItem.querySelector('.edit-history-btn');
-                editBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    editHistoryItem(item);
-                });
+                if (editBtn) {
+                    editBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        editHistoryItem(item);
+                    });
+                }
                 
                 historyList.appendChild(historyItem);
             });
             
-            // 添加删除选中和删除全部按钮事件
-            document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', deleteSelectedHistory);
-            document.getElementById('deleteAllHistoryBtn').addEventListener('click', deleteAllHistory);
+            const deleteSelectedBtn = document.getElementById('deleteSelectedHistoryBtn');
+            const deleteAllBtn = document.getElementById('deleteAllHistoryBtn');
+            
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', deleteSelectedHistory);
+            }
+            
+            if (deleteAllBtn) {
+                deleteAllBtn.addEventListener('click', deleteAllHistory);
+            }
+            
+            // 初始化排序功能
+            initSortable();
+        }
+        
+        // ==================== 新增：拖拽排序功能 ====================
+        let draggedItem = null;
+        let dragOffsetY = 0;
+        
+        function initSortable() {
+            const historyItems = document.querySelectorAll('.history-item');
+            
+            historyItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('dragenter', handleDragEnter);
+                item.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        function startDrag(item, e) {
+            draggedItem = item;
+            const rect = item.getBoundingClientRect();
+            dragOffsetY = e.clientY - rect.top;
+            
+            // 设置拖拽效果
+            item.classList.add('dragging');
+            item.style.opacity = '0.5';
+            
+            // 设置拖拽数据
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', item.getAttribute('data-id'));
+            
+            // 添加全局拖拽监听
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+        
+        function handleMouseMove(e) {
+            if (!draggedItem) return;
+            
+            const container = document.getElementById('historyList');
+            const containerRect = container.getBoundingClientRect();
+            
+            // 计算拖拽位置
+            let mouseY = e.clientY - containerRect.top;
+            
+            // 限制在容器范围内
+            mouseY = Math.max(10, Math.min(mouseY, containerRect.height - 10));
+            
+            // 移动拖拽元素
+            draggedItem.style.position = 'absolute';
+            draggedItem.style.top = (mouseY - dragOffsetY) + 'px';
+            draggedItem.style.left = '10px';
+            draggedItem.style.width = (containerRect.width - 20) + 'px';
+            draggedItem.style.zIndex = '1000';
+            
+            // 查找插入位置
+            const historyItems = document.querySelectorAll('.history-item:not(.dragging)');
+            let targetItem = null;
+            
+            for (const item of historyItems) {
+                const rect = item.getBoundingClientRect();
+                const itemMiddleY = rect.top + rect.height / 2;
+                
+                if (e.clientY < itemMiddleY) {
+                    targetItem = item;
+                    break;
+                }
+            }
+            
+            // 移动其他元素
+            if (targetItem) {
+                container.insertBefore(draggedItem, targetItem);
+            } else {
+                container.appendChild(draggedItem);
+            }
+        }
+        
+        function handleMouseUp() {
+            if (!draggedItem) return;
+            
+            // 移除拖拽效果
+            draggedItem.classList.remove('dragging');
+            draggedItem.style.position = '';
+            draggedItem.style.top = '';
+            draggedItem.style.left = '';
+            draggedItem.style.width = '';
+            draggedItem.style.zIndex = '';
+            draggedItem.style.opacity = '';
+            
+            // 保存新的顺序
+            saveHistoryOrder();
+            
+            // 清理
+            draggedItem = null;
+            dragOffsetY = 0;
+            
+            // 移除监听
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+        
+        function handleDragStart(e) {
+            // 标准拖拽API处理
+            draggedItem = this;
+            setTimeout(() => {
+                this.classList.add('dragging');
+            }, 0);
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            if (draggedItem !== this) {
+                const container = document.getElementById('historyList');
+                const draggingRect = draggedItem.getBoundingClientRect();
+                const thisRect = this.getBoundingClientRect();
+                
+                if (draggingRect.top < thisRect.top) {
+                    container.insertBefore(draggedItem, this);
+                } else {
+                    container.insertBefore(draggedItem, this.nextSibling);
+                }
+                
+                saveHistoryOrder();
+            }
+        }
+        
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedItem = null;
+        }
+        
+        function handleDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('dragging-over');
+        }
+        
+        function handleDragLeave() {
+            this.classList.remove('dragging-over');
+        }
+        
+        function saveHistoryOrder() {
+            const historyList = document.getElementById('historyList');
+            const items = historyList.querySelectorAll('.history-item');
+            const order = [];
+            
+            items.forEach(item => {
+                const id = parseInt(item.getAttribute('data-id'));
+                order.push(id);
+            });
+            
+            // 获取当前历史记录
+            let history = JSON.parse(localStorage.getItem('flightHistory') || '[]');
+            
+            // 按新顺序重新排序
+            const newHistory = [];
+            order.forEach(id => {
+                const item = history.find(h => h.id === id);
+                if (item) {
+                    newHistory.push(item);
+                }
+            });
+            
+            // 保存新顺序
+            localStorage.setItem('flightHistory', JSON.stringify(newHistory));
+            
+            // 重新加载历史记录以更新显示
+            loadHistory();
         }
 
-        // 新增：编辑历史记录
+        // 编辑历史记录 - 改进版本，支持晚上/次日状态和截止值机时间
         function editHistoryItem(historyItem) {
-            // 创建编辑模态框
             const modal = document.createElement('div');
             modal.style.position = 'fixed';
             modal.style.top = '0';
@@ -3144,6 +4623,10 @@
                                 <input type="text" value="${segment.departureTime}" data-index="${index}" data-field="departureTime" style="width: 100%;">
                             </div>
                             <div>
+                                <label>晚上:</label>
+                                <input type="checkbox" ${segment.isEvening ? 'checked' : ''} data-index="${index}" data-field="isEvening" style="width: 20px; height: 20px;">
+                            </div>
+                            <div>
                                 <label>到达城市:</label>
                                 <div class="autocomplete-container">
                                     <input type="text" value="${segment.arrival}" data-index="${index}" data-field="arrival" style="width: 100%;" class="city-autocomplete">
@@ -3158,6 +4641,14 @@
                             <div>
                                 <label>到达时间:</label>
                                 <input type="text" value="${segment.arrivalTime}" data-index="${index}" data-field="arrivalTime" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label>次日:</label>
+                                <input type="checkbox" ${segment.isNextDay ? 'checked' : ''} data-index="${index}" data-field="isNextDay" style="width: 20px; height: 20px;">
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label>截止值机时间:</label>
+                                <input type="text" value="${segment.flightTime}" data-index="${index}" data-field="flightTime" style="width: 100%;">
                             </div>
                         </div>
                     </div>
@@ -3175,29 +4666,28 @@
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
             
-            // 为城市输入框添加智能输入
             const cityInputs = modalContent.querySelectorAll('.city-autocomplete');
             cityInputs.forEach(input => {
                 initSmartInputForModal(input, 'citiesList');
             });
             
-            // 为航站楼输入框添加智能输入
             const terminalInputs = modalContent.querySelectorAll('.terminal-autocomplete');
             terminalInputs.forEach(input => {
                 initSmartInputForModal(input, 'terminalsList');
             });
             
-            // 保存按钮事件
             document.getElementById('saveHistoryEdit').addEventListener('click', function() {
-                // 收集编辑后的数据
                 const inputs = modalContent.querySelectorAll('input');
                 inputs.forEach(input => {
                     const index = parseInt(input.getAttribute('data-index'));
                     const field = input.getAttribute('data-field');
-                    historyItem.data[index][field] = input.value;
+                    if (input.type === 'checkbox') {
+                        historyItem.data[index][field] = input.checked;
+                    } else {
+                        historyItem.data[index][field] = input.value;
+                    }
                 });
                 
-                // 更新本地存储
                 const history = JSON.parse(localStorage.getItem('flightHistory') || '[]');
                 const itemIndex = history.findIndex(item => item.id === historyItem.id);
                 if (itemIndex !== -1) {
@@ -3205,17 +4695,14 @@
                     localStorage.setItem('flightHistory', JSON.stringify(history));
                 }
                 
-                // 关闭模态框并刷新显示
                 document.body.removeChild(modal);
                 loadHistory();
             });
             
-            // 取消按钮事件
             document.getElementById('cancelHistoryEdit').addEventListener('click', function() {
                 document.body.removeChild(modal);
             });
             
-            // 点击模态框外部关闭
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     document.body.removeChild(modal);
@@ -3223,7 +4710,7 @@
             });
         }
 
-        // 新增：为模态框中的输入框初始化智能输入
+        // 为模态框中的输入框初始化智能输入
         function initSmartInputForModal(input, settingsListId) {
             let dropdown = null;
             
@@ -3237,7 +4724,6 @@
                     return;
                 }
                 
-                // 获取设置列表中的选项
                 let items = [];
                 if (settingsListId === 'citiesList') {
                     items = airportList;
@@ -3249,17 +4735,14 @@
                     item.toLowerCase().includes(value.toLowerCase())
                 );
                 
-                // 移除现有下拉框
                 if (dropdown) {
                     dropdown.remove();
                 }
                 
-                // 如果没有匹配项，不显示下拉框
                 if (matches.length === 0) {
                     return;
                 }
                 
-                // 创建下拉框
                 dropdown = document.createElement('div');
                 dropdown.className = 'autocomplete-dropdown';
                 
@@ -3275,7 +4758,6 @@
                     dropdown.appendChild(item);
                 });
                 
-                // 定位下拉框
                 const rect = input.getBoundingClientRect();
                 dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
                 dropdown.style.left = (rect.left + window.scrollX) + 'px';
@@ -3284,7 +4766,6 @@
                 document.body.appendChild(dropdown);
             });
             
-            // 点击其他地方时关闭下拉框
             document.addEventListener('click', function(e) {
                 if (dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.remove();
@@ -3293,53 +4774,7 @@
             });
         }
 
-        // 新增：从历史记录回填
-        function fillFromHistory(flightData) {
-            // 确保只有一个行程方案
-            const itineraries = document.querySelectorAll('.itinerary-container');
-            if (itineraries.length === 0) {
-                addNewItinerary();
-            } else if (itineraries.length > 1) {
-                if (!confirm('当前有多个行程方案，将使用第一个方案进行回填。是否继续？')) {
-                    return;
-                }
-            }
-            
-            const itineraryId = document.querySelector('.itinerary-container').id.replace('itinerary', '');
-            
-            // 清空现有航段
-            const segmentsContainer = document.getElementById(`flightSegments${itineraryId}`);
-            segmentsContainer.innerHTML = '';
-            
-            // 添加历史航段
-            flightData.forEach((segment, index) => {
-                addFlightSegment(itineraryId);
-                const segmentId = segmentCounters[itineraryId];
-                
-                // 回填数据
-                setTimeout(() => {
-                    const flightNoInput = document.getElementById(`segment${itineraryId}-${segmentId}-flightNo-input`);
-                    const departureInput = document.getElementById(`segment${itineraryId}-${segmentId}-departure-input`);
-                    const departureTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-departure-terminal`);
-                    const departureTime = document.getElementById(`segment${itineraryId}-${segmentId}-departure-time`);
-                    const arrivalInput = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-input`);
-                    const arrivalTerminal = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-terminal`);
-                    const arrivalTime = document.getElementById(`segment${itineraryId}-${segmentId}-arrival-time`);
-                    
-                    if (flightNoInput) flightNoInput.value = segment.flightNo;
-                    if (departureInput) departureInput.value = segment.departure;
-                    if (departureTerminal) departureTerminal.value = segment.departureTerminal;
-                    if (departureTime) departureTime.value = segment.departureTime;
-                    if (arrivalInput) arrivalInput.value = segment.arrival;
-                    if (arrivalTerminal) arrivalTerminal.value = segment.arrivalTerminal;
-                    if (arrivalTime) arrivalTime.value = segment.arrivalTime;
-                }, 100);
-            });
-            
-            alert('历史记录已回填到行程方案中');
-        }
-
-        // 新增：删除选中的历史记录
+        // 删除选中的历史记录
         function deleteSelectedHistory() {
             const checkboxes = document.querySelectorAll('.history-checkbox:checked');
             if (checkboxes.length === 0) {
@@ -3360,7 +4795,7 @@
             alert('已删除选中的历史记录');
         }
 
-        // 新增：删除全部历史记录
+        // 删除全部历史记录
         function deleteAllHistory() {
             const history = JSON.parse(localStorage.getItem('flightHistory') || '[]');
             if (history.length === 0) {
@@ -3377,7 +4812,7 @@
             alert('已删除全部历史记录');
         }
 
-        // 新增：设置页面功能
+        // 设置页面功能
         function initSettingsPage() {
             // 加载设置数据
             loadSettings();
@@ -3431,20 +4866,29 @@
             updateCheckedBaggageList();
         }
         
-        // 保存航线设置
+        // 保存航线设置 - 修复：移除强制添加的多余航线
         function saveRoutesSettings() {
             const textarea = document.getElementById('setting-routes');
             if (textarea) {
                 const routes = textarea.value.split('\n').filter(route => route.trim() !== '');
-                commonRoutes.length = 0; // 清空现有航线
+                commonRoutes.length = 0;
                 
+                // 只添加用户输入的航线，不强制添加任何多余的航线
                 routes.forEach(route => {
                     const parts = route.split('-');
-                    if (parts.length >= 2) {
+                    if (parts.length === 2) {
                         const name = route;
                         const departure = parts[0].trim();
                         const arrival = parts[1].trim();
                         commonRoutes.push({ name, departure, arrival });
+                    } else if (parts.length === 3) {
+                        // 处理三段航线
+                        const name = route;
+                        const segments = [
+                            { departure: parts[0].trim(), arrival: parts[1].trim() },
+                            { departure: parts[1].trim(), arrival: parts[2].trim() }
+                        ];
+                        commonRoutes.push({ name, segments });
                     }
                 });
                 
@@ -3458,8 +4902,8 @@
             const textarea = document.getElementById('setting-cities');
             if (textarea) {
                 const cities = textarea.value.split('\n').filter(city => city.trim() !== '');
-                airportList.length = 0; // 清空现有城市
-                savedLocations.length = 0; // 清空现有地点
+                airportList.length = 0;
+                savedLocations.length = 0;
                 
                 cities.forEach(city => {
                     airportList.push(city.trim());
@@ -3478,8 +4922,8 @@
             const textarea = document.getElementById('setting-terminals');
             if (textarea) {
                 const terminals = textarea.value.split('\n').filter(terminal => terminal.trim() !== '');
-                terminalList.length = 0; // 清空现有航站楼
-                terminalList.push("请选择"); // 添加默认选项
+                terminalList.length = 0;
+                terminalList.push("请选择");
                 
                 terminals.forEach(terminal => {
                     terminalList.push(terminal.trim());
@@ -3495,7 +4939,7 @@
             const textarea = document.getElementById('setting-checkin-times');
             if (textarea) {
                 const times = textarea.value.split('\n').filter(time => time.trim() !== '');
-                checkinTimeOptions.length = 0; // 清空现有值机时间
+                checkinTimeOptions.length = 0;
                 
                 times.forEach(time => {
                     checkinTimeOptions.push(time.trim());
@@ -3511,7 +4955,7 @@
             const textarea = document.getElementById('setting-transfer-notes');
             if (textarea) {
                 const notes = textarea.value.split('\n').filter(note => note.trim() !== '');
-                transferNoteOptions.length = 0; // 清空现中转行李提示
+                transferNoteOptions.length = 0;
                 
                 notes.forEach(note => {
                     transferNoteOptions.push(note.trim());
@@ -3527,7 +4971,7 @@
             const textarea = document.getElementById('setting-note-keywords');
             if (textarea) {
                 const keywords = textarea.value.split('\n').filter(keyword => keyword.trim() !== '');
-                presetNotes.length = 0; // 清空现备注关键词
+                presetNotes.length = 0;
                 
                 keywords.forEach(keyword => {
                     presetNotes.push(keyword.trim());
@@ -3543,7 +4987,7 @@
             const textarea = document.getElementById('setting-trip-types');
             if (textarea) {
                 const types = textarea.value.split('\n').filter(type => type.trim() !== '');
-                tripTypeOptions.length = 0; // 清空现行程类型
+                tripTypeOptions.length = 0;
                 
                 types.forEach(type => {
                     tripTypeOptions.push(type.trim());
@@ -3560,7 +5004,7 @@
             const textarea = document.getElementById('setting-carry-on-baggage');
             if (textarea) {
                 const baggageList = textarea.value.split('\n').filter(baggage => baggage.trim() !== '');
-                carryOnBaggageOptions.length = 0; // 清空现手提行李要求
+                carryOnBaggageOptions.length = 0;
                 
                 baggageList.forEach(baggage => {
                     carryOnBaggageOptions.push(baggage.trim());
@@ -3577,7 +5021,7 @@
             const textarea = document.getElementById('setting-checked-baggage');
             if (textarea) {
                 const baggageList = textarea.value.split('\n').filter(baggage => baggage.trim() !== '');
-                checkedBaggageOptions.length = 0; // 清空现托运行李要求
+                checkedBaggageOptions.length = 0;
                 
                 baggageList.forEach(baggage => {
                     checkedBaggageOptions.push(baggage.trim());
@@ -3599,6 +5043,7 @@
                     optionElement.value = option === '单程' ? '的行程如下:' : 
                                          option === '往返' ? '的往返行程如下:' : 
                                          option === '更改行程' ? '的行程更改如下:' : 
+                                         option === '联程航班' ? '的联程航班行程如下:' : 
                                          '的往返行程更改如下:';
                     optionElement.textContent = option;
                     tripTypeSelect.appendChild(optionElement);
@@ -3721,21 +5166,41 @@
             const saved = localStorage.getItem('flightSettings');
             if (saved) {
                 const settings = JSON.parse(saved);
-                Object.assign(airportList, settings.airportList || []);
-                Object.assign(terminalList, settings.terminalList || []);
-                Object.assign(commonRoutes, settings.commonRoutes || []);
-                Object.assign(savedFlightNumbers, settings.savedFlightNumbers || []);
-                Object.assign(savedLocations, settings.savedLocations || []);
-                Object.assign(checkinTimeOptions, settings.checkinTimeOptions || []);
-                Object.assign(transferNoteOptions, settings.transferNoteOptions || []);
-                Object.assign(presetNotes, settings.presetNotes || []);
-                Object.assign(tripTypeOptions, settings.tripTypeOptions || []);
-                Object.assign(carryOnBaggageOptions, settings.carryOnBaggageOptions || []);
-                Object.assign(checkedBaggageOptions, settings.checkedBaggageOptions || []);
+                
+                // 清空现有数组
+                airportList.length = 0;
+                terminalList.length = 0;
+                commonRoutes.length = 0;
+                savedFlightNumbers.length = 0;
+                savedLocations.length = 0;
+                checkinTimeOptions.length = 0;
+                transferNoteOptions.length = 0;
+                presetNotes.length = 0;
+                tripTypeOptions.length = 0;
+                carryOnBaggageOptions.length = 0;
+                checkedBaggageOptions.length = 0;
+                
+                // 从保存的设置中恢复数据
+                if (settings.airportList) airportList.push(...settings.airportList);
+                if (settings.terminalList) terminalList.push(...settings.terminalList);
+                if (settings.commonRoutes) commonRoutes.push(...settings.commonRoutes);
+                if (settings.savedFlightNumbers) savedFlightNumbers.push(...settings.savedFlightNumbers);
+                if (settings.savedLocations) savedLocations.push(...settings.savedLocations);
+                if (settings.checkinTimeOptions) checkinTimeOptions.push(...settings.checkinTimeOptions);
+                if (settings.transferNoteOptions) transferNoteOptions.push(...settings.transferNoteOptions);
+                if (settings.presetNotes) presetNotes.push(...settings.presetNotes);
+                if (settings.tripTypeOptions) tripTypeOptions.push(...settings.tripTypeOptions);
+                if (settings.carryOnBaggageOptions) carryOnBaggageOptions.push(...settings.carryOnBaggageOptions);
+                if (settings.checkedBaggageOptions) checkedBaggageOptions.push(...settings.checkedBaggageOptions);
+                
+                // 确保终端列表有默认值
+                if (terminalList.length === 0) {
+                    terminalList.push("请选择");
+                }
             }
         }
         
-        // 新增：付款状态页面功能
+        // 付款状态页面功能
         function initPaymentStatusPage() {
             // 加载付款数据
             loadPaymentData();
@@ -3748,6 +5213,11 @@
             // 删除付款记录按钮
             document.getElementById('deletePaymentBtn').addEventListener('click', function() {
                 deleteSelectedPayments();
+            });
+            
+            // 取消筛选按钮（新增）
+            document.getElementById('clearSelectionBtn').addEventListener('click', function() {
+                clearAllCheckboxes();
             });
             
             // 全选复选框
@@ -3763,14 +5233,17 @@
                 clearAllFilters();
             });
             
-            // 筛选按钮 - 修改为按年、月、日筛选
+            // 筛选按钮
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const column = this.getAttribute('data-column');
+                    activeFilterColumn = column;
                     if (column === 'date') {
-                        showDateFilterDropdown(this, column);
+                        showDateMultiFilterDropdown(this, column);
+                    } else if (column === 'passenger') {
+                        showPassengerMultiFilterDropdown(this, column);
                     } else {
-                        showFilterDropdown(this, column);
+                        showSimpleFilterDropdown(this, column);
                     }
                 });
             });
@@ -3784,7 +5257,6 @@
             if (saved) {
                 paymentData = JSON.parse(saved);
             } else {
-                // 默认数据 - 差额默认为空白
                 paymentData = [
                     { id: 1, date: '', passenger: '', amount: '', difference: '', settlement: '未结算', notes: '' },
                     { id: 2, date: '', passenger: '', amount: '', difference: '', settlement: '未结算', notes: '' }
@@ -3834,7 +5306,6 @@
                     </td>
                 `;
                 
-                // 结算状态变化事件
                 const select = row.querySelector('.settlement-select');
                 select.addEventListener('change', function() {
                     const id = parseInt(this.getAttribute('data-id'));
@@ -3845,7 +5316,6 @@
                     }
                 });
                 
-                // 可编辑单元格事件
                 const editableCells = row.querySelectorAll('.editable-cell');
                 editableCells.forEach(cell => {
                     cell.addEventListener('blur', function() {
@@ -3859,7 +5329,6 @@
                         }
                     });
                     
-                    // 按Enter键保存
                     cell.addEventListener('keypress', function(e) {
                         if (e.key === 'Enter') {
                             this.blur();
@@ -3875,7 +5344,6 @@
         }
         
         function updateTotals() {
-            // 计算总计
             const totalAmount = paymentData.reduce((sum, item) => {
                 return sum + (parseInt(item.amount) || 0);
             }, 0);
@@ -3887,7 +5355,6 @@
             document.getElementById('totalAmount').textContent = totalAmount;
             document.getElementById('totalDifference').textContent = totalDifference;
             
-            // 计算筛选结果总计
             if (filteredPaymentData) {
                 const filteredTotalAmount = filteredPaymentData.reduce((sum, item) => {
                     return sum + (parseInt(item.amount) || 0);
@@ -3909,24 +5376,50 @@
             const filterStatus = document.getElementById('filterStatus');
             const filterTags = document.getElementById('filterTags');
             
-            if (currentFilters.year || currentFilters.month || currentFilters.day) {
+            const hasActiveFilters = Object.keys(currentFilters).some(key => 
+                Array.isArray(currentFilters[key]) ? currentFilters[key].length > 0 : false
+            );
+            
+            if (hasActiveFilters) {
                 filterStatus.style.display = 'block';
                 let tagsHtml = '';
                 
-                if (currentFilters.year) {
-                    tagsHtml += `<span class="filter-tag">${currentFilters.year}年</span>`;
+                if (currentFilters.date && currentFilters.date.length > 0) {
+                    const dateLabels = currentFilters.date.map(f => {
+                        if (f.type === 'year') return `${f.value}年`;
+                        if (f.type === 'month') return `${f.value}月`;
+                        if (f.type === 'day') return `${f.value}日`;
+                        return f.value;
+                    });
+                    tagsHtml += `<span class="filter-tag">日期: ${dateLabels.join(', ')}</span>`;
                 }
-                if (currentFilters.month) {
-                    tagsHtml += `<span class="filter-tag">${currentFilters.month}月</span>`;
+                
+                if (currentFilters.passenger && currentFilters.passenger.length > 0) {
+                    tagsHtml += `<span class="filter-tag">订票人: ${currentFilters.passenger.join(', ')}</span>`;
                 }
-                if (currentFilters.day) {
-                    tagsHtml += `<span class="filter-tag">${currentFilters.day}日</span>`;
-                }
+                
+                ['amount', 'difference', 'settlement', 'notes'].forEach(column => {
+                    if (currentFilters[column] && currentFilters[column].length > 0) {
+                        tagsHtml += `<span class="filter-tag">${getColumnLabel(column)}: ${currentFilters[column].join(', ')}</span>`;
+                    }
+                });
                 
                 filterTags.innerHTML = tagsHtml;
             } else {
                 filterStatus.style.display = 'none';
             }
+        }
+        
+        function getColumnLabel(column) {
+            const labels = {
+                'date': '日期',
+                'passenger': '订票人',
+                'amount': '金额',
+                'difference': '差额',
+                'settlement': '结算',
+                'notes': '备注'
+            };
+            return labels[column] || column;
         }
         
         function addPaymentRecord() {
@@ -3936,7 +5429,7 @@
                 date: new Date().toISOString().split('T')[0],
                 passenger: '',
                 amount: '',
-                difference: '', // 差额默认为空白
+                difference: '',
                 settlement: '未结算',
                 notes: ''
             });
@@ -3964,202 +5457,173 @@
             alert('已删除选中的付款记录');
         }
         
-        // 新增：日期筛选下拉框（按年、月、日）- 支持叠加筛选
-        function showDateFilterDropdown(button, column) {
-            // 移除现有下拉框
-            const existing = document.querySelector('.filter-dropdown');
-            if (existing) {
-                existing.remove();
-            }
-            
-            // 获取所有日期并提取年、月、日
-            const dates = paymentData.map(item => item.date);
-            const years = [...new Set(dates.map(date => date.split('-')[0]))].sort().reverse();
-            const months = [...new Set(dates.map(date => date.split('-')[1]))].sort().reverse();
-            const days = [...new Set(dates.map(date => date.split('-')[2]))].sort().reverse();
-            
-            // 创建下拉框
-            const dropdown = document.createElement('div');
-            dropdown.className = 'filter-dropdown';
-            
-            // 添加"全部"选项
-            const allItem = document.createElement('div');
-            allItem.className = 'filter-item';
-            allItem.textContent = '全部';
-            allItem.addEventListener('click', function() {
-                // 重置筛选
-                clearAllFilters();
-                dropdown.remove();
+        // 清除所有复选框
+        function clearAllCheckboxes() {
+            const checkboxes = document.querySelectorAll('.payment-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
             });
-            dropdown.appendChild(allItem);
-            
-            // 添加年份筛选
-            if (years.length > 0) {
-                const yearHeader = document.createElement('div');
-                yearHeader.className = 'filter-item';
-                yearHeader.style.fontWeight = 'bold';
-                yearHeader.textContent = '按年筛选:';
-                dropdown.appendChild(yearHeader);
-                
-                years.forEach(year => {
-                    const item = document.createElement('div');
-                    item.className = 'filter-item';
-                    item.textContent = `${year}年`;
-                    item.addEventListener('click', function() {
-                        // 设置年份筛选
-                        currentFilters.year = year;
-                        currentFilters.month = null;
-                        currentFilters.day = null;
-                        applyDateFilter();
-                        dropdown.remove();
-                    });
-                    dropdown.appendChild(item);
-                });
-            }
-            
-            // 添加月份筛选 - 只在已选择年份时显示
-            if (currentFilters.year) {
-                const monthHeader = document.createElement('div');
-                monthHeader.className = 'filter-item';
-                monthHeader.style.fontWeight = 'bold';
-                monthHeader.textContent = '按月筛选:';
-                dropdown.appendChild(monthHeader);
-                
-                months.forEach(month => {
-                    const item = document.createElement('div');
-                    item.className = 'filter-item';
-                    item.textContent = `${month}月`;
-                    item.addEventListener('click', function() {
-                        // 设置月份筛选
-                        currentFilters.month = month;
-                        currentFilters.day = null;
-                        applyDateFilter();
-                        dropdown.remove();
-                    });
-                    dropdown.appendChild(item);
-                });
-            }
-            
-            // 添加日期筛选 - 只在已选择年份和月份时显示
-            if (currentFilters.year && currentFilters.month) {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'filter-item';
-                dayHeader.style.fontWeight = 'bold';
-                dayHeader.textContent = '按日筛选:';
-                dropdown.appendChild(dayHeader);
-                
-                days.forEach(day => {
-                    const item = document.createElement('div');
-                    item.className = 'filter-item';
-                    item.textContent = `${day}日`;
-                    item.addEventListener('click', function() {
-                        // 设置日期筛选
-                        currentFilters.day = day;
-                        applyDateFilter();
-                        dropdown.remove();
-                    });
-                    dropdown.appendChild(item);
-                });
-            }
-            
-            // 定位下拉框
-            const rect = button.getBoundingClientRect();
-            dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
-            dropdown.style.left = (rect.left + window.scrollX) + 'px';
-            
-            document.body.appendChild(dropdown);
-            
-            // 点击其他地方时关闭下拉框
-            document.addEventListener('click', function closeDropdown(e) {
-                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.remove();
-                    document.removeEventListener('click', closeDropdown);
-                }
-            });
-        }
-        
-        // 应用日期筛选
-        function applyDateFilter() {
-            let filteredData = [...paymentData];
-            
-            // 按年份筛选
-            if (currentFilters.year) {
-                filteredData = filteredData.filter(item => item.date.startsWith(currentFilters.year));
-            }
-            
-            // 按月份筛选
-            if (currentFilters.month) {
-                filteredData = filteredData.filter(item => item.date.includes(`-${currentFilters.month}-`));
-            }
-            
-            // 按日期筛选
-            if (currentFilters.day) {
-                filteredData = filteredData.filter(item => item.date.endsWith(currentFilters.day));
-            }
-            
-            renderPaymentTable(filteredData);
+            document.getElementById('selectAllPayments').checked = false;
         }
         
         // 清除所有筛选
         function clearAllFilters() {
             currentFilters = {
-                year: null,
-                month: null,
-                day: null
+                date: [],
+                passenger: [],
+                amount: [],
+                difference: [],
+                settlement: [],
+                notes: []
             };
             renderPaymentTable();
         }
         
-        // 原有的其他列筛选函数
-        function showFilterDropdown(button, column) {
-            // 移除现有下拉框
-            const existing = document.querySelector('.filter-dropdown');
+        // 日期多选筛选下拉框
+        function showDateMultiFilterDropdown(button, column) {
+            const existing = document.querySelector('.multi-filter-dropdown');
             if (existing) {
                 existing.remove();
             }
             
-            // 获取列的所有值
-            const values = [...new Set(paymentData.map(item => item[column]))];
+            const dates = paymentData.map(item => item.date).filter(d => d);
             
-            // 创建下拉框
+            const allYears = [...new Set(dates.map(date => date.split('-')[0]))].filter(y => y).sort().reverse();
+            const allMonths = [...new Set(dates.map(date => date.split('-')[1]))].filter(m => m).sort().reverse();
+            const allDays = [...new Set(dates.map(date => date.split('-')[2]))].filter(d => d).sort().reverse();
+            
+            const selectedDateFilters = currentFilters.date || [];
+            
             const dropdown = document.createElement('div');
-            dropdown.className = 'filter-dropdown';
+            dropdown.className = 'multi-filter-dropdown';
+            dropdown.style.minWidth = '180px';
+            dropdown.style.padding = '0';
             
-            // 添加"全部"选项
-            const allItem = document.createElement('div');
-            allItem.className = 'filter-item';
-            allItem.textContent = '全部';
-            allItem.addEventListener('click', function() {
-                // 重置筛选
-                renderPaymentTable();
-                dropdown.remove();
-            });
-            dropdown.appendChild(allItem);
+            const title = document.createElement('div');
+            title.className = 'filter-section';
+            title.style.padding = '10px';
+            title.style.borderBottom = '1px solid #e2e8f0';
+            title.style.fontWeight = 'bold';
+            title.style.fontSize = '11px';
+            title.textContent = '日期筛选';
+            dropdown.appendChild(title);
             
-            // 添加各值选项
-            values.forEach(value => {
-                if (!value) return;
+            if (allYears.length > 0) {
+                const yearSection = document.createElement('div');
+                yearSection.className = 'filter-section';
                 
-                const item = document.createElement('div');
-                item.className = 'filter-item';
-                item.textContent = value;
-                item.addEventListener('click', function() {
-                    // 筛选表格
-                    const filteredData = paymentData.filter(item => item[column] === value);
-                    renderPaymentTable(filteredData);
-                    dropdown.remove();
+                const yearTitle = document.createElement('div');
+                yearTitle.className = 'filter-section-title';
+                yearTitle.textContent = '按年筛选:';
+                yearSection.appendChild(yearTitle);
+                
+                allYears.forEach(year => {
+                    const isChecked = selectedDateFilters.some(f => f.type === 'year' && f.value === year);
+                    
+                    const option = document.createElement('div');
+                    option.className = 'filter-option';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'small-checkbox';
+                    checkbox.dataset.type = 'year';
+                    checkbox.dataset.value = year;
+                    checkbox.checked = isChecked;
+                    checkbox.style.marginRight = '8px';
+                    
+                    const label = document.createElement('label');
+                    label.textContent = `${year}年`;
+                    label.style.fontSize = '11px';
+                    label.style.cursor = 'pointer';
+                    label.style.flex = '1';
+                    
+                    checkbox.addEventListener('change', function() {
+                        updateMonthAndDayOptions(dropdown, selectedDateFilters);
+                    });
+                    
+                    option.appendChild(checkbox);
+                    option.appendChild(label);
+                    yearSection.appendChild(option);
                 });
-                dropdown.appendChild(item);
-            });
+                
+                dropdown.appendChild(yearSection);
+            }
             
-            // 定位下拉框
+            const monthSection = document.createElement('div');
+            monthSection.className = 'filter-section';
+            
+            const monthTitle = document.createElement('div');
+            monthTitle.className = 'filter-section-title';
+            monthTitle.textContent = '按月筛选:';
+            monthSection.appendChild(monthTitle);
+            
+            const monthOptionsContainer = document.createElement('div');
+            monthOptionsContainer.id = 'month-options-container';
+            monthSection.appendChild(monthOptionsContainer);
+            
+            dropdown.appendChild(monthSection);
+            
+            const daySection = document.createElement('div');
+            daySection.className = 'filter-section';
+            
+            const dayTitle = document.createElement('div');
+            dayTitle.className = 'filter-section-title';
+            dayTitle.textContent = '按日筛选:';
+            daySection.appendChild(dayTitle);
+            
+            const dayOptionsContainer = document.createElement('div');
+            dayOptionsContainer.id = 'day-options-container';
+            daySection.appendChild(dayOptionsContainer);
+            
+            dropdown.appendChild(daySection);
+            
+            const buttonSection = document.createElement('div');
+            buttonSection.className = 'filter-buttons';
+            buttonSection.style.flexDirection = 'row';
+            buttonSection.style.justifyContent = 'space-between';
+            buttonSection.style.gap = '5px';
+            
+            const applyButton = document.createElement('button');
+            applyButton.className = 'filter-apply-btn';
+            applyButton.textContent = '应用筛选';
+            
+            const clearButton = document.createElement('button');
+            clearButton.className = 'filter-clear-btn';
+            clearButton.textContent = '清除筛选';
+            
+            buttonSection.appendChild(applyButton);
+            buttonSection.appendChild(clearButton);
+            dropdown.appendChild(buttonSection);
+            
             const rect = button.getBoundingClientRect();
             dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
             dropdown.style.left = (rect.left + window.scrollX) + 'px';
             
             document.body.appendChild(dropdown);
             
-            // 点击其他地方时关闭下拉框
+            updateMonthAndDayOptions(dropdown, selectedDateFilters);
+            
+            applyButton.addEventListener('click', function() {
+                const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+                const selectedFilters = [];
+                
+                checkboxes.forEach(cb => {
+                    const type = cb.dataset.type;
+                    const value = cb.dataset.value;
+                    selectedFilters.push({ type, value });
+                });
+                
+                currentFilters.date = selectedFilters;
+                applyMultiFilter();
+                dropdown.remove();
+            });
+            
+            clearButton.addEventListener('click', function() {
+                currentFilters.date = [];
+                applyMultiFilter();
+                dropdown.remove();
+            });
+            
             document.addEventListener('click', function closeDropdown(e) {
                 if (!button.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.remove();
@@ -4167,6 +5631,483 @@
                 }
             });
         }
+        
+        // 动态更新月份和日期选项
+        function updateMonthAndDayOptions(dropdown, selectedDateFilters) {
+            const dates = paymentData.map(item => item.date).filter(d => d);
+            
+            const yearCheckboxes = dropdown.querySelectorAll('input[type="checkbox"][data-type="year"]:checked');
+            const selectedYears = Array.from(yearCheckboxes).map(cb => cb.dataset.value);
+            
+            let filteredDates = dates;
+            if (selectedYears.length > 0) {
+                filteredDates = dates.filter(date => {
+                    const year = date.split('-')[0];
+                    return selectedYears.includes(year);
+                });
+            }
+            
+            const monthOptionsContainer = dropdown.querySelector('#month-options-container');
+            monthOptionsContainer.innerHTML = '';
+            
+            const possibleMonths = [...new Set(filteredDates.map(date => date.split('-')[1]))].filter(m => m).sort().reverse();
+            
+            possibleMonths.forEach(month => {
+                const isChecked = selectedDateFilters.some(f => f.type === 'month' && f.value === month);
+                
+                const option = document.createElement('div');
+                option.className = 'filter-option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'small-checkbox';
+                checkbox.dataset.type = 'month';
+                checkbox.dataset.value = month;
+                checkbox.checked = isChecked;
+                checkbox.style.marginRight = '8px';
+                
+                const label = document.createElement('label');
+                label.textContent = `${month}月`;
+                label.style.fontSize = '11px';
+                label.style.cursor = 'pointer';
+                label.style.flex = '1';
+                
+                checkbox.addEventListener('change', function() {
+                    updateDayOptions(dropdown, selectedDateFilters);
+                });
+                
+                option.appendChild(checkbox);
+                option.appendChild(label);
+                monthOptionsContainer.appendChild(option);
+            });
+            
+            updateDayOptions(dropdown, selectedDateFilters);
+        }
+        
+        // 动态更新日期选项
+        function updateDayOptions(dropdown, selectedDateFilters) {
+            const dates = paymentData.map(item => item.date).filter(d => d);
+            
+            const yearCheckboxes = dropdown.querySelectorAll('input[type="checkbox"][data-type="year"]:checked');
+            const selectedYears = Array.from(yearCheckboxes).map(cb => cb.dataset.value);
+            
+            const monthCheckboxes = dropdown.querySelectorAll('input[type="checkbox"][data-type="month"]:checked');
+            const selectedMonths = Array.from(monthCheckboxes).map(cb => cb.dataset.value);
+            
+            let filteredDates = dates;
+            if (selectedYears.length > 0) {
+                filteredDates = filteredDates.filter(date => {
+                    const year = date.split('-')[0];
+                    return selectedYears.includes(year);
+                });
+            }
+            if (selectedMonths.length > 0) {
+                filteredDates = filteredDates.filter(date => {
+                    const month = date.split('-')[1];
+                    return selectedMonths.includes(month);
+                });
+            }
+            
+            const dayOptionsContainer = dropdown.querySelector('#day-options-container');
+            dayOptionsContainer.innerHTML = '';
+            
+            const possibleDays = [...new Set(filteredDates.map(date => date.split('-')[2]))].filter(d => d).sort().reverse();
+            
+            possibleDays.forEach(day => {
+                const isChecked = selectedDateFilters.some(f => f.type === 'day' && f.value === day);
+                
+                const option = document.createElement('div');
+                option.className = 'filter-option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'small-checkbox';
+                checkbox.dataset.type = 'day';
+                checkbox.dataset.value = day;
+                checkbox.checked = isChecked;
+                checkbox.style.marginRight = '8px';
+                
+                const label = document.createElement('label');
+                label.textContent = `${day}日`;
+                label.style.fontSize = '11px';
+                label.style.cursor = 'pointer';
+                label.style.flex = '1';
+                
+                option.appendChild(checkbox);
+                option.appendChild(label);
+                dayOptionsContainer.appendChild(option);
+            });
+        }
+        
+        // 订票人多选筛选下拉框
+        function showPassengerMultiFilterDropdown(button, column) {
+            const existing = document.querySelector('.multi-filter-dropdown');
+            if (existing) {
+                existing.remove();
+            }
+            
+            const values = [...new Set(paymentData.map(item => item[column]))].filter(v => v);
+            
+            const selectedFilters = currentFilters[column] || [];
+            
+            const dropdown = document.createElement('div');
+            dropdown.className = 'multi-filter-dropdown';
+            dropdown.style.minWidth = '180px';
+            dropdown.style.maxHeight = '250px';
+            dropdown.style.overflowY = auto;
+            dropdown.style.padding = '0';
+            
+            const title = document.createElement('div');
+            title.className = 'filter-section';
+            title.style.padding = '10px';
+            title.style.borderBottom = '1px solid #e2e8f0';
+            title.style.fontWeight = 'bold';
+            title.style.fontSize = '11px';
+            title.textContent = '订票人筛选';
+            dropdown.appendChild(title);
+            
+            const selectAllSection = document.createElement('div');
+            selectAllSection.className = 'filter-section';
+            selectAllSection.style.padding = '8px';
+            selectAllSection.style.backgroundColor = '#f7fafc';
+            
+            const selectAllOption = document.createElement('div');
+            selectAllOption.className = 'filter-option';
+            
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.className = 'small-checkbox';
+            selectAllCheckbox.id = 'selectAllFilter';
+            selectAllCheckbox.checked = selectedFilters.length === values.length;
+            selectAllCheckbox.style.marginRight = '8px';
+            
+            const selectAllLabel = document.createElement('label');
+            selectAllLabel.htmlFor = 'selectAllFilter';
+            selectAllLabel.textContent = '全选';
+            selectAllLabel.style.fontSize = '11px';
+            selectAllLabel.style.cursor = 'pointer';
+            selectAllLabel.style.flex = '1';
+            
+            selectAllOption.appendChild(selectAllCheckbox);
+            selectAllOption.appendChild(selectAllLabel);
+            selectAllSection.appendChild(selectAllOption);
+            dropdown.appendChild(selectAllSection);
+            
+            const valuesSection = document.createElement('div');
+            valuesSection.className = 'filter-section';
+            
+            values.forEach(value => {
+                const isChecked = selectedFilters.includes(value);
+                
+                const option = document.createElement('div');
+                option.className = 'filter-option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'small-checkbox';
+                checkbox.value = value;
+                checkbox.checked = isChecked;
+                checkbox.style.marginRight = '8px';
+                
+                const label = document.createElement('label');
+                label.textContent = value;
+                label.style.fontSize = '11px';
+                label.style.cursor = 'pointer';
+                label.style.flex = '1';
+                
+                option.appendChild(checkbox);
+                option.appendChild(label);
+                valuesSection.appendChild(option);
+            });
+            
+            dropdown.appendChild(valuesSection);
+            
+            const buttonSection = document.createElement('div');
+            buttonSection.className = 'filter-buttons';
+            buttonSection.style.flexDirection = 'row';
+            buttonSection.style.justifyContent = 'space-between';
+            buttonSection.style.gap = '5px';
+            
+            const applyButton = document.createElement('button');
+            applyButton.className = 'filter-apply-btn';
+            applyButton.textContent = '应用筛选';
+            
+            const clearButton = document.createElement('button');
+            clearButton.className = 'filter-clear-btn';
+            clearButton.textContent = '清除筛选';
+            
+            buttonSection.appendChild(applyButton);
+            buttonSection.appendChild(clearButton);
+            dropdown.appendChild(buttonSection);
+            
+            const rect = button.getBoundingClientRect();
+            dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+            dropdown.style.left = (rect.left + window.scrollX) + 'px';
+            
+            document.body.appendChild(dropdown);
+            
+            selectAllCheckbox.addEventListener('change', function() {
+                const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:not(#selectAllFilter)');
+                checkboxes.forEach(cb => {
+                    cb.checked = this.checked;
+                });
+            });
+            
+            applyButton.addEventListener('click', function() {
+                const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:not(#selectAllFilter):checked');
+                const selectedValues = Array.from(checkboxes).map(cb => cb.value);
+                
+                currentFilters[column] = selectedValues;
+                applyMultiFilter();
+                dropdown.remove();
+            });
+            
+            clearButton.addEventListener('click', function() {
+                currentFilters[column] = [];
+                applyMultiFilter();
+                dropdown.remove();
+            });
+            
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+        
+        // 应用多选筛选
+        function applyMultiFilter() {
+            let filteredData = [...paymentData];
+            
+            if (currentFilters.date && currentFilters.date.length > 0) {
+                filteredData = filteredData.filter(item => {
+                    if (!item.date) return false;
+                    
+                    const [year, month, day] = item.date.split('-');
+                    
+                    const yearMatch = currentFilters.date.some(f => f.type === 'year' && f.value === year);
+                    const monthMatch = currentFilters.date.some(f => f.type === 'month' && f.value === month);
+                    const dayMatch = currentFilters.date.some(f => f.type === 'day' && f.value === day);
+                    
+                    const hasYearFilter = currentFilters.date.some(f => f.type === 'year');
+                    const hasMonthFilter = currentFilters.date.some(f => f.type === 'month');
+                    const hasDayFilter = currentFilters.date.some(f => f.type === 'day');
+                    
+                    let matches = true;
+                    
+                    if (hasYearFilter) matches = matches && yearMatch;
+                    if (hasMonthFilter) matches = matches && monthMatch;
+                    if (hasDayFilter) matches = matches && dayMatch;
+                    
+                    return matches;
+                });
+            }
+            
+            ['passenger', 'amount', 'difference', 'settlement', 'notes'].forEach(column => {
+                if (currentFilters[column] && currentFilters[column].length > 0) {
+                    filteredData = filteredData.filter(item => 
+                        currentFilters[column].includes(item[column])
+                    );
+                }
+            });
+            
+            renderPaymentTable(filteredData);
+        }
+        
+        // 简单的筛选下拉框
+        function showSimpleFilterDropdown(button, column) {
+            const existing = document.querySelector('.multi-filter-dropdown');
+            if (existing) {
+                existing.remove();
+            }
+            
+            const values = [...new Set(paymentData.map(item => item[column]))];
+            
+            const dropdown = document.createElement('div');
+            dropdown.className = 'multi-filter-dropdown';
+            dropdown.style.minWidth = '120px';
+            dropdown.style.padding = '0';
+            
+            const allItem = document.createElement('div');
+            allItem.className = 'filter-option';
+            allItem.style.padding = '8px';
+            allItem.style.borderBottom = '1px solid #e2e8f0';
+            allItem.textContent = '全部';
+            allItem.style.cursor = 'pointer';
+            allItem.style.fontSize = '11px';
+            allItem.addEventListener('click', function() {
+                currentFilters[column] = [];
+                applyMultiFilter();
+                dropdown.remove();
+            });
+            dropdown.appendChild(allItem);
+            
+            values.forEach(value => {
+                if (!value) return;
+                
+                const item = document.createElement('div');
+                item.className = 'filter-option';
+                item.style.padding = '8px';
+                item.style.borderBottom = '1px solid #e2e8f0';
+                item.textContent = value;
+                item.style.cursor = 'pointer';
+                item.style.fontSize = '11px';
+                item.addEventListener('click', function() {
+                    currentFilters[column] = [value];
+                    applyMultiFilter();
+                    dropdown.remove();
+                });
+                dropdown.appendChild(item);
+            });
+            
+            const rect = button.getBoundingClientRect();
+            dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+            dropdown.style.left = (rect.left + window.scrollX) + 'px';
+            
+            document.body.appendChild(dropdown);
+            
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+        
+        // 智能输入功能
+        function initSmartInput(inputId, settingsListId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            let dropdown = null;
+            
+            input.addEventListener('input', function() {
+                const value = this.value.trim();
+                if (!value) {
+                    if (dropdown) {
+                        dropdown.remove();
+                        dropdown = null;
+                    }
+                    return;
+                }
+                
+                const settingsList = document.getElementById(settingsListId);
+                if (!settingsList) return;
+                
+                const items = settingsList.querySelectorAll('.editable-list-item input');
+                const matches = [];
+                
+                items.forEach(item => {
+                    if (item.value.toLowerCase().includes(value.toLowerCase())) {
+                        matches.push(item.value);
+                    }
+                });
+                
+                if (dropdown) {
+                    dropdown.remove();
+                }
+                
+                if (matches.length === 0) {
+                    return;
+                }
+                
+                dropdown = document.createElement('div');
+                dropdown.className = 'autocomplete-dropdown';
+                
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.textContent = match;
+                    item.addEventListener('click', function() {
+                        input.value = match;
+                        dropdown.remove();
+                        dropdown = null;
+                    });
+                    dropdown.appendChild(item);
+                });
+                
+                const rect = input.getBoundingClientRect();
+                dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+                dropdown.style.left = (rect.left + window.scrollX) + 'px';
+                dropdown.style.width = rect.width + 'px';
+                
+                document.body.appendChild(dropdown);
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.remove();
+                    dropdown = null;
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value && !isValueInSettingsList(value, settingsListId)) {
+                    addValueToSettingsList(value, settingsListId);
+                }
+            });
+        }
+        
+        // 检查值是否在设置列表中
+        function isValueInSettingsList(value, settingsListId) {
+            const settingsList = document.getElementById(settingsListId);
+            if (!settingsList) return false;
+            
+            const items = settingsList.querySelectorAll('.editable-list-item input');
+            for (let item of items) {
+                if (item.value === value) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // 添加值到设置列表
+        function addValueToSettingsList(value, settingsListId) {
+            const settingsList = document.getElementById(settingsListId);
+            if (!settingsList) return;
+            
+            const item = document.createElement('div');
+            item.className = 'editable-list-item';
+            item.innerHTML = `
+                <input type="text" value="${value}">
+                <div class="editable-list-actions">
+                    <button class="delete-item-btn">删除</button>
+                </div>
+            `;
+            
+            const deleteBtn = item.querySelector('.delete-item-btn');
+            deleteBtn.addEventListener('click', function() {
+                item.remove();
+                saveSettings();
+            });
+            
+            const input = item.querySelector('input');
+            input.addEventListener('change', function() {
+                saveSettings();
+            });
+            
+            settingsList.appendChild(item);
+            saveSettings();
+        }
+        
+        // 更新版本显示
+        function updateVersionDisplay() {
+            const versionBadge = document.getElementById('currentVersionBadge');
+            const versionText = document.getElementById('currentVersionText');
+            const versionDisplay = document.getElementById('versionDisplay');
+            
+            if (versionBadge) versionBadge.textContent = `v${APP_VERSION}`;
+            if (versionText) versionText.textContent = `当前版本：${APP_VERSION}`;
+            if (versionDisplay) versionDisplay.innerHTML = `当前版本：<strong>${APP_VERSION}</strong>`;
+        }
+        
+        // 页面加载完成后初始化版本显示
+        setTimeout(() => {
+            updateVersionDisplay();
+        }, 100);
     </script>
 </body>
 </html>
