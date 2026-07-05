@@ -102,7 +102,7 @@
             border-radius: 16px;
             touch-action: none;
             width: 100%;
-            height: 240px; /* Увеличено в 2 раза */
+            height: 300px; /* 300px */
             border: 1px solid #c9d8ec;
             cursor: crosshair;
         }
@@ -564,11 +564,11 @@
             updateAll();
         });
 
-        // ----- подпись (синяя ручка) с увеличенным масштабом (lineWidth в 2 раза) -----
+        // ----- подпись (синяя ручка) -----
         function resizeCanvas() {
             const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width || 400;
-            canvas.height = rect.height || 240;
+            canvas.width = rect.width || 500; // 500px
+            canvas.height = rect.height || 300; // 300px
             if (signatureData && signatureData !== 'drawing') {
                 const img = new Image();
                 img.onload = () => { ctx.drawImage(img, 0, 0); };
@@ -593,7 +593,7 @@
             ctx.moveTo(lastX,lastY);
             ctx.lineTo(p.x,p.y);
             ctx.strokeStyle = '#1a5bb5';
-            ctx.lineWidth = 5.0; // Увеличен в 2 раза (было 2.5)
+            ctx.lineWidth = 5.0;
             ctx.lineCap = 'round';
             ctx.stroke();
             lastX=p.x; lastY=p.y;
@@ -646,7 +646,7 @@
             }
         });
 
-        // ----- Скачать.docx (Word) с принудительным Page View -----
+        // ----- Скачать.docx (Word) с правильным форматом .doc -----
         downloadDocBtn.addEventListener('click', function() {
             const fio = getFIO();
             const shortFio = getShortFIO();
@@ -670,74 +670,96 @@
 
             const bold = (text) => `<strong>${text}</strong>`;
 
+            // Подпись 100px
+            let sigImg = '';
+            if (signatureData && signatureData !== 'drawing') {
+                sigImg = `<img src="${signatureData}" style="height:100px; vertical-align:middle;" />`;
+            } else {
+                sigImg = '________';
+            }
+
             const docContent = `
-                <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="UTF-8"><title>Обращение</title>
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                      xmlns:w="urn:schemas-microsoft-com:office:word" 
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                 <!--[if gte mso 9]>
                 <xml>
                 <w:WordDocument>
                 <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
                 </w:WordDocument>
                 </xml>
                 <![endif]-->
                 <style>
-                    @page { margin: 1.5cm; }
-                    body { font-family: 'Times New Roman', serif; font-size: 10pt; }
-                    .chinese { font-family: 'Times New Roman', serif; font-size: 10pt; }
-                    div { margin: 2px 0; }
+                    /* Page setup */
+                    @page { 
+                        margin: 1.5cm;
+                        mso-page-orientation: portrait;
+                    }
+                    body { 
+                        font-family: 'Times New Roman', serif; 
+                        font-size: 10pt;
+                        line-height: 1.3;
+                    }
+                    .chinese { 
+                        font-family: 'Times New Roman', serif; 
+                        font-size: 10pt; 
+                    }
+                    p { margin: 2px 0; }
                     .right { text-align: right; }
                     .center { text-align: center; }
                     .left { text-align: left; }
-                    .clear { clear: both; }
                     .flex-row { display: flex; justify-content: space-between; }
                     .underline { text-decoration: none; border-bottom: 1px solid #000; display: inline-block; min-width: 200px; }
+                    strong { font-weight: bold; }
                 </style>
                 </head>
                 <body>
-                    <div class="right">Руководителю Корпорации FUTUYRE BIOTECH (РОССИЯ)</div>
-                    <div class="right">господину <strong>Ян Сияну</strong></div>
-                    <div class="right">От ${bold(fio)}</div>
+                    <p class="right">Руководителю Корпорации FUTUYRE BIOTECH (РОССИЯ)</p>
+                    <p class="right">господину <strong>Ян Сияну</strong></p>
+                    <p class="right">От ${bold(fio)}</p>
                     <br>
-                    <div class="center"># ОБРАЩЕНИЕ</div>
+                    <p class="center"># ОБРАЩЕНИЕ</p>
                     <br>
-                    <div>Я, ${bold(fio)}, партнер Корпорации FUTURE BIOTECH (РОССИЯ) с ${bold(dateRegDisplay)} г. ID партнёра ${bold(id)}, Телефон при регистрации ${bold(phoneDisplay)}.</div>
+                    <p>Я, ${bold(fio)}, партнер Корпорации FUTURE BIOTECH (РОССИЯ) с ${bold(dateRegDisplay)} г. ID партнёра ${bold(id)}, Телефон при регистрации ${bold(phoneDisplay)}.</p>
                     <br>
-                    <div>Прошу ВАС перевести меня вместе со всей моей структурой, с сохранением всех статусов и объемов, в первую линию ${bold(sfio)}, ${bold(sidDisplay)}, ${bold(sPhoneDisplay)}, списки и «фото-скрин» с спонсор объемами моей команды прилагаю.</div>
+                    <p>Прошу ВАС перевести меня вместе со всей моей структурой, с сохранением всех статусов и объемов, в первую линию ${bold(sfio)}, ${bold(sidDisplay)}, ${bold(sPhoneDisplay)}, списки и «фото-скрин» с спонсор объемами моей команды прилагаю.</p>
                     <br>
-                    <div class="flex-row">
-                        <span>Дата обращения: ${bold(today)}</span>
-                        <span>ФИО: ${bold(shortFio)}</span>
-                    </div>
-                    <div class="right">Подпись</div>
-                    <div class="center"><span class="underline">&nbsp;</span></div>
+                    <p class="flex-row"><span>Дата обращения: ${bold(today)}</span><span>ФИО: ${bold(shortFio)}</span></p>
+                    <p class="right">Подпись ${sigImg}</p>
+                    <p class="center"><span class="underline">&nbsp;</span></p>
                     <br>
-                    <!-- КИТАЙСКАЯ ЧАСТЬ (Times New Roman, 10pt) -->
-                    <div class="chinese right">致未来生物科技集团</div>
-                    <div class="chinese right">俄罗斯区负责人</div>
-                    <div class="chinese right">杨希阳</div>
+                    <!-- КИТАЙСКАЯ ЧАСТЬ -->
+                    <p class="chinese right">致未来生物科技集团</p>
+                    <p class="chinese right">俄罗斯区负责人</p>
+                    <p class="chinese right">杨希阳</p>
                     <br>
-                    <div class="chinese center">申请书</div>
+                    <p class="chinese center">申请书</p>
                     <br>
-                    <div class="chinese">本人${bold(fio)}，自${bold(chineseDateReg)}起成为未来生物科技集团 (俄罗斯区域) 合作经销商，会员编号：${bold(id)}，注册预留手机号：${bold(phoneDisplay)}。</div>
+                    <p class="chinese">本人${bold(fio)}，自${bold(chineseDateReg)}起成为未来生物科技集团 (俄罗斯区域) 合作经销商，会员编号：${bold(id)}，注册预留手机号：${bold(phoneDisplay)}。</p>
                     <br>
-                    <div class="chinese">恳请贵公司将本人及全部下属团队架构整体迁移至${bold(sfio)}，${bold(chineseSid)}，${bold(chineseSphone)}的一级直推下线，迁移时完整保留本人所有会员的职级与全部销售业绩，随本申请书附上本人团队成员名单及包含团队业绩数据的截图凭证。</div>
+                    <p class="chinese">恳请贵公司将本人及全部下属团队架构整体迁移至${bold(sfio)}，${bold(chineseSid)}，${bold(chineseSphone)}的一级直推下线，迁移时完整保留本人所有会员的职级与全部销售业绩，随本申请书附上本人团队成员名单及包含团队业绩数据的截图凭证。</p>
                     <br>
-                    <div class="flex-row chinese">
-                        <span>申请日期：${bold(chineseToday)}</span>
-                        <span>申请人：${bold(shortFio)}</span>
-                    </div>
-                    <div class="chinese right">签字</div>
+                    <p class="flex-row chinese"><span>申请日期：${bold(chineseToday)}</span><span>申请人：${bold(shortFio)}</span></p>
+                    <p class="chinese right">签字</p>
                 </body>
                 </html>
             `;
-            const blob = new Blob([docContent], { type: 'application/msword' });
+            
+            // Используем application/msword для правильного формата .doc
+            const blob = new Blob([docContent], { 
+                type: 'application/msword;charset=utf-8' 
+            });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'Obrashchenie_FUTURE_BIOTECH.doc';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            URL.revokeObjectURL(link.href);
+            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
         });
 
         // ----- Создать изображение (переход на вторую страницу, A4 пропорции) -----
@@ -769,7 +791,7 @@
 
             let sigImg = '';
             if (signatureData && signatureData !== 'drawing') {
-                sigImg = `<img src="${signatureData}" style="height:20px; vertical-align:middle;" />`;
+                sigImg = `<img src="${signatureData}" style="height:100px; vertical-align:middle;" />`;
             } else {
                 sigImg = '________';
             }
@@ -793,7 +815,6 @@
                     <div style="text-align:right;">Подпись ${sigImg}</div>
                     <div style="text-align:center; margin-top:4px;">________________________</div>
                     <br>
-                    <!-- КИТАЙСКАЯ ЧАСТЬ (Times New Roman, 10pt) -->
                     <div style="font-family: 'Times New Roman', serif; font-size: 10pt; text-align:right;">致未来生物科技集团</div>
                     <div style="font-family: 'Times New Roman', serif; font-size: 10pt; text-align:right;">俄罗斯区负责人</div>
                     <div style="font-family: 'Times New Roman', serif; font-size: 10pt; text-align:right;">杨希阳</div>
@@ -847,14 +868,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // ----- Сохранение фото в папке (сохраняем в "Загрузки" через download) -----
+        // ----- Сохранить фото в папке (сохраняем в "Загрузки" через download) -----
         saveImageBtn.addEventListener('click', function() {
             if (!currentImageData) {
                 alert('Нет изображения для сохранения.');
                 return;
             }
 
-            // Используем download для сохранения в папку "Загрузки" (Files.app)
             const link = document.createElement('a');
             link.href = currentImageData;
             link.download = 'Zayavlenie_FUTURE_BIOTECH.png';
@@ -875,13 +895,11 @@
             const today = getToday();
             const subject = `Обращение от ${fio} от ${today}`;
             
-            // Для mail.ru используем mailto: с указанием темы и тела
-            // Вложение через mailto не поддерживается, поэтому открываем почтовый клиент
-            // и предлагаем пользователю прикрепить файл вручную
+            // Открываем mail.ru (или стандартное почтовое приложение)
             const mailtoUrl = `mailto:243669280@qq.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Смотрите вложение (скриншот заявления).')}`;
             window.location.href = mailtoUrl;
             
-            // Дополнительно скачиваем файл, чтобы пользователь мог его прикрепить
+            // Скачиваем файл для прикрепления
             const link = document.createElement('a');
             link.href = currentImageData;
             link.download = 'Zayavlenie_FUTURE_BIOTECH.png';
