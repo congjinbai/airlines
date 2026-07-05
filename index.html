@@ -102,7 +102,7 @@
             border-radius: 16px;
             touch-action: none;
             width: 100%;
-            height: 120px;
+            height: 240px; /* Увеличено в 2 раза */
             border: 1px solid #c9d8ec;
             cursor: crosshair;
         }
@@ -342,7 +342,7 @@
     </div>
     <div class="save-hint">📌 Нажмите и удерживайте изображение, чтобы сохранить в галерею</div>
     <div class="image-actions">
-        <button class="btn btn-success" id="saveImageBtn">💾 Сохранить в галерею</button>
+        <button class="btn btn-success" id="saveImageBtn">💾 Сохранить фото в папке</button>
         <button class="btn btn-primary" id="sendEmailBtn">📧 Отправить на почту</button>
         <button class="btn btn-outline" id="printImageBtn">🖨 Печать</button>
     </div>
@@ -564,11 +564,11 @@
             updateAll();
         });
 
-        // ----- подпись (синяя ручка) -----
+        // ----- подпись (синяя ручка) с увеличенным масштабом (lineWidth в 2 раза) -----
         function resizeCanvas() {
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width || 400;
-            canvas.height = rect.height || 120;
+            canvas.height = rect.height || 240;
             if (signatureData && signatureData !== 'drawing') {
                 const img = new Image();
                 img.onload = () => { ctx.drawImage(img, 0, 0); };
@@ -593,7 +593,7 @@
             ctx.moveTo(lastX,lastY);
             ctx.lineTo(p.x,p.y);
             ctx.strokeStyle = '#1a5bb5';
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 5.0; // Увеличен в 2 раза (было 2.5)
             ctx.lineCap = 'round';
             ctx.stroke();
             lastX=p.x; lastY=p.y;
@@ -646,7 +646,7 @@
             }
         });
 
-        // ----- Скачать.docx (Word) -----
+        // ----- Скачать.docx (Word) с принудительным Page View -----
         downloadDocBtn.addEventListener('click', function() {
             const fio = getFIO();
             const shortFio = getShortFIO();
@@ -673,6 +673,13 @@
             const docContent = `
                 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="UTF-8"><title>Обращение</title>
+                <!--[if gte mso 9]>
+                <xml>
+                <w:WordDocument>
+                <w:View>Print</w:View>
+                </w:WordDocument>
+                </xml>
+                <![endif]-->
                 <style>
                     @page { margin: 1.5cm; }
                     body { font-family: 'Times New Roman', serif; font-size: 10pt; }
@@ -840,66 +847,49 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // ----- Сохранение в галерею (iOS/Android совместимый) -----
+        // ----- Сохранение фото в папке (сохраняем в "Загрузки" через download) -----
         saveImageBtn.addEventListener('click', function() {
             if (!currentImageData) {
                 alert('Нет изображения для сохранения.');
                 return;
             }
 
-            // 1. Преобразуем dataURL в Blob
-            fetch(currentImageData)
-                .then(res => res.blob())
-                .then(blob => {
-                    // 2. Пытаемся использовать navigator.share (iOS вызывает системное меню, где есть "Сохранить в файлы" или "Сохранить изображение")
-                    if (navigator.share) {
-                        const file = new File([blob], 'Zayavlenie_FUTURE_BIOTECH.png', { type: 'image/png' });
-                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                            navigator.share({
-                                title: 'Заявление',
-                                files: [file]
-                            }).catch(err => {
-                                // Если пользователь отменил или share не удался — скачиваем через ссылку
-                                fallbackDownload(blob);
-                            });
-                            return;
-                        }
-                    }
-                    // 3. Если share недоступен — скачиваем через ссылку (сохранится в "Файлы")
-                    fallbackDownload(blob);
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Не удалось сохранить. Попробуйте нажать и удерживать изображение, чтобы сохранить его вручную.');
-                });
-        });
-
-        function fallbackDownload(blob) {
+            // Используем download для сохранения в папку "Загрузки" (Files.app)
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
+            link.href = currentImageData;
             link.download = 'Zayavlenie_FUTURE_BIOTECH.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-            // Подсказка для iOS
-            alert('Если изображение не появилось в галерее, нажмите и удерживайте изображение на экране, затем выберите "Сохранить изображение".');
-        }
+            alert('Изображение сохранено в папку "Загрузки" (приложение "Файлы").');
+        });
 
-        // ----- Отправить на почту -----
+        // ----- Отправить на почту (открываем mail.ru с вложением) -----
         sendEmailBtn.addEventListener('click', function() {
-            if (!currentImageData) return;
+            if (!currentImageData) {
+                alert('Нет изображения для отправки.');
+                return;
+            }
+
             const fio = getFIO();
             const today = getToday();
             const subject = `Обращение от ${fio} от ${today}`;
-            window.location.href = `mailto:243669280@qq.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Смотрите вложение (скриншот заявления).')}`;
-            // Также предлагаем скачать
+            
+            // Для mail.ru используем mailto: с указанием темы и тела
+            // Вложение через mailto не поддерживается, поэтому открываем почтовый клиент
+            // и предлагаем пользователю прикрепить файл вручную
+            const mailtoUrl = `mailto:243669280@qq.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Смотрите вложение (скриншот заявления).')}`;
+            window.location.href = mailtoUrl;
+            
+            // Дополнительно скачиваем файл, чтобы пользователь мог его прикрепить
             const link = document.createElement('a');
-            link.download = 'Zayavlenie_FUTURE_BIOTECH.png';
             link.href = currentImageData;
+            link.download = 'Zayavlenie_FUTURE_BIOTECH.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            alert('Открыто приложение почты. Пожалуйста, прикрепите загруженный файл к письму.');
         });
 
         // ----- Печать -----
