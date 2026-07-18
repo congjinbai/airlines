@@ -297,6 +297,13 @@
         .itinerary-container:nth-child(even) .ticket-price-section { background-color: #f0f8ff; }
         .smart-nav-btns { display: flex; gap: 4px; align-items: center; }
         .smart-step-btn { display: none; }
+        .download-selected-btn { background-color: #38a169; }
+        .download-selected-btn:hover { background-color: #2f855a; }
+        .select-all-visible-btn { background-color: #3182ce; }
+        .select-all-visible-btn:hover { background-color: #2c5aa0; }
+        .deselect-all-visible-btn { background-color: #e53e3e; }
+        .deselect-all-visible-btn:hover { background-color: #c53030; }
+        .history-header .history-actions-group { display: flex; gap: 6px; align-items: center; }
     </style>
 </head>
 <body>
@@ -425,8 +432,16 @@
     </div>
     
     <div id="history-page" class="page-content">
-        <div class="history-header"><h3>保存的历史记录</h3><div><button id="deleteSelectedHistoryBtn" style="background-color: #e53e3e;" class="compact-btn">删除选中</button><button id="deleteAllHistoryBtn" style="background-color: #e53e3e;" class="compact-btn">删除全部</button></div></div>
-        <div class="history-toolbar"><input type="text" id="historySearchInput" placeholder="🔍 搜索历史记录..." style="flex:1; min-width:150px; max-width:300px;"><div class="history-btn-group"><button id="downloadExcelBtn" style="background-color: #38a169;">下载航程</button><button id="uploadExcelBtn" style="background-color: #805ad5;">上传航程</button><button id="downloadTemplateBtn" style="background-color: #ed8936;">表格模板</button></div></div>
+        <div class="history-header">
+            <h3>保存的历史记录</h3>
+            <div class="history-actions-group">
+                <button id="selectAllVisibleBtn" class="select-all-visible-btn compact-btn">全部选中</button>
+                <button id="deselectAllVisibleBtn" class="deselect-all-visible-btn compact-btn">取消选中</button>
+                <button id="deleteSelectedHistoryBtn" style="background-color: #e53e3e;" class="compact-btn">删除选中</button>
+                <button id="deleteAllHistoryBtn" style="background-color: #e53e3e;" class="compact-btn">删除全部</button>
+            </div>
+        </div>
+        <div class="history-toolbar"><input type="text" id="historySearchInput" placeholder="🔍 搜索历史记录..." style="flex:1; min-width:150px; max-width:300px;"><div class="history-btn-group"><button id="downloadSelectedBtn" class="download-selected-btn">下载选中</button><button id="uploadExcelBtn" style="background-color: #805ad5;">上传航程</button><button id="downloadTemplateBtn" style="background-color: #ed8936;">表格模板</button></div></div>
         <div class="history-list" id="historyList"></div>
     </div>
     
@@ -1754,7 +1769,76 @@ function filterHistoryItems(keyword){
     });
 }
 function highlightText(item,keyword){ const contentDiv=item.querySelector('.history-item-content'); if(!contentDiv) return; const originalText=contentDiv.getAttribute('data-original-text'); if(originalText) contentDiv.innerHTML=originalText; else contentDiv.setAttribute('data-original-text',contentDiv.innerHTML); const text=contentDiv.innerHTML; const regex=new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'); contentDiv.innerHTML=text.replace(regex,'<span class="highlight-match">$1</span>'); }
-function downloadHistoryToExcel(){ const history=JSON.parse(localStorage.getItem('flightHistory')||'[]'); if(history.length===0){ alert('没有历史记录可下载'); return; } let csvRows=[]; csvRows.push(['序号','航段信息'].join(',')); history.forEach((item,index)=>{ const segments=item.data.map(seg=>{ let text=`${seg.flightNo} | ${seg.departure}${seg.departureTerminal && seg.departureTerminal!=="请选择"? '('+seg.departureTerminal+')':''} ${seg.departureTime}`; if(seg.isEvening) text+='(夜间)'; text+=` → ${seg.arrival}${seg.arrivalTerminal && seg.arrivalTerminal!=="请选择"? '('+seg.arrivalTerminal+')':''} ${seg.arrivalTime}`; if(seg.isNextDay) text+='(次日)'; if(seg.flightTime) text+=` | ${seg.flightTime}`; return text; }).join('; '); csvRows.push([index+1,segments].join(',')); }); const csvContent=csvRows.join('\n'); const blob=new Blob(['\uFEFF'+csvContent],{type:'text/csv;charset=utf-8;'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`航程历史记录_${new Date().toISOString().split('T')[0]}.csv`; link.click(); URL.revokeObjectURL(link.href); }
+
+// 获取当前可见的历史记录项 (根据搜索和隐藏状态)
+function getVisibleHistoryItems() {
+    return document.querySelectorAll('#historyList .history-item:not(.hidden-item)');
+}
+
+// 全部选中可见的历史记录
+function selectAllVisibleHistory() {
+    const visibleItems = getVisibleHistoryItems();
+    visibleItems.forEach(item => {
+        const checkbox = item.querySelector('.history-checkbox');
+        if (checkbox) checkbox.checked = true;
+    });
+}
+
+// 取消选中所有可见的历史记录
+function deselectAllVisibleHistory() {
+    const visibleItems = getVisibleHistoryItems();
+    visibleItems.forEach(item => {
+        const checkbox = item.querySelector('.history-checkbox');
+        if (checkbox) checkbox.checked = false;
+    });
+}
+
+// 下载选中的历史记录 (可见且勾选)
+function downloadSelectedHistory() {
+    const checkedItems = document.querySelectorAll('#historyList .history-checkbox:checked');
+    if (checkedItems.length === 0) {
+        alert('请先勾选要下载的历史记录');
+        return;
+    }
+    const history = JSON.parse(localStorage.getItem('flightHistory')||'[]');
+    const selectedIds = Array.from(checkedItems).map(cb => parseInt(cb.getAttribute('data-id')));
+    const selectedHistory = history.filter(item => selectedIds.includes(item.id));
+    if (selectedHistory.length === 0) {
+        alert('没有找到对应的历史记录数据');
+        return;
+    }
+    // 生成CSV
+    let csvRows = [];
+    csvRows.push(['序号','航段信息'].join(','));
+    selectedHistory.forEach((item, index) => {
+        const segments = item.data.map(seg => {
+            let text = `${seg.flightNo} | ${seg.departure}${seg.departureTerminal && seg.departureTerminal!=="请选择"? '('+seg.departureTerminal+')':''} ${seg.departureTime}`;
+            if(seg.isEvening) text += '(夜间)';
+            text += ` → ${seg.arrival}${seg.arrivalTerminal && seg.arrivalTerminal!=="请选择"? '('+seg.arrivalTerminal+')':''} ${seg.arrivalTime}`;
+            if(seg.isNextDay) text += '(次日)';
+            if(seg.flightTime) text += ` | ${seg.flightTime}`;
+            return text;
+        }).join('; ');
+        csvRows.push([index+1, segments].join(','));
+    });
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], {type:'text/csv;charset=utf-8;'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `航程历史记录_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+
+function downloadHistoryToExcel() {
+    // 保留原功能：下载全部历史记录（兼容旧版本）
+    const history = JSON.parse(localStorage.getItem('flightHistory')||'[]');
+    if(history.length===0){ alert('没有历史记录可下载'); return; }
+    let csvRows=[]; csvRows.push(['序号','航段信息'].join(','));
+    history.forEach((item,index)=>{ const segments=item.data.map(seg=>{ let text=`${seg.flightNo} | ${seg.departure}${seg.departureTerminal && seg.departureTerminal!=="请选择"? '('+seg.departureTerminal+')':''} ${seg.departureTime}`; if(seg.isEvening) text+='(夜间)'; text+=` → ${seg.arrival}${seg.arrivalTerminal && seg.arrivalTerminal!=="请选择"? '('+seg.arrivalTerminal+')':''} ${seg.arrivalTime}`; if(seg.isNextDay) text+='(次日)'; if(seg.flightTime) text+=` | ${seg.flightTime}`; return text; }).join('; '); csvRows.push([index+1,segments].join(',')); });
+    const csvContent=csvRows.join('\n'); const blob=new Blob(['\uFEFF'+csvContent],{type:'text/csv;charset=utf-8;'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`航程历史记录_${new Date().toISOString().split('T')[0]}.csv`; link.click(); URL.revokeObjectURL(link.href);
+}
+
 function uploadHistoryFromExcel(file){ const reader=new FileReader(); reader.onload=function(e){ try{ const text=e.target.result; const lines=text.split('\n').filter(line=>line.trim()); if(lines.length<2){ alert('文件格式不正确，请使用正确的CSV文件'); return; } const newHistory=[]; for(let i=1;i<lines.length;i++){ const parts=lines[i].split(','); if(parts.length>=2){ const segmentText=parts.slice(1).join(',').trim(); const segments=parseSegmentText(segmentText); if(segments && segments.length>0){ newHistory.push({id:Date.now()+i,data:segments,timestamp:new Date().toLocaleString()}); } } } if(newHistory.length===0){ alert('未能解析出有效的航段信息'); return; } let existingHistory=JSON.parse(localStorage.getItem('flightHistory')||'[]'); existingHistory=[...newHistory,...existingHistory]; const uniqueHistory=[]; const seenKeys=new Set(); existingHistory.forEach(item=>{ const key=item.data.map(seg=>`${seg.flightNo}|${seg.departure}|${seg.departureTerminal}|${seg.departureTime}|${seg.isEvening}|${seg.arrival}|${seg.arrivalTerminal}|${seg.arrivalTime}|${seg.isNextDay}|${seg.flightTime}`).join('||'); if(!seenKeys.has(key)){ seenKeys.add(key); uniqueHistory.push(item); } }); localStorage.setItem('flightHistory',JSON.stringify(uniqueHistory)); loadHistory(); alert(`成功导入 ${newHistory.length} 条历史记录`); } catch(err){ alert('导入失败: '+err.message); } }; reader.readAsText(file); }
 function parseSegmentText(text){ const segments=[]; const parts=text.split(';').filter(s=>s.trim()); parts.forEach(part=>{ const trimmed=part.trim(); const flightMatch=trimmed.match(/([A-Z0-9]{2,})\s*\|/); const flightNo=flightMatch?flightMatch[1]:''; const arrowMatch=trimmed.match(/(.+?)\s*→\s*(.+)/); if(arrowMatch){ const departurePart=arrowMatch[1].trim(); const arrivalPart=arrowMatch[2].trim(); const depMatch=departurePart.match(/(.+?)(?:\((.+?)\))?/); const departure=depMatch?depMatch[1].trim():departurePart; const departureTerminal=depMatch && depMatch[2]?depMatch[2].trim():''; const arrMatch=arrivalPart.match(/(.+?)(?:\((.+?)\))?/); const arrival=arrMatch?arrMatch[1].trim():arrivalPart; const arrivalTerminal=arrMatch && arrMatch[2]?arrMatch[2].trim():''; const depTimeMatch=departurePart.match(/(\d{2}:\d{2}|\d{4})/); const arrTimeMatch=arrivalPart.match(/(\d{2}:\d{2}|\d{4})/); const isEvening=departurePart.includes('夜间'); const isNextDay=arrivalPart.includes('次日'); const checkinMatch=trimmed.match(/\|\s*(.+)$/); const flightTime=checkinMatch?checkinMatch[1].trim():''; segments.push({flightNo,departure,departureTerminal,departureTime:depTimeMatch?depTimeMatch[1].replace(':',''):'',isEvening,arrival,arrivalTerminal,arrivalTime:arrTimeMatch?arrTimeMatch[1].replace(':',''):'',isNextDay,flightTime}); } }); return segments; }
 function downloadExcelTemplate(){ const headers=['序号','航段1航班号','航段1起飞城市','航段1起飞机场航站楼','航段1起飞时间','航段1夜间','航段1到达城市','航段1到达机场航站楼','航段1到达时间','航段1次日','航段1截止值机时间','航段2航班号','航段2起飞城市','航段2起飞机场航站楼','航段2起飞时间','航段2夜间','航段2到达城市','航段2到达机场航站楼','航段2到达时间','航段2次日','航段2截止值机时间']; const example=['1','SU1234','莫斯科','D','1430','否','北京','T3','1845','否','起飞前40分钟停办']; const csvRows=[headers.join(','),example.join(',')]; const blob=new Blob(['\uFEFF'+csvRows.join('\n')],{type:'text/csv;charset=utf-8;'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`航程模板_${new Date().toISOString().split('T')[0]}.csv`; link.click(); URL.revokeObjectURL(link.href); }
@@ -1882,7 +1966,18 @@ function showPassengerMultiFilterDropdown(button,column){ const existing=documen
 function applyMultiFilter(){ let filteredData=[...paymentData]; if(currentFilters.date && currentFilters.date.length>0){ filteredData=filteredData.filter(item=>{ if(!item.date) return false; const [year,month,day]=item.date.split('-'); const yearMatch=currentFilters.date.some(f=>f.type==='year'&&f.value===year); const monthMatch=currentFilters.date.some(f=>f.type==='month'&&f.value===month); const dayMatch=currentFilters.date.some(f=>f.type==='day'&&f.value===day); const hasYear=currentFilters.date.some(f=>f.type==='year'); const hasMonth=currentFilters.date.some(f=>f.type==='month'); const hasDay=currentFilters.date.some(f=>f.type==='day'); let matches=true; if(hasYear) matches=matches&&yearMatch; if(hasMonth) matches=matches&&monthMatch; if(hasDay) matches=matches&&dayMatch; return matches; }); } ['passenger','amount','difference','settlement','notes'].forEach(column=>{ if(currentFilters[column] && currentFilters[column].length>0){ filteredData=filteredData.filter(item=>currentFilters[column].includes(item[column])); } }); renderPaymentTable(filteredData); }
 function showSimpleFilterDropdown(button,column){ const existing=document.querySelector('.multi-filter-dropdown'); if(existing) existing.remove(); const values=[...new Set(paymentData.map(item=>item[column]))]; const dropdown=document.createElement('div'); dropdown.className='multi-filter-dropdown'; dropdown.style.minWidth='120px'; dropdown.style.padding='0'; const allItem=document.createElement('div'); allItem.className='filter-option'; allItem.style.padding='8px'; allItem.style.borderBottom='1px solid #e2e8f0'; allItem.textContent='全部'; allItem.style.cursor='pointer'; allItem.style.fontSize='11px'; allItem.addEventListener('click',function(){ currentFilters[column]=[]; applyMultiFilter(); dropdown.remove(); }); dropdown.appendChild(allItem); values.forEach(value=>{ if(!value) return; const item=document.createElement('div'); item.className='filter-option'; item.style.padding='8px'; item.style.borderBottom='1px solid #e2e8f0'; item.textContent=value; item.style.cursor='pointer'; item.style.fontSize='11px'; item.addEventListener('click',function(){ currentFilters[column]=[value]; applyMultiFilter(); dropdown.remove(); }); dropdown.appendChild(item); }); const rect=button.getBoundingClientRect(); dropdown.style.top=(rect.bottom+window.scrollY)+'px'; dropdown.style.left=(rect.left+window.scrollX)+'px'; document.body.appendChild(dropdown); document.addEventListener('click',function closeDropdown(e){ if(!button.contains(e.target)&&!dropdown.contains(e.target)){ dropdown.remove(); document.removeEventListener('click',closeDropdown); } }); }
 
-function initHistoryPage(){ document.getElementById('historySearchInput').addEventListener('input',function(){ filterHistoryItems(this.value.trim()); }); document.getElementById('downloadExcelBtn').addEventListener('click',downloadHistoryToExcel); document.getElementById('uploadExcelBtn').addEventListener('click',function(){ document.getElementById('fileInput').click(); }); document.getElementById('fileInput').addEventListener('change',function(e){ if(this.files.length>0) uploadHistoryFromExcel(this.files[0]); this.value=''; }); document.getElementById('downloadTemplateBtn').addEventListener('click',downloadExcelTemplate); }
+function initHistoryPage(){
+    document.getElementById('historySearchInput').addEventListener('input',function(){ filterHistoryItems(this.value.trim()); });
+    // 下载选中按钮
+    document.getElementById('downloadSelectedBtn').addEventListener('click', downloadSelectedHistory);
+    // 全部选中按钮
+    document.getElementById('selectAllVisibleBtn').addEventListener('click', selectAllVisibleHistory);
+    // 取消选中按钮
+    document.getElementById('deselectAllVisibleBtn').addEventListener('click', deselectAllVisibleHistory);
+    document.getElementById('uploadExcelBtn').addEventListener('click',function(){ document.getElementById('fileInput').click(); });
+    document.getElementById('fileInput').addEventListener('change',function(e){ if(this.files.length>0) uploadHistoryFromExcel(this.files[0]); this.value=''; });
+    document.getElementById('downloadTemplateBtn').addEventListener('click',downloadExcelTemplate);
+}
 
 setTimeout(()=>{
     const badge=document.getElementById('currentVersionBadge');
