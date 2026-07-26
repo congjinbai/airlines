@@ -1191,6 +1191,34 @@ function initSegmentSmart(itiId, sid){
     let isCheckinStep=false;
     let extraRow=null;
     let citySelectControl=null;
+    const flightProgressLabels={
+        '起飞日期':'日期',
+        '起飞城市':'起飞城市',
+        '到达城市':'到达城市',
+        '起飞时间':'起飞时间',
+        '到达时间':'到达时间',
+        '截止值机时间':'值机'
+    };
+
+    function renderFlightProgress(){
+        progress.innerHTML='';
+        flightQuestions.forEach((question,i)=>{
+            let dot=document.createElement('span');
+            dot.className='step-dot';
+            if(i===segStep&&segStep<flightQuestions.length)dot.classList.add('active');
+            else if(i<segStep||segStep>=flightQuestions.length)dot.classList.add('done');
+            let progressQuestion=String(question||'').replace(/[：:]\s*$/,'').trim();
+            dot.textContent=flightProgressLabels[progressQuestion]||progressQuestion||String(i+1);
+            dot.title=progressQuestion;
+            dot.onclick=function(){
+                if(i<segStep||segStep>=flightQuestions.length){
+                    segStep=i;
+                    renderStep();
+                }
+            };
+            progress.appendChild(dot);
+        });
+    }
 
     function renderStep(){
         if(segStep>=flightQuestions.length){
@@ -1207,7 +1235,8 @@ function initSegmentSmart(itiId, sid){
             nextDayBtn.style.display='none';
             doneBtn.style.display='inline-block';
             transferBtn.style.display='none';
-            progress.innerHTML='';
+            // 完成后保留进度条，允许返回任意步骤重新修改，包括起飞日期。
+            renderFlightProgress();
             updatePreview(itiId, sid);
             return;
         }
@@ -1218,26 +1247,7 @@ function initSegmentSmart(itiId, sid){
         step.textContent='步骤 '+cur+'/'+total;
         isCheckinStep=(qLabel==='截止值机时间');
 
-        progress.innerHTML='';
-        const flightProgressLabels={
-            '起飞日期':'日期',
-            '起飞城市':'起飞城市',
-            '到达城市':'到达城市',
-            '起飞时间':'起飞时间',
-            '到达时间':'到达时间',
-            '截止值机时间':'值机'
-        };
-        flightQuestions.forEach((question,i)=>{
-            let dot=document.createElement('span');
-            dot.className='step-dot';
-            if(i===segStep)dot.classList.add('active');
-            else if(i<segStep)dot.classList.add('done');
-            let progressQuestion=String(question||'').replace(/[：:]\s*$/,'').trim();
-            dot.textContent=flightProgressLabels[progressQuestion]||progressQuestion||String(i+1);
-            dot.title=String(question||'').replace(/[：:]\s*$/,'').trim();
-            dot.onclick=function(){if(i<segStep){segStep=i;renderStep();}};
-            progress.appendChild(dot);
-        });
+        renderFlightProgress();
 
         eveningBtn.style.display='none';
         nextDayBtn.style.display='none';
@@ -1252,23 +1262,21 @@ function initSegmentSmart(itiId, sid){
         if(extraRow){extraRow.remove();extraRow=null;}
         if(citySelectControl){citySelectControl.remove();citySelectControl=null;}
 
-        // 判断是否是第二航段及以后，起飞日期允许为空
-        let isLaterSegment = (sid > 1);
-
         if(qLabel==='起飞日期'){
-            hint.innerHTML='💡 输入 <kbd>4位数字</kbd> 如 0802，回车确认' + (isLaterSegment ? ' (可留空)' : '');
-            input.placeholder=isLaterSegment ? '如 0802 或留空' : '如 0802';
+            hint.innerHTML='💡 输入 <kbd>4位数字</kbd> 如 0802，回车确认；也可留空直接跳过';
+            input.placeholder='如 0802 或留空';
             input.oninput=function(){
                 let v=formatDateOnly(this.value);
                 this.value=v;
                 if(v.length>4)this.value=v.slice(0,4);
                 if(v.length===4)this.value=v.slice(0,2)+'月'+v.slice(2)+'日';
                 let val=this.value;
-                if(val.length>0){
-                    let key='seg_'+qLabel;
-                    segValues[key]=val;
-                    updatePreview(itiId, sid);
-                }
+                let key='seg_'+qLabel;
+                segValues[key]=val;
+                let dateEl=$('seg'+itiId+'-'+sid+'-date');
+                if(dateEl)dateEl.value=val;
+                updatePreview(itiId, sid);
+                updateDisplay();
             };
         }else if(qLabel==='起飞城市'||qLabel==='到达城市'){
             hint.innerHTML='💡 输入城市名称(汉字或3位代码)，回车确认，或从下拉列表选择';
@@ -1506,12 +1514,13 @@ function initSegmentSmart(itiId, sid){
         let qLabel=q.replace(/[：:]\s*$/,'').trim();
         let key='seg_'+qLabel;
         let val='';
-        let isLaterSegment = (sid > 1);
         if(qLabel==='截止值机时间'){val=select.value;}else{val=input.value.trim();}
 
-        // 起飞日期允许为空（第二航段及以后）
-        if(qLabel==='起飞日期' && isLaterSegment && val===''){
+        // 所有航段的起飞日期都允许留空；留空时必须同时清除隐藏字段。
+        if(qLabel==='起飞日期' && val===''){
             segValues[key]='';
+            let dateEl=$('seg'+itiId+'-'+sid+'-date');
+            if(dateEl)dateEl.value='';
             if(segStep<flightQuestions.length-1){segStep++;renderStep();}
             else{segStep=flightQuestions.length;renderStep();}
             updatePreview(itiId, sid);
@@ -1524,7 +1533,7 @@ function initSegmentSmart(itiId, sid){
             val=convertCodeToCity(val);
         }
 
-        if(!val && qLabel!=='截止值机时间' && !(qLabel==='起飞日期' && isLaterSegment)){
+        if(!val && qLabel!=='截止值机时间' && qLabel!=='起飞日期'){
             hint.innerHTML='⚠️ 请输入内容';
             return;
         }
@@ -1701,7 +1710,8 @@ function updatePreview(itiId, sid){
         if(currentIndex>0){
             let previousSid=segmentList[currentIndex-1].id.split('-')[1];
             let previousDate=$('seg'+itiId+'-'+previousSid+'-date')?.value||'';
-            if(previousDate&&(date===previousDate||!date))displayDate='当日';
+            // 航班信息页：与上一航段同日，或当前航段日期留空，统一显示“再”。
+            if(!date||(previousDate&&date===previousDate))displayDate='再';
         }
     }
     if(displayDate)parts.push(`<span class="d-tag date">📅 ${displayDate}</span>`);
@@ -1739,9 +1749,10 @@ function getEffectiveTicketDates(source){
 }
 function getTicketDisplayDates(source){
     let effective=getEffectiveTicketDates(source);
-    return effective.map((date,index)=>{
-        if(index>0&&date&&effective[index-1]===date)return '当日';
-        return date;
+    return source.map((segment,index)=>{
+        let rawDate=segment?.date||'';
+        if(index>0&&(!rawDate||(effective[index-1]&&effective[index]===effective[index-1])))return '当日';
+        return rawDate||effective[index]||'';
     });
 }
 function updateDisplay(){updateTicketDisplay();}
@@ -1794,9 +1805,9 @@ function genAll(){
 
             let effectiveDate=date||prevDate;
             let segText='';
-            if(si>0&&effectiveDate&&prevDate&&effectiveDate===prevDate)segText+='当日 ';
+            // 航班信息页生成结果：同日或未填写日期的后续航段均用“再”。
+            if(si>0&&(!date||(prevDate&&date===prevDate)))segText+='再 ';
             else if(date)segText+=date+' ';
-            else if(si>0)segText+='再 ';
             segText+=dep;
             if(depT)segText+=depT;
             if(eve && effectiveDate)segText+=eveningText(effectiveDate);
