@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>航班信息生成器 v2.1</title>
+    <title>航班信息生成器 v2.1.1</title>
     <style>
         *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         body{max-width:1100px;margin:0 auto;padding:15px;background:#f0f2f5;color:#333;font-size:12px}
@@ -198,6 +199,13 @@
         .smart-area .smart-display .d-tag.time{background:#e6fffa;color:#319795}
         .smart-area .smart-display .d-tag.date{background:#fefcbf;color:#975a16}
         .smart-area .smart-display .d-tag.city{background:#e9d8fd;color:#6b46c1}
+        .city-fuzzy-wrap{position:relative;width:100%}
+        .city-fuzzy-list{position:absolute;left:0;right:0;top:calc(100% + 3px);z-index:12000;max-height:220px;overflow-y:auto;background:#fff;border:1px solid #cbd5e0;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.14);display:none}
+        .city-fuzzy-item{padding:7px 10px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;font-size:12px}
+        .city-fuzzy-item:hover,.city-fuzzy-item.active{background:#ebf8ff}
+        .city-fuzzy-city{font-weight:600;color:#2d3748}
+        .city-fuzzy-code{color:#718096;font-family:Consolas,monospace}
+        .city-fuzzy-empty{padding:9px 10px;color:#a0aec0;font-size:11px}
         .passenger-row,.baggage-location-row,.baggage-requirements-row{display:flex;gap:12px;margin-bottom:12px}
         .passenger-row>div,.baggage-location-item,.baggage-requirements-item{flex:1}
         .update-guide{margin-top:24px;text-align:left;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:18px;color:#2d3748}
@@ -296,8 +304,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.1</span></h1>
-    <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.1</div></div>
+    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.1.1</span></h1>
+    <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.1.1</div></div>
 
     <div class="page-tabs">
         <div class="page-tab active" data-page="flight">航班信息</div>
@@ -402,16 +410,16 @@
 到达时间：
 截止值机时间：</textarea></div><button id="saveQuestions" class="btn-success">保存问题设置</button></div>
 
-        <div class="settings-section"><h3>中转设置</h3><div class="settings-group"><label>中转选项列表 (每行一个)</label><textarea id="setTransfer" rows="4">莫斯科住一夜
-需要住宿
-打车转机场</textarea></div><button id="saveTransfer" class="btn-success">保存中转设置</button></div>
+        <div class="settings-section"><h3>中转设置</h3><div class="settings-group"><label>中转选项列表 (每行一个)</label><textarea id="setTransfer" rows="4">⚠️莫斯科住一夜⚠️
+需要住宿⚠️
+⚠️打车转机场⚠️
+⚠️根据现在局势，建议莫斯科住一夜，确保后程顺利中转⚠️</textarea></div><button id="saveTransfer" class="btn-success">保存中转设置</button></div>
 
-        <div class="settings-section"><h3>城市代码设置</h3><div class="settings-group"><label>城市代码列表 (每行一个，格式: 代码-城市名)</label><textarea id="setCityCodes" rows="20">MOW-莫斯科
-ALA-阿拉木图
+        <div class="settings-section"><h3>城市代码设置</h3><div class="settings-group"><label>城市代码列表 (每行一个，格式: 代码-城市名)</label><textarea id="setCityCodes" rows="20">ALA-阿拉木图
 NQZ-阿斯塔纳
 EVN-埃里温
-OSS-奥斯
 REN-奥伦堡
+OSS-奥斯
 BAX-巴尔瑙尔
 BQS-布市
 PEE-彼尔姆
@@ -425,18 +433,19 @@ GRV-格罗兹尼
 VVO-海参崴
 KHV-哈巴
 KGD-加里宁格勒
-KJA-克市
 KZN-喀山
+KJA-克市
 MRV-矿泉水城
 IGT-马嘎斯
 MCX-马哈奇克拉
 MSQ-明斯克
+MOW-莫斯科
 OMS-欧姆斯克
-TAS-塔什干
-LED-圣彼得堡
 KUF-萨马拉
+LED-圣彼得堡
 STW-斯塔夫
 AER-索契
+TAS-塔什干
 UGC-乌尔根奇
 UFA-乌法
 UUD-乌兰乌德
@@ -447,21 +456,21 @@ IKT-伊尔库
 IST-伊斯坦布尔
 BJS-北京
 CGQ-长春
+CTU-成都
 CKG-重庆
 CAN-广州
-SIA-西安
-HGH-杭州
-SHE-沈阳
-HRB-哈尔滨
 HAK-海口
-TAO-青岛
-CTU-成都
-MDG-牡丹江
+HRB-哈尔滨
+HGH-杭州
 JMU-佳木斯
+MDG-牡丹江
+TAO-青岛
 SYX-三亚
 SHA-上海
+SHE-沈阳
 SZX-深圳
-URC-乌鲁木齐</textarea></div><button id="saveCityCodes" class="btn-success">保存城市代码</button></div>
+URC-乌鲁木齐
+SIA-西安</textarea></div><button id="saveCityCodes" class="btn-success">保存城市代码</button></div>
 
         <div class="settings-section"><h3>常用航线设置</h3><div class="settings-group"><label>航线列表 (每行一个)</label><textarea id="setRoutes" rows="12">莫斯科-格罗兹尼
 莫斯科-马嘎斯
@@ -501,23 +510,26 @@ URC-乌鲁木齐</textarea></div><button id="saveCityCodes" class="btn-success">
 叶卡-伊尔库
 莫斯科-青岛-哈尔滨
 哈尔滨-青岛-莫斯科
-莫斯科-北京-哈尔滨
-哈尔滨-北京-莫斯科
+莫斯科-西安-哈尔滨
+哈尔滨-西安-莫斯科
+莫斯科-成都-哈尔滨
+哈尔滨-成都-莫斯科
 莫斯科-杭州-哈尔滨
 哈尔滨-杭州-莫斯科
-格罗兹尼-莫斯科-车里亚宾
-车里亚宾-莫斯科-格罗兹尼
-格罗兹尼-莫斯科-海参崴
-海参崴-莫斯科-格罗兹尼
-格罗兹尼-莫斯科-哈尔滨
-哈尔滨-莫斯科-格罗兹尼</textarea></div><button id="saveRoutes" class="btn-success">保存常用航线</button></div>
+莫斯科-车里亚宾-莫斯科
+车里亚宾-莫斯科-车里亚宾
+莫斯科-格罗兹尼-莫斯科
+格罗兹尼-莫斯科-格罗兹尼
+矿泉水城-埃里温-矿泉水城
+格罗兹尼-塔什干-北京
+北京-塔什干-格罗兹尼</textarea></div><button id="saveRoutes" class="btn-success">保存常用航线</button></div>
 
         <div class="settings-section"><h3>城市/机场设置</h3><div class="settings-group"><label>城市列表 (每行一个)</label><textarea id="setCities" rows="20">莫斯科
 阿拉木图
 阿斯塔纳
 埃里温
-奥斯
 奥伦堡
+奥斯
 巴尔瑙尔
 布市
 彼尔姆
@@ -531,18 +543,18 @@ URC-乌鲁木齐</textarea></div><button id="saveCityCodes" class="btn-success">
 海参崴
 哈巴
 加里宁格勒
-克市
 喀山
+克市
 矿泉水城
 马嘎斯
 马哈奇克拉
 明斯克
 欧姆斯克
-塔什干
-圣彼得堡
 萨马拉
+圣彼得堡
 斯塔夫
 索契
+塔什干
 乌尔根奇
 乌法
 乌兰乌德
@@ -553,32 +565,28 @@ URC-乌鲁木齐</textarea></div><button id="saveCityCodes" class="btn-success">
 伊斯坦布尔
 北京
 长春
+成都
 重庆
 广州
-西安
-杭州
-沈阳
-哈尔滨
 海口
-青岛
-成都
-牡丹江
+哈尔滨
+杭州
 佳木斯
+牡丹江
+青岛
 三亚
 上海
+沈阳
 深圳
-乌鲁木齐</textarea></div><button id="saveCities" class="btn-success">保存城市设置</button></div>
+乌鲁木齐
+西安</textarea></div><button id="saveCities" class="btn-success">保存城市设置</button></div>
 
         <div class="settings-section"><h3>机场航站楼设置</h3><div class="settings-group"><label>航站楼列表 (每行一个)</label><textarea id="setTerminals" rows="20">谢列梅捷沃机场B航站楼
 谢列梅捷沃机场C航站楼
 谢列梅捷沃机场D航站楼
-谢列梅捷沃机场E航站楼
-谢列梅捷沃机场F航站楼
 Шереметьево B
 Шереметьево C
 Шереметьево D
-Шереметьево E
-Шереметьево F
 德莫杰多沃机场
 大妈解答哇机场
 Домодедово
@@ -626,7 +634,8 @@ F
 ⚠️提取行李，中转到*航站楼⚠️
 ⚠️提取行李，打车中转到*机场⚠️</textarea></div><button id="saveTransferNotes" class="btn-success">保存中转行李设置</button></div>
 
-        <div class="settings-section"><h3>备注信息关键词设置</h3><div class="settings-group"><label>备注关键词列表 (每行一个)</label><textarea id="setNoteKeywords" rows="12">隔日中转航班
+        <div class="settings-section"><h3>备注信息关键词设置</h3><div class="settings-group"><label>备注关键词列表 (每行一个)</label><textarea id="setNoteKeywords" rows="12">根据现在局势，建议莫斯科住一夜，确保后程顺利中转
+隔日中转航班
 青岛中转免费住宿
 杭州中转免费住宿
 手提3公斤
@@ -645,13 +654,15 @@ F
         <div class="settings-section"><h3>城市名称全称设置</h3><div class="settings-group"><label>城市全称列表 (每行一个，格式：简称-全称)</label><textarea id="setCityFullNames" rows="12">布市-布拉格维申斯克
 车里亚宾-车里雅宾斯克
 车里雅宾-车里雅宾斯克
+车宾-车里雅宾斯克
 伏尔加-伏尔加格勒
 哈巴-哈巴罗夫斯克
 克市-克拉斯诺亚尔斯克
 达尔-克拉斯诺达尔
 斯塔夫-斯塔夫罗波尔
 叶卡-叶卡捷琳堡
-伊尔库-伊尔库茨克</textarea></div><button id="saveCityFullNames" class="btn-success">保存城市全称</button></div>
+伊尔库-伊尔库茨克
+五山城-矿泉水城</textarea></div><button id="saveCityFullNames" class="btn-success">保存城市全称</button></div>
 
         <div class="settings-section"><h3>行程类型设置</h3><div class="settings-group"><label>行程类型列表 (每行一个)</label><textarea id="setTripTypes" rows="5">单程
 往返
@@ -661,6 +672,7 @@ F
 
         <div class="settings-section"><h3>手提行李要求设置</h3><div class="settings-group"><label>手提行李列表 (每行一个)</label><textarea id="setCarryOn" rows="12">❗️尺寸要求严格36x30x27厘米
 ❗️尺寸要求严格40x30x20厘米
+3公斤
 5公斤
 7公斤
 8公斤
@@ -719,7 +731,7 @@ F
     <!-- 版本 -->
     <div id="version-page" class="page-content">
         <div class="version-section">
-            <div class="version-info"><div class="version-title">航班信息生成器</div><div class="version-display" id="vDisplay">当前版本：<strong>2.1</strong><span class="version-badge" id="vStatus">最新版</span></div><div class="version-date" id="vDate">更新于2026年07月24日</div><div class="version-time" id="vTime">10:00:00</div></div>
+            <div class="version-info"><div class="version-title">航班信息生成器</div><div class="version-display" id="vDisplay">当前版本：<strong>2.1.1</strong><span class="version-badge" id="vStatus">最新版</span></div><div class="version-date" id="vDate">更新于2026年07月27日</div><div class="version-time" id="vTime">22:00:00</div></div>
             <div class="update-guide">
                 <h2>更新版本说明</h2>
                 <h3>准备新版本：</h3>
@@ -750,35 +762,35 @@ F
 
 <script>
 // ===== 全局数据 =====
-const APP_VER='2.1';
+const APP_VER='2.1.1';
 let flightQuestions=["起飞日期：","起飞城市：","到达城市：","起飞时间：","到达时间：","截止值机时间："];
-let TRANSFER_OPTIONS=["莫斯科住一夜","需要住宿","打车转机场"];
-let airportList=["莫斯科","阿拉木图","阿斯塔纳","埃里温","奥斯","奥伦堡","巴尔瑙尔","布市","彼尔姆","车里亚宾","赤塔","达尔","第比利斯","杜尚别","伏尔加","格罗兹尼","海参崴","哈巴","加里宁格勒","克市","喀山","矿泉水城","马嘎斯","马哈奇克拉","明斯克","欧姆斯克","塔什干","圣彼得堡","萨马拉","斯塔夫","索契","乌尔根奇","乌法","乌兰乌德","新西伯利亚","雅库茨克","叶卡","伊尔库","伊斯坦布尔","北京","长春","重庆","广州","西安","杭州","沈阳","哈尔滨","海口","青岛","成都","牡丹江","佳木斯","三亚","上海","深圳","乌鲁木齐"];
-let terminalList=["谢列梅捷沃机场B航站楼","谢列梅捷沃机场C航站楼","谢列梅捷沃机场D航站楼","谢列梅捷沃机场E航站楼","谢列梅捷沃机场F航站楼","Шереметьево B","Шереметьево C","Шереметьево D","Шереметьево E","Шереметьево F","德莫杰多沃机场","大妈解答哇机场","Домодедово","伏努科沃机场","福怒噶哇机场","Внуково","茹科夫斯基机场","Жуковский","T1","T2","T3","T4","T5","大兴","首都T1","首都T2","首都T3","首都T4","虹桥","浦东","国际","天府国际","双流国际","A","B","C","D","E","F","Терминал A","Терминал B","Терминал C"];
+let TRANSFER_OPTIONS=["⚠️莫斯科住一夜⚠️","⚠️需要住宿⚠️","⚠️打车转机场⚠️","⚠️根据现在局势，建议莫斯科住一夜，确保后程顺利中转⚠️"];
+let airportList=["莫斯科","阿拉木图","阿斯塔纳","埃里温","奥伦堡","奥斯","巴尔瑙尔","布市","彼尔姆","车里亚宾","赤塔","达尔","第比利斯","杜尚别","伏尔加","格罗兹尼","海参崴","哈巴","加里宁格勒","喀山","克市","矿泉水城","马嘎斯","马哈奇克拉","明斯克","欧姆斯克","萨马拉","圣彼得堡","斯塔夫","索契","塔什干","乌尔根奇","乌法","乌兰乌德","新西伯利亚","雅库茨克","叶卡","伊尔库","伊斯坦布尔","北京","长春","成都","重庆","广州","海口","哈尔滨","杭州","佳木斯","牡丹江","青岛","三亚","上海","沈阳","深圳","乌鲁木齐","西安"];
+let terminalList=["谢列梅捷沃机场B航站楼","谢列梅捷沃机场C航站楼","谢列梅捷沃机场D航站楼","Шереметьево B","Шереметьево C","Шереметьево D","德莫杰多沃机场","大妈解答哇机场","Домодедово","伏努科沃机场","福怒噶哇机场","Внуково","茹科夫斯基机场","Жуковский","T1","T2","T3","T4","T5","大兴","首都T1","首都T2","首都T3","首都T4","虹桥","浦东","国际","天府国际","双流国际","A","B","C","D","E","F","Терминал A","Терминал B","Терминал C"];
 let checkinTimeOptions=["起飞前40分钟停办","起飞前1小时停办"];
 let transferNoteOptions=["⚠️隔日中转航班⚠️","⚠️无需提取行李⚠️","⚠️无需提取行李，直挂目的地⚠️","⚠️无需提取行李，中转到*航站楼⚠️","⚠️中转到*航站楼⚠️","⚠️打车中转到*机场⚠️","⚠️重新办理值机⚠️","⚠️提取行李，重新办理值机⚠️","⚠️提取行李，中转到*航站楼⚠️","⚠️提取行李，打车中转到*机场⚠️"];
-let presetNotes=["隔日中转航班","青岛中转免费住宿","杭州中转免费住宿","手提3公斤","手提5公斤","手提7公斤","手提8公斤","手提10公斤","手提10公斤，尺寸不超过55*40*25厘米","手提尺寸要求严格36*30*27厘米","手提尺寸要求严格40*30*20厘米","托运10公斤","托运20公斤","托运23公斤","托运32公斤"];
+let presetNotes=["根据现在局势，建议莫斯科住一夜，确保后程顺利中转","隔日中转航班","青岛中转免费住宿","杭州中转免费住宿","手提3公斤","手提5公斤","手提7公斤","手提8公斤","手提10公斤","手提10公斤，尺寸不超过55*40*25厘米","手提尺寸要求严格36*30*27厘米","手提尺寸要求严格40*30*20厘米","托运10公斤","托运20公斤","托运23公斤","托运32公斤"];
 const DEFAULT_TRIP_TYPES=["单程","往返","更改行程","往返行程更改","联程航班"];
 let tripTypeOptions=[...DEFAULT_TRIP_TYPES];
-let carryOnOptions=["❗️尺寸要求严格36x30x27厘米","❗️尺寸要求严格40x30x20厘米","5公斤","7公斤","8公斤","10公斤","10公斤，尺寸不超过55x40x25厘米","各5公斤","各7公斤","各8公斤","各10公斤","各10公斤，尺寸不超过55x40x25厘米"];
+let carryOnOptions=["❗️尺寸要求严格36x30x27厘米","❗️尺寸要求严格40x30x20厘米","3公斤","5公斤","7公斤","8公斤","10公斤","10公斤，尺寸不超过55x40x25厘米","各5公斤","各7公斤","各8公斤","各10公斤","各10公斤，尺寸不超过55x40x25厘米"];
 let checkedOptions=["无托运行李","1件，10公斤","1件，15公斤","1件，20公斤","1件，23公斤","1件，32公斤","各1件，每件10公斤","各1件，每件15公斤","各1件，每件20公斤","各1件，每件23公斤","各1件，每件32公斤","共*件，每件10公斤","共*件，每件15公斤","共*件，每件20公斤","共*件，每件23公斤","共*件，每件32公斤"];
 let priceOptions=["机票选项","带托运","无托运减","无托运","带托运加","带一件10公斤托运","带一件15公斤托运","带一件20公斤托运","带一件23公斤托运","带一件32公斤托运"];
 let commonRoutes=[];
 let savedLocations=[...airportList];
 let cityCodeMap={};
 let cityFullNameMap={
-    '布市':'布拉格维申斯克','车里亚宾':'车里雅宾斯克','车里雅宾':'车里雅宾斯克',
+    '布市':'布拉格维申斯克','车里亚宾':'车里雅宾斯克','车里雅宾':'车里雅宾斯克','车宾':'车里雅宾斯克',
     '伏尔加':'伏尔加格勒','哈巴':'哈巴罗夫斯克','克市':'克拉斯诺亚尔斯克',
-    '达尔':'克拉斯诺达尔','斯塔夫':'斯塔夫罗波尔','叶卡':'叶卡捷琳堡','伊尔库':'伊尔库茨克'
+    '达尔':'克拉斯诺达尔','斯塔夫':'斯塔夫罗波尔','叶卡':'叶卡捷琳堡','伊尔库':'伊尔库茨克','五山城':'矿泉水城'
 };
-const CHINA_CITY_SET=new Set(['北京','长春','重庆','广州','西安','杭州','沈阳','哈尔滨','海口','青岛','成都','牡丹江','佳木斯','三亚','上海','深圳','乌鲁木齐']);
+const CHINA_CITY_SET=new Set(['北京','长春','成都','重庆','广州','海口','哈尔滨','杭州','佳木斯','牡丹江','青岛','三亚','上海','沈阳','深圳','乌鲁木齐','西安']);
 let activeTicketItineraryId=null;
 let ticketQuestions=[];
 let ticketData={passenger:'',segments:[],carryOn:'',checkedBag:'',checkedCount:'1'};
 let itineraryCount=0, segCounters={}, priceCounters={};
 let paymentData=[], currentFilters={date:[],passenger:[],amount:[],difference:[],settlement:[],notes:[]};
 let filteredPaymentData=null, activeFilterColumn=null;
-let versionHistory=[{version:'2.1',date:'2026-07-24',time:'10:00:00',desc:'机票页细节与航班页交互修复版'}];
+let versionHistory=[{version:'2.1.1',date:'2026-07-27',time:'22:00:00',desc:'城市模糊搜索与历史记录城市排序优化'},{version:'2.1',date:'2026-07-24',time:'10:00:00',desc:'机票页细节与航班页交互修复版'}];
 
 // 智能输入状态 - 机票页
 let tValues={}, tStep=0, tEvening=false, tNextDay=false, tTransfer=false, tSelTransfer='';
@@ -828,20 +840,12 @@ function initCityCodeMap(){
     // 默认代码
     if(Object.keys(cityCodeMap).length===0){
         cityCodeMap={
-            'MOW':'莫斯科','ALA':'阿拉木图','NQZ':'阿斯塔纳','EVN':'埃里温',
-            'OSS':'奥斯','REN':'奥伦堡','BAX':'巴尔瑙尔','BQS':'布市',
-            'PEE':'彼尔姆','CEK':'车里亚宾','HTA':'赤塔','KRR':'达尔',
-            'TBS':'第比利斯','DYU':'杜尚别','VOG':'伏尔加','GRV':'格罗兹尼',
-            'VVO':'海参崴','KHV':'哈巴','KGD':'加里宁格勒','KJA':'克市',
-            'KZN':'喀山','MRV':'矿泉水城','IGT':'马嘎斯','MCX':'马哈奇克拉',
-            'MSQ':'明斯克','OMS':'欧姆斯克','TAS':'塔什干','LED':'圣彼得堡',
-            'KUF':'萨马拉','STW':'斯塔夫','AER':'索契','UGC':'乌尔根奇',
-            'UFA':'乌法','UUD':'乌兰乌德','OVB':'新西伯利亚','YKS':'雅库茨克',
-            'SVX':'叶卡','IKT':'伊尔库','IST':'伊斯坦布尔','BJS':'北京',
-            'CGQ':'长春','CKG':'重庆','CAN':'广州','SIA':'西安',
-            'HGH':'杭州','SHE':'沈阳','HRB':'哈尔滨','HAK':'海口',
-            'TAO':'青岛','CTU':'成都','MDG':'牡丹江','JMU':'佳木斯',
-            'SYX':'三亚','SHA':'上海','SZX':'深圳','URC':'乌鲁木齐'
+            'MOW':'莫斯科','ALA':'阿拉木图','NQZ':'阿斯塔纳','EVN':'埃里温','REN':'奥伦堡','OSS':'奥斯','BAX':'巴尔瑙尔','BQS':'布市','PEE':'彼尔姆',
+'CEK':'车里亚宾','HTA':'赤塔','KRR':'达尔','TBS':'第比利斯','DYU':'杜尚别','VOG':'伏尔加','GRV':'格罗兹尼','VVO':'海参崴','KHV':'哈巴','KGD':'加里宁格勒',
+'KZN':'喀山','KJA':'克市','MRV':'矿泉水城','IGT':'马嘎斯','MCX':'马哈奇克拉','MSQ':'明斯克','OMS':'欧姆斯克','KUF':'萨马拉','LED':'圣彼得堡','STW':'斯塔夫',
+'AER':'索契','TAS':'塔什干','UGC':'乌尔根奇','UFA':'乌法','UUD':'乌兰乌德','OVB':'新西伯利亚','YKS':'雅库茨克','SVX':'叶卡','IKT':'伊尔库','IST':'伊斯坦布尔',
+'BJS':'北京','CGQ':'长春','CTU':'成都','CKG':'重庆','CAN':'广州','HAK':'海口','HRB':'哈尔滨','HGH':'杭州','JMU':'佳木斯','MDG':'牡丹江','TAO':'青岛',
+'SYX':'三亚','SHA':'上海','SHE':'沈阳','SZX':'深圳','URC':'乌鲁木齐','SIA':'西安'
         };
     }
 }
@@ -851,6 +855,76 @@ function convertCodeToCity(input){
     let trimmed=input.trim().toUpperCase();
     if(cityCodeMap[trimmed])return cityCodeMap[trimmed];
     return input;
+}
+
+function getCityFuzzyMatches(query){
+    const q=String(query||'').trim();
+    if(!q)return [];
+    const qLower=q.toLowerCase();
+    const qUpper=q.toUpperCase();
+    const rows=[];
+    const seen=new Set();
+    Object.entries(cityCodeMap).forEach(([code,city])=>{
+        if(String(city).toLowerCase().includes(qLower)||String(code).toUpperCase().includes(qUpper)){
+            const key=String(city)+'|'+String(code).toUpperCase();
+            if(!seen.has(key)){seen.add(key);rows.push({city:String(city),code:String(code).toUpperCase()});}
+        }
+    });
+    airportList.forEach(city=>{
+        if(String(city).toLowerCase().includes(qLower)&&!rows.some(x=>x.city===String(city))){
+            rows.push({city:String(city),code:''});
+        }
+    });
+    return rows.sort((a,b)=>{
+        const aExact=(a.city.toLowerCase()===qLower||a.code===qUpper)?0:1;
+        const bExact=(b.city.toLowerCase()===qLower||b.code===qUpper)?0:1;
+        return aExact-bExact||a.city.localeCompare(b.city,'zh-CN');
+    });
+}
+
+function attachCityFuzzyAutocomplete(input,onSelect){
+    if(!input||input.dataset.cityFuzzyReady==='1')return;
+    input.dataset.cityFuzzyReady='1';
+    const parent=input.parentElement;
+    parent.classList.add('city-fuzzy-wrap');
+    const list=document.createElement('div');
+    list.className='city-fuzzy-list';
+    parent.appendChild(list);
+    let active=-1;
+    function close(){list.style.display='none';active=-1;}
+    function choose(row){input.value=row.city;close();if(typeof onSelect==='function')onSelect(row.city,row.code);}
+    function render(){
+        const rows=getCityFuzzyMatches(input.value);
+        active=-1;
+        if(!input.value.trim()){close();return;}
+        if(!rows.length){list.innerHTML='<div class="city-fuzzy-empty">没有匹配的城市或代码</div>';list.style.display='block';return;}
+        list.innerHTML='';
+        rows.forEach((row,i)=>{
+            const item=document.createElement('div');
+            item.className='city-fuzzy-item';
+            item.innerHTML='<span class="city-fuzzy-city">'+escapeHtml(row.city)+'</span><span class="city-fuzzy-code">'+escapeHtml(row.code)+'</span>';
+            item.addEventListener('mousedown',e=>{e.preventDefault();choose(row);});
+            list.appendChild(item);
+        });
+        list.style.display='block';
+    }
+    input.addEventListener('input',render);
+    input.addEventListener('focus',render);
+    input.addEventListener('keydown',e=>{
+        const items=Array.from(list.querySelectorAll('.city-fuzzy-item'));
+        if(list.style.display==='none'||!items.length)return;
+        if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+            e.preventDefault();
+            active=e.key==='ArrowDown'?Math.min(active+1,items.length-1):Math.max(active-1,0);
+            items.forEach((x,i)=>x.classList.toggle('active',i===active));
+            items[active]?.scrollIntoView({block:'nearest'});
+        }else if(e.key==='Enter'&&active>=0){
+            e.preventDefault();
+            const rows=getCityFuzzyMatches(input.value);
+            if(rows[active])choose(rows[active]);
+        }else if(e.key==='Escape')close();
+    });
+    document.addEventListener('mousedown',e=>{if(!parent.contains(e.target))close();});
 }
 
 // ===== 初始化 =====
@@ -887,7 +961,15 @@ function loadSettings(){
         let co=localStorage.getItem('carryOnList');if(co){let p=JSON.parse(co);if(p.length)carryOnOptions=p;}
         let ck=localStorage.getItem('checkedList');if(ck){let p=JSON.parse(ck);if(p.length)checkedOptions=p;}
         let pr=localStorage.getItem('priceOptionList');if(pr){let p=JSON.parse(pr);if(p.length)priceOptions=p;}
-        let rt=localStorage.getItem('routeList');if(rt){let p=JSON.parse(rt);if(p.length)commonRoutes=p;}
+        let rt=localStorage.getItem('routeList');if(rt){let p=JSON.parse(rt);if(Array.isArray(p)&&p.length)commonRoutes=p;}
+        // 如果本地尚未保存常用航线，则读取 HTML 文本框中内置的默认航线。
+        // 避免 commonRoutes 的初始空数组覆盖设置页原有内容。
+        if(!commonRoutes.length){
+            let defaultRoutesEl=$('setRoutes');
+            if(defaultRoutesEl){
+                commonRoutes=defaultRoutesEl.value.split('\n').map(x=>x.trim()).filter(Boolean);
+            }
+        }
         let cc=localStorage.getItem('cityCodes');if(cc){let p=JSON.parse(cc);if(p&&typeof p==='object')cityCodeMap=p;}
         let cfn=localStorage.getItem('cityFullNameMap');if(cfn){let p=JSON.parse(cfn);if(p&&typeof p==='object')cityFullNameMap=p;}
     }catch(e){}
@@ -1283,16 +1365,9 @@ function initSegmentSmart(itiId, sid){
             input.placeholder='输入城市名或代码';
             input.oninput=function(){
                 let val=this.value;
-                // 检查是否是代码
-                let converted=convertCodeToCity(val);
-                if(converted!==val){
-                    this.value=converted;
-                    val=converted;
-                }
                 if(val.length>0){
                     let key='seg_'+qLabel;
                     segValues[key]=val;
-                    // 更新隐藏字段
                     let fieldMap={'起飞城市':'departure','到达城市':'arrival'};
                     let f=fieldMap[qLabel];
                     if(f){
@@ -1302,6 +1377,16 @@ function initSegmentSmart(itiId, sid){
                     updatePreview(itiId, sid);
                 }
             };
+            attachCityFuzzyAutocomplete(input,function(city){
+                let key='seg_'+qLabel;
+                segValues[key]=city;
+                let fieldMap={'起飞城市':'departure','到达城市':'arrival'};
+                let f=fieldMap[qLabel];
+                let el=f?$('seg'+itiId+'-'+sid+'-'+f):null;
+                if(el)el.value=city;
+                updatePreview(itiId,sid);
+                updateDisplay();
+            });
 
             // “选择城市”放到“重置”按钮右侧，与按钮并列。
             let citySel=document.createElement('select');
@@ -1974,7 +2059,7 @@ function initEvents(){
     $('saveCarryOn').onclick=function(){let v=$('setCarryOn').value.split('\n').filter(x=>x.trim());if(v.length){carryOnOptions=v;saveSettings();updateSelects();renderTicketStep();alert('已保存');}};
     $('saveChecked').onclick=function(){let v=$('setChecked').value.split('\n').filter(x=>x.trim());if(v.length){checkedOptions=v;saveSettings();updateSelects();renderTicketStep();alert('已保存');}};
     $('savePriceOptions').onclick=function(){let v=$('setPriceOptions').value.split('\n').filter(x=>x.trim());if(v.length){priceOptions=v;saveSettings();alert('已保存');}};
-    $('delVerHist').onclick=function(){if(confirm('删除版本历史？')){versionHistory=[{version:APP_VER,date:'2026-07-24',time:'10:00:00',desc:'当前版本'}];renderVersion();alert('已删除');}};
+    $('delVerHist').onclick=function(){if(confirm('删除版本历史？')){versionHistory=[{version:APP_VER,date:'2026-07-27',time:'22:00:00',desc:'当前版本'}];renderVersion();alert('已删除');}};
 
     $('vBadge').textContent='v'+APP_VER;
     $('vText').textContent='当前版本：'+APP_VER;
@@ -2051,6 +2136,9 @@ function loadHistory(){
     unique.forEach((item,index)=>{
         const el=document.createElement('div');
         el.className='history-item sortable-item';el.dataset.id=item.id;el.dataset.index=index;el.draggable=true;
+        el.dataset.firstDeparture=String(item.data[0]?.departure||'').toLowerCase();
+        el.dataset.departures=item.data.map(s=>String(s.departure||'')).join('\n').toLowerCase();
+        el.dataset.arrivals=item.data.map(s=>String(s.arrival||'')).join('\n').toLowerCase();
         const locations=[];item.data.forEach((s,i)=>{if(i===0)locations.push(s.departure||'未指定');locations.push(s.arrival||'未指定');});
         let content=locations.length?`<div class="history-route-title">${escapeHtml(locations.join('-'))}</div>`:'';
         item.data.forEach((s,i)=>{
@@ -2124,7 +2212,28 @@ function editHistoryItem(item){
 }
 function deleteSelectedHistory(){const selected=Array.from(document.querySelectorAll('#historyList .history-checkbox:checked')).map(x=>Number(x.dataset.id));if(!selected.length){alert('请先选择要删除的历史记录');return;}if(!confirm(`确定要删除选中的 ${selected.length} 条历史记录吗？`))return;let h=JSON.parse(localStorage.getItem('flightHistory')||'[]').filter(x=>!selected.includes(Number(x.id)));localStorage.setItem('flightHistory',JSON.stringify(h));loadHistory();}
 function deleteAllHistory(){if(!confirm('确定要删除全部历史记录吗？此操作不可恢复！'))return;localStorage.removeItem('flightHistory');loadHistory();}
-function filterHistoryItems(query){const q=String(query||'').toLowerCase();document.querySelectorAll('#historyList .history-item').forEach(item=>item.classList.toggle('hidden-item',q&&!item.textContent.toLowerCase().includes(q)));}
+function filterHistoryItems(query){
+    const q=String(query||'').trim().toLowerCase();
+    const list=$('historyList');if(!list)return;
+    const items=Array.from(list.querySelectorAll('.history-item'));
+    if(!q){
+        items.sort((a,b)=>Number(a.dataset.index)-Number(b.dataset.index)).forEach(item=>{item.classList.remove('hidden-item');list.appendChild(item);});
+        return;
+    }
+    const ranked=[];
+    items.forEach(item=>{
+        const firstDep=item.dataset.firstDeparture||'';
+        const deps=item.dataset.departures||'';
+        const arrs=item.dataset.arrivals||'';
+        let rank=99;
+        if(firstDep.includes(q))rank=0;
+        else if(deps.includes(q))rank=1;
+        else if(arrs.includes(q))rank=2;
+        item.classList.toggle('hidden-item',rank===99);
+        if(rank!==99)ranked.push({item,rank,index:Number(item.dataset.index)||0});
+    });
+    ranked.sort((a,b)=>a.rank-b.rank||a.index-b.index).forEach(x=>list.appendChild(x.item));
+}
 function getVisibleHistoryItems(){return document.querySelectorAll('#historyList .history-item:not(.hidden-item)');}
 function selectAllVisibleHistory(){getVisibleHistoryItems().forEach(item=>{const cb=item.querySelector('.history-checkbox');if(cb)cb.checked=true;});}
 function deselectAllVisibleHistory(){getVisibleHistoryItems().forEach(item=>{const cb=item.querySelector('.history-checkbox');if(cb)cb.checked=false;});}
