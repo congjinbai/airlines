@@ -293,6 +293,215 @@
         #history-page .drag-handle{font-size:18px;line-height:20px;color:#718096;cursor:grab;user-select:none;padding:0 4px}
         #history-page .history-item.dragging{opacity:.45;background:#ebf8ff}
         #history-page .history-item.dragging-over{border-top:3px solid #3182ce}
+
+
+        /* ===== V2.1.1 高级视觉增强：仅改变外观，不改变布局与功能 ===== */
+        :root{
+            --premium-navy:#173b67;
+            --premium-blue:#2f78bd;
+            --premium-blue-dark:#225f99;
+            --premium-line:#d8e2ec;
+            --premium-surface:#ffffff;
+            --premium-soft:#f5f8fc;
+            --premium-text:#22344a;
+        }
+        html{-webkit-text-size-adjust:100%}
+        body{
+            background:
+                radial-gradient(circle at 8% 0%,rgba(49,130,206,.10),transparent 31%),
+                radial-gradient(circle at 96% 8%,rgba(128,90,213,.07),transparent 28%),
+                linear-gradient(180deg,#eef3f8 0%,#f6f8fb 55%,#edf2f7 100%);
+            color:var(--premium-text);
+        }
+        .container{
+            border:1px solid rgba(255,255,255,.85);
+            border-radius:15px;
+            box-shadow:0 18px 46px rgba(24,54,86,.14),0 2px 8px rgba(24,54,86,.08);
+            background:rgba(255,255,255,.97);
+        }
+        h1{
+            color:var(--premium-navy);
+            font-size:22px;
+            letter-spacing:.3px;
+            text-shadow:0 1px 0 #fff;
+            border-bottom-color:#dce6ef;
+        }
+        label,.settings-group label{color:#31465f}
+        input,select,textarea,.settings-group textarea{
+            color:#24384f;
+            background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);
+            border-color:#c9d6e3;
+            box-shadow:inset 0 1px 2px rgba(20,52,82,.04),0 1px 1px rgba(255,255,255,.9);
+            transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease;
+            -webkit-appearance:none;
+        }
+        select{background-color:#fff}
+        input:focus,select:focus,textarea:focus,.settings-group textarea:focus{
+            outline:none;
+            border-color:#4b91cf;
+            box-shadow:0 0 0 3px rgba(49,130,206,.14),inset 0 1px 2px rgba(20,52,82,.03);
+            background:#fff;
+        }
+        button{
+            border:1px solid rgba(18,66,109,.18);
+            border-radius:8px;
+            background:linear-gradient(180deg,#4795d4 0%,#307fc1 54%,#286fae 100%);
+            box-shadow:0 3px 0 #1f5f97,0 6px 12px rgba(31,95,151,.18),inset 0 1px 0 rgba(255,255,255,.35);
+            text-shadow:0 1px 1px rgba(0,0,0,.18);
+            font-weight:600;
+            transition:transform .10s ease,box-shadow .10s ease,filter .18s ease;
+            -webkit-tap-highlight-color:transparent;
+        }
+        button:hover{filter:brightness(1.045)}
+        button:active{
+            transform:translateY(2px);
+            box-shadow:0 1px 0 #1f5f97,0 3px 7px rgba(31,95,151,.16),inset 0 1px 3px rgba(0,0,0,.10);
+        }
+        button:focus-visible{outline:3px solid rgba(49,130,206,.24);outline-offset:2px}
+        button[style*="#38a169"],.btn-success,.save-history-btn,.download-selected-btn,.btn-confirm,.add-custom-note{
+            box-shadow:0 3px 0 #24714c,0 6px 12px rgba(36,113,76,.18),inset 0 1px 0 rgba(255,255,255,.32)!important;
+        }
+        button[style*="#e53e3e"],.remove-segment,.remove-itinerary,.btn-reset,.deselect-all-visible-btn{
+            box-shadow:0 3px 0 #a92c2c,0 6px 12px rgba(169,44,44,.17),inset 0 1px 0 rgba(255,255,255,.28)!important;
+        }
+        button[style*="#805ad5"],.copy-btn,.copy-itinerary,.btn-notes{
+            box-shadow:0 3px 0 #5f3fa8,0 6px 12px rgba(95,63,168,.17),inset 0 1px 0 rgba(255,255,255,.28)!important;
+        }
+        button[style*="#ed8936"],.btn-transfer{
+            box-shadow:0 3px 0 #b95f18,0 6px 12px rgba(185,95,24,.16),inset 0 1px 0 rgba(255,255,255,.28)!important;
+        }
+        .page-tabs{
+            gap:5px;
+            padding:5px 5px 0;
+            border:1px solid #d9e3ed;
+            border-radius:11px 11px 0 0;
+            background:linear-gradient(180deg,#f8fafc,#eef3f8);
+            box-shadow:inset 0 1px 0 #fff;
+        }
+        .page-tab{
+            border-color:#d7e1eb;
+            border-radius:8px 8px 0 0;
+            background:linear-gradient(180deg,#fff,#eaf0f6);
+            color:#536980;
+            box-shadow:0 -1px 0 rgba(255,255,255,.8),inset 0 1px 0 #fff;
+            transition:color .18s ease,background .18s ease,transform .18s ease;
+        }
+        .page-tab:hover{color:#245f96;background:linear-gradient(180deg,#fff,#f3f7fb)}
+        .page-tab.active{
+            color:#1f6dac;
+            background:#fff;
+            box-shadow:0 -3px 0 #3182ce,inset 0 1px 0 #fff;
+            font-weight:700;
+        }
+        .flight-segment,.ticket-price-plan,.settings-section,.passenger-info-section,.ticket-price-section,.version-section{
+            border:1px solid #d9e3ed;
+            background:linear-gradient(145deg,#fff 0%,#fbfdff 100%);
+            box-shadow:0 8px 20px rgba(32,72,108,.07),inset 0 1px 0 #fff;
+            border-radius:11px;
+        }
+        .section-title,.settings-group h3{
+            color:#234665;
+            letter-spacing:.15px;
+        }
+        .smart-area{
+            background:linear-gradient(145deg,#f8fbff 0%,#f1f6fb 100%);
+            border-color:#d2deea;
+            box-shadow:0 7px 18px rgba(36,78,115,.07),inset 0 1px 0 rgba(255,255,255,.95);
+        }
+        .smart-area .smart-label{color:#29455f;font-weight:700}
+        .smart-area .smart-row .smart-input-wrap input,
+        .smart-area .smart-row .smart-input-wrap select{
+            border-color:#c4d3e1;
+            box-shadow:inset 0 1px 2px rgba(19,57,91,.04),0 2px 5px rgba(40,74,106,.05);
+        }
+        .smart-area .smart-display{
+            background:linear-gradient(180deg,#fff,#f7fbff);
+            border-color:#cfdeeb;
+            box-shadow:inset 0 1px 2px rgba(28,66,99,.04),0 3px 9px rgba(34,78,118,.05);
+            padding:10px 13px;
+        }
+        .smart-area .smart-display .d-tag{
+            border:1px solid rgba(49,130,206,.13);
+            box-shadow:0 2px 4px rgba(37,78,115,.06),inset 0 1px 0 rgba(255,255,255,.7);
+            padding:3px 9px;
+            border-radius:7px;
+        }
+        .smart-area .smart-display .d-tag.time{
+            font-size:17px;
+            font-weight:800;
+            letter-spacing:.35px;
+            color:#187a70;
+            border-color:rgba(49,151,149,.20);
+        }
+        .smart-area .smart-display .d-tag.city{
+            font-size:15px;
+            font-weight:800;
+            color:#583b96;
+            border-color:rgba(107,70,193,.18);
+        }
+        .smart-area .smart-display .d-tag.date{font-weight:700}
+        .flight-display-box{
+            background:linear-gradient(145deg,#fff,#f5f9fd);
+            border-color:#d4e0eb;
+            box-shadow:0 8px 20px rgba(31,72,108,.08),inset 0 1px 0 #fff;
+        }
+        .flight-display-box .flight-route,.ticket-route-summary{
+            color:#163f67;
+            font-size:15px;
+            font-weight:800;
+            letter-spacing:.15px;
+        }
+        .output{
+            background:linear-gradient(145deg,#eff8ff,#e8f4fc);
+            border-color:#b9d9ed;
+            box-shadow:inset 0 1px 3px rgba(33,84,122,.06),0 7px 18px rgba(33,84,122,.06);
+            color:#243f57;
+        }
+        .history-list,.version-history-list{
+            border-color:#d2deea;
+            box-shadow:inset 0 2px 6px rgba(31,64,94,.04);
+        }
+        #history-page .history-item,.history-item{
+            background:linear-gradient(145deg,#fff,#f5f8fb);
+            border-color:#d9e3ec;
+            box-shadow:0 3px 9px rgba(38,71,101,.05);
+            transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;
+        }
+        #history-page .history-item:hover,.history-item:hover{
+            transform:translateY(-1px);
+            border-color:#b9d4e8;
+            box-shadow:0 7px 15px rgba(39,88,127,.09);
+        }
+        #history-page .history-route-title{color:#245f96;font-weight:800;font-size:14px}
+        .payment-table thead th,#payment-page .payment-table thead th{
+            background:linear-gradient(180deg,#f9fbfd,#eaf1f7);
+            color:#2e485f;
+            box-shadow:inset 0 -1px 0 #d1dde8,inset 0 1px 0 #fff;
+        }
+        .payment-table tbody tr,#payment-page .payment-table tbody tr{transition:background-color .15s ease}
+        .version-current,.version-badge{
+            box-shadow:0 3px 8px rgba(39,112,76,.18),inset 0 1px 0 rgba(255,255,255,.3);
+            text-shadow:0 1px 1px rgba(0,0,0,.15);
+        }
+        .note-tag,.smart-area .smart-tags .tag,.smart-area .smart-progress .step-dot{
+            box-shadow:0 2px 4px rgba(36,70,101,.06),inset 0 1px 0 rgba(255,255,255,.8);
+            transition:transform .12s ease,box-shadow .12s ease,background-color .15s ease;
+        }
+        .note-tag:active,.smart-area .smart-tags .tag:active,.smart-area .smart-progress .step-dot:active{transform:translateY(1px)}
+        @media(max-width:768px){
+            body{padding:8px;background:linear-gradient(180deg,#edf3f8,#f7f9fb)}
+            .container{padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(24,54,86,.12)}
+            h1{font-size:19px}
+            .page-tabs{gap:2px;padding-left:3px;padding-right:3px}
+            .page-tab{padding:8px 10px}
+            button{box-shadow:0 2px 0 #1f5f97,0 4px 8px rgba(31,95,151,.15),inset 0 1px 0 rgba(255,255,255,.3)}
+            .smart-area .smart-display .d-tag.time{font-size:16px}
+            .smart-area .smart-display .d-tag.city{font-size:14px}
+        }
+        @media(prefers-reduced-motion:reduce){
+            *,*::before,*::after{transition:none!important;scroll-behavior:auto!important}
+        }
+
     </style>
 </head>
 <body>
