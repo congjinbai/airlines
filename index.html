@@ -1,10 +1,12 @@
 
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>航班信息生成器 v2.1.1</title>
+    <title>航班信息生成器 v2.1.2</title>
     <style>
         *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         body{max-width:1100px;margin:0 auto;padding:15px;background:#f0f2f5;color:#333;font-size:12px}
@@ -500,6 +502,245 @@
         }
         @media(prefers-reduced-motion:reduce){
             *,*::before,*::after{transition:none!important;scroll-behavior:auto!important}
+        }
+
+
+
+        /* ===== Apple-inspired visual theme: appearance only, no layout/function changes ===== */
+        :root{
+            --apple-bg:#f5f5f7;
+            --apple-surface:rgba(255,255,255,.86);
+            --apple-surface-solid:#ffffff;
+            --apple-text:#1d1d1f;
+            --apple-secondary:#6e6e73;
+            --apple-tertiary:#86868b;
+            --apple-line:rgba(0,0,0,.10);
+            --apple-line-strong:rgba(0,0,0,.16);
+            --apple-blue:#0071e3;
+            --apple-blue-hover:#0077ed;
+            --apple-green:#248a3d;
+            --apple-red:#d70015;
+            --apple-orange:#c93400;
+            --apple-purple:#7d2ae8;
+            --apple-radius:18px;
+            --apple-radius-sm:12px;
+            --apple-shadow:0 14px 40px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);
+        }
+        html{background:var(--apple-bg)}
+        body{
+            color:var(--apple-text);
+            background:
+                radial-gradient(circle at 12% -10%,rgba(0,113,227,.08),transparent 28%),
+                radial-gradient(circle at 92% 4%,rgba(125,42,232,.055),transparent 24%),
+                linear-gradient(180deg,#fbfbfd 0%,#f5f5f7 42%,#f2f2f4 100%);
+            font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+            letter-spacing:-.005em;
+        }
+        .container{
+            background:var(--apple-surface);
+            border:1px solid rgba(255,255,255,.72);
+            border-radius:24px;
+            box-shadow:var(--apple-shadow);
+            backdrop-filter:saturate(180%) blur(24px);
+            -webkit-backdrop-filter:saturate(180%) blur(24px);
+        }
+        h1{
+            color:var(--apple-text);
+            font-size:25px;
+            font-weight:700;
+            letter-spacing:-.035em;
+            text-shadow:none;
+            border-bottom-color:var(--apple-line);
+        }
+        label,.settings-group label,.smart-area .smart-label{color:#3a3a3c}
+        .section-title,.settings-group h3,.version-title,.update-guide h2,.update-guide h3{
+            color:var(--apple-text);
+            font-weight:700;
+            letter-spacing:-.015em;
+        }
+        input,select,textarea,.settings-group textarea,
+        .smart-area .smart-row .smart-input-wrap input,
+        .smart-area .smart-row .smart-input-wrap select{
+            color:var(--apple-text);
+            background:rgba(255,255,255,.92);
+            border:1px solid var(--apple-line-strong);
+            border-radius:10px;
+            box-shadow:0 1px 2px rgba(0,0,0,.025);
+            transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+        }
+        input:hover,select:hover,textarea:hover{border-color:rgba(0,0,0,.24)}
+        input:focus,select:focus,textarea:focus,.settings-group textarea:focus,
+        .smart-area .smart-row .smart-input-wrap input:focus,
+        .smart-area .smart-row .smart-input-wrap select:focus{
+            outline:none;
+            border-color:var(--apple-blue);
+            background:#fff;
+            box-shadow:0 0 0 4px rgba(0,113,227,.14);
+        }
+        button,
+        .smart-area .smart-row .smart-btns button{
+            color:#fff;
+            border:0;
+            border-radius:980px;
+            background:var(--apple-blue);
+            box-shadow:none!important;
+            text-shadow:none;
+            font-weight:600;
+            transition:background-color .18s ease,transform .12s ease,opacity .18s ease,box-shadow .18s ease;
+        }
+        button:hover{background:var(--apple-blue-hover);filter:none;box-shadow:0 4px 12px rgba(0,113,227,.20)!important}
+        button:active{transform:scale(.975);box-shadow:none!important}
+        button:focus-visible{outline:4px solid rgba(0,113,227,.20);outline-offset:2px}
+        button[style*="#38a169"],.btn-success,.save-history-btn,.download-selected-btn,.btn-confirm,.add-custom-note{
+            background:var(--apple-green)!important;
+        }
+        button[style*="#38a169"]:hover,.btn-success:hover,.save-history-btn:hover,.download-selected-btn:hover,.btn-confirm:hover,.add-custom-note:hover{background:#2b9348!important}
+        button[style*="#e53e3e"],.remove-segment,.remove-itinerary,.btn-reset,.deselect-all-visible-btn{
+            background:var(--apple-red)!important;
+        }
+        button[style*="#e53e3e"]:hover,.remove-segment:hover,.remove-itinerary:hover,.btn-reset:hover,.deselect-all-visible-btn:hover{background:#e30018!important}
+        button[style*="#805ad5"],.copy-btn,.copy-itinerary,.btn-notes{background:var(--apple-purple)!important}
+        button[style*="#805ad5"]:hover,.copy-btn:hover,.copy-itinerary:hover,.btn-notes:hover{background:#8838ef!important}
+        button[style*="#ed8936"],.btn-transfer{background:var(--apple-orange)!important}
+        button[style*="#ed8936"]:hover,.btn-transfer:hover{background:#dc3d00!important}
+        .page-tabs{
+            gap:4px;
+            padding:5px;
+            border:0;
+            border-radius:14px;
+            background:rgba(118,118,128,.12);
+            box-shadow:none;
+        }
+        .page-tab{
+            border:0;
+            border-radius:10px;
+            background:transparent;
+            color:var(--apple-secondary);
+            box-shadow:none;
+            font-weight:600;
+            transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+        }
+        .page-tab:hover{color:var(--apple-text);background:rgba(255,255,255,.48)}
+        .page-tab.active{
+            color:var(--apple-text);
+            background:#fff;
+            box-shadow:0 2px 8px rgba(0,0,0,.08);
+            border:0;
+            margin-bottom:0;
+        }
+        .flight-segment,.ticket-price-plan,.settings-section,.passenger-info-section,
+        .ticket-price-section,.version-section,.smart-area,.flight-display-box,
+        .update-guide,.notes-container,.calculator-container{
+            background:rgba(255,255,255,.78);
+            border:1px solid var(--apple-line);
+            border-radius:var(--apple-radius);
+            box-shadow:0 6px 22px rgba(0,0,0,.045);
+        }
+        .smart-area{background:rgba(248,248,250,.92)}
+        .smart-area .smart-display,.output{
+            background:rgba(255,255,255,.78);
+            border:1px solid var(--apple-line);
+            border-radius:14px;
+            box-shadow:inset 0 1px 2px rgba(0,0,0,.025);
+            color:var(--apple-text);
+        }
+        .flight-display-box .passenger-line,.flight-display-box .flight-route,
+        .ticket-route-summary,.ticket-detail-line{color:var(--apple-text)}
+        .flight-display-box .date-line,.flight-display-box .baggage-line,
+        .ticket-extra-line,.smart-area .smart-hint,.smart-area .smart-label .step-info{
+            color:var(--apple-secondary);
+        }
+        .note-tag,.smart-area .smart-tags .tag,.smart-area .smart-progress .step-dot{
+            background:rgba(118,118,128,.10);
+            color:#3a3a3c;
+            border:1px solid transparent;
+            border-radius:980px;
+            box-shadow:none;
+        }
+        .note-tag:hover,.smart-area .smart-tags .tag:hover,.smart-area .smart-progress .step-dot:hover{background:rgba(118,118,128,.17)}
+        .note-tag.selected,.smart-area .smart-tags .tag.selected,.smart-area .smart-progress .step-dot.active{
+            background:var(--apple-blue);
+            color:#fff;
+            border-color:transparent;
+        }
+        .smart-area .smart-progress .step-dot.done{background:var(--apple-green);border-color:transparent;color:#fff}
+        .smart-area .smart-display .d-tag{
+            border:0;
+            border-radius:8px;
+            box-shadow:none;
+        }
+        .smart-area .smart-display .d-tag.city{background:#f0e9ff;color:#6e28c7}
+        .smart-area .smart-display .d-tag.time{background:#e8f7ee;color:#18783b}
+        .smart-area .smart-display .d-tag.date{background:#fff4d6;color:#8a5a00}
+        .smart-area .smart-display .d-tag.transfer{background:#ffe9eb;color:#c40018}
+        .history-list,.version-history-list,#history-page .history-list{
+            background:rgba(255,255,255,.58);
+            border:1px solid var(--apple-line);
+            border-radius:14px;
+            box-shadow:none;
+        }
+        #history-page .history-item,.history-item{
+            background:rgba(255,255,255,.90);
+            border:1px solid var(--apple-line);
+            border-radius:12px;
+            box-shadow:none;
+        }
+        #history-page .history-item:hover,.history-item:hover{
+            transform:none;
+            background:#fff;
+            border-color:rgba(0,113,227,.28);
+            box-shadow:0 4px 14px rgba(0,0,0,.055);
+        }
+        #history-page .history-route-title{color:var(--apple-blue)}
+        .payment-table,.payment-table th,.payment-table td,
+        #payment-page .payment-table,#payment-page .payment-table th,#payment-page .payment-table td{
+            border-color:var(--apple-line);
+        }
+        .payment-table thead th,#payment-page .payment-table thead th{
+            background:rgba(245,245,247,.96);
+            color:#3a3a3c;
+            box-shadow:inset 0 -1px 0 var(--apple-line);
+        }
+        .payment-table tbody tr:nth-child(even),#payment-page .payment-table tbody tr:nth-child(even){background:rgba(245,245,247,.58)}
+        .payment-table tbody tr:hover,#payment-page .payment-table tbody tr:hover{background:rgba(0,113,227,.065)}
+        .payment-total-row,#payment-page .payment-total-row{background:#eef8f1!important}
+        .payment-total-row td,#payment-page .payment-total-row td{border-top:2px solid rgba(36,138,61,.42)!important}
+        .filter-status{background:#edf6ff;border-color:rgba(0,113,227,.18)}
+        .filter-tag{background:var(--apple-blue)}
+        .multi-filter-dropdown,.filter-dropdown{
+            background:rgba(255,255,255,.94);
+            border:1px solid var(--apple-line);
+            border-radius:14px;
+            box-shadow:0 14px 36px rgba(0,0,0,.14);
+            backdrop-filter:blur(18px);
+            -webkit-backdrop-filter:blur(18px);
+        }
+        .version-badge,.version-current{
+            border-radius:980px;
+            box-shadow:none;
+            text-shadow:none;
+        }
+        .version-badge{background:var(--apple-blue)}
+        .version-current{background:var(--apple-green)}
+        .segment-transfer-between{
+            background:#fff1f2;
+            border-left-color:var(--apple-red);
+            color:#b50014;
+            border-radius:10px;
+        }
+        .update-guide pre{background:#1d1d1f;border-radius:12px}
+        .update-guide .warning{background:#fff8e8;border-left-color:#ff9f0a;border-radius:10px}
+        ::selection{background:rgba(0,113,227,.20)}
+        *{scrollbar-color:rgba(60,60,67,.28) transparent;scrollbar-width:thin}
+        *::-webkit-scrollbar{width:10px;height:10px}
+        *::-webkit-scrollbar-track{background:transparent}
+        *::-webkit-scrollbar-thumb{background:rgba(60,60,67,.24);border:3px solid transparent;border-radius:10px;background-clip:padding-box}
+        @media(max-width:768px){
+            body{background:var(--apple-bg);padding:8px}
+            .container{border-radius:18px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.07)}
+            h1{font-size:21px}
+            .page-tabs{border-radius:12px}
+            .page-tab{border-radius:8px}
         }
 
     </style>
