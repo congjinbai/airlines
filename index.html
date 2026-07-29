@@ -5,12 +5,13 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>航班信息生成器 v2.1.2</title>
+    <title>航班信息生成器 v2.1.4</title>
     <style>
         *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         body{max-width:1100px;margin:0 auto;padding:15px;background:#f0f2f5;color:#333;font-size:12px}
@@ -747,11 +748,18 @@
             .page-tab{border-radius:8px}
         }
 
-    </style>
+    
+        .ticket-output-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+        #history-page .history-header{justify-content:space-between}
+        #history-page .history-actions-group{margin-left:auto;justify-content:flex-end}
+        #history-page .history-checkbox{appearance:none;-webkit-appearance:none;width:16px!important;height:16px!important;border:1.8px solid #8e8e93;border-radius:50%;background:#fff;cursor:pointer;display:inline-block;position:relative;margin:0 8px 0 0!important;flex:0 0 16px}
+        #history-page .history-checkbox:checked{background:#1d1d1f;border-color:#1d1d1f;box-shadow:inset 0 0 0 3px #fff}
+        #history-page .history-checkbox:focus-visible{outline:3px solid rgba(0,113,227,.22);outline-offset:2px}
+</style>
 </head>
 <body>
 <div class="container">
-    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.1.2</span></h1>
+    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.1.4</span></h1>
     <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.1.2</div></div>
 
     <div class="page-tabs">
@@ -774,7 +782,6 @@
         <div class="output" id="allOutput"></div>
         <div class="output-buttons">
             <button id="copyBtn" class="copy-btn">复制到剪贴板</button>
-            <button id="saveHistoryBtn" class="copy-btn save-history-btn">保存到历史记录</button>
         </div>
     </div>
 
@@ -827,7 +834,7 @@
         <div class="bottom-section">
             <div class="bottom-buttons"><button id="genTicketBtn" style="background:#38a169;" class="compact-btn">生成表单</button><button id="resetOutputBtn" style="background:#e53e3e;" class="compact-btn">重置表单</button></div>
             <div class="output" id="ticketOutput"></div>
-            <div><button id="copyTicketBtn" class="copy-btn compact-btn">复制到剪贴板</button></div>
+            <div class="ticket-output-actions"><button id="copyTicketBtn" class="copy-btn compact-btn">复制到剪贴板</button><button id="saveHistoryBtn" class="save-history-btn compact-btn">保存到历史记录</button></div>
         </div>
     </div>
 
@@ -1158,12 +1165,11 @@ F
             <h3>保存的历史记录</h3>
             <div class="history-actions-group">
                 <button id="selectAllVisibleBtn" class="select-all-visible-btn compact-btn">全部选中</button>
-                <button id="deselectAllVisibleBtn" class="deselect-all-visible-btn compact-btn">取消选中</button>
                 <button id="deleteSelectedHistoryBtn" style="background-color: #e53e3e;" class="compact-btn">删除选中</button>
                 <button id="deleteAllHistoryBtn" style="background-color: #e53e3e;" class="compact-btn">删除全部</button>
             </div>
         </div>
-        <div class="history-toolbar"><input type="text" id="historySearchInput" placeholder="🔍 搜索历史记录..." style="flex:1; min-width:150px; max-width:300px;"><div class="history-btn-group"><button id="downloadSelectedBtn" class="download-selected-btn">下载选中</button><button id="uploadExcelBtn" style="background-color: #805ad5;">上传航程</button><button id="downloadTemplateBtn" style="background-color: #ed8936;">表格模板</button></div></div>
+        <div class="history-toolbar"><input type="text" id="historySearchInput" placeholder="🔍 搜索历史记录..." style="flex:1; min-width:150px; max-width:300px;"><div class="history-btn-group"><button id="downloadSelectedBtn" class="download-selected-btn">下载选中</button><button id="uploadExcelBtn" style="background-color: #805ad5;">上传航程</button><button id="downloadTemplateBtn" style="background-color: #ed8936;">表格模板</button><button id="exportJsonBtn" style="background-color:#3182ce;">下载JSON</button><button id="importJsonBtn" style="background-color:#805ad5;">导入JSON</button></div></div>
         <div class="history-list" id="historyList"></div>
     </div>
 
@@ -1197,11 +1203,11 @@ F
         </div>
     </div>
 </div>
-<input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
+<input type="file" id="fileInput" accept=".csv" style="display:none;"><input type="file" id="jsonFileInput" accept=".json,application/json" style="display:none;">
 
 <script>
 // ===== 全局数据 =====
-const APP_VER='2.1.2';
+const APP_VER='2.1.4';
 let flightQuestions=["起飞日期：","起飞城市：","到达城市：","起飞时间：","到达时间：","截止值机时间："];
 let TRANSFER_OPTIONS=["⚠️莫斯科住一夜⚠️","⚠️需要住宿⚠️","⚠️打车转机场⚠️","⚠️协助莫斯科打车、住宿服务⚠️","⚠️根据当前局势，建议提前一天抵达莫斯科，确保后程顺利中转⚠️"];
 let airportList=["莫斯科","阿拉木图","阿斯塔纳","埃里温","奥伦堡","奥斯","巴尔瑙尔","布市","彼尔姆","车里亚宾","赤塔","达尔","第比利斯","杜尚别","伏尔加","格罗兹尼","海参崴","哈巴","加里宁格勒","喀山","克市","矿泉水城","马嘎斯","马哈奇克拉","明斯克","欧姆斯克","萨马拉","圣彼得堡","斯塔夫","索契","塔什干","乌尔根奇","乌法","乌兰乌德","新西伯利亚","雅库茨克","叶卡","伊尔库","伊斯坦布尔","北京","长春","成都","重庆","广州","海口","哈尔滨","杭州","佳木斯","牡丹江","青岛","三亚","上海","沈阳","深圳","乌鲁木齐","西安"];
@@ -2615,7 +2621,6 @@ function initHistoryPage(){
     $('historySearchInput').addEventListener('input',function(){filterHistoryItems(this.value.trim());});
     $('downloadSelectedBtn').addEventListener('click',downloadSelectedHistory);
     $('selectAllVisibleBtn').addEventListener('click',selectAllVisibleHistory);
-    $('deselectAllVisibleBtn').addEventListener('click',deselectAllVisibleHistory);
     $('deleteSelectedHistoryBtn').addEventListener('click',deleteSelectedHistory);
     $('deleteAllHistoryBtn').addEventListener('click',deleteAllHistory);
     $('uploadExcelBtn').addEventListener('click',()=>$('fileInput').click());
@@ -2990,6 +2995,76 @@ function renderVersion(){
     $('vDate').textContent='更新于'+now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
     $('vTime').textContent=now.toTimeString().slice(0,8);
 }
+
+
+// ===== v2.1.3 历史记录增强与可移植 JSON 数据 =====
+const HISTORY_FIELDS_PER_SEGMENT=['flightNo','departure','departureTerminal','departureTime','isEvening','arrival','arrivalTerminal','arrivalTime','isNextDay','flightTime','transferNote'];
+const itineraryTicketStore={};
+const _syncToTicketV212=syncToTicket;
+syncToTicket=function(itiId,resetAnswers=false){
+    if(activeTicketItineraryId&&ticketData&&Array.isArray(ticketData.segments)) itineraryTicketStore[String(activeTicketItineraryId)]=JSON.parse(JSON.stringify(ticketData));
+    const target=itiId!==undefined&&itiId!==null?String(itiId):String(activeTicketItineraryId||'');
+    if(!resetAnswers&&target&&itineraryTicketStore[target]){
+        activeTicketItineraryId=target;
+        const source=getTicketSourceSegments();
+        const saved=JSON.parse(JSON.stringify(itineraryTicketStore[target]));
+        ticketData={passenger:saved.passenger||'',segments:source.map((x,i)=>saved.segments?.[i]||{flightNo:'',depTerminal:'',arrTerminal:'',seat:'',transfer:'',transferTemplate:'',transferReplacement:''}),carryOn:saved.carryOn||'',checkedBag:saved.checkedBag||'',checkedCount:saved.checkedCount||'1'};
+        tValues=ticketData;pName.value=ticketData.passenger;carryOn.value=ticketData.carryOn;checkedBag.value=ticketData.checkedBag;checkedCount.value=ticketData.checkedCount;
+        if(source.length){depInput.value=source[0].dep;arrInput.value=source[source.length-1].arr;}
+        buildTicketQuestions();updateTicketDisplay();return;
+    }
+    _syncToTicketV212(itiId,resetAnswers);
+};
+function historyComparableSegment(seg){const s=normalizeHistorySegment(seg);s.date='';return s;}
+function historySegmentKeyNoDate(seg){const s=historyComparableSegment(seg);return `${s.flightNo}|${s.departure}|${s.departureTerminal}|${s.departureTime}|${s.isEvening}|${s.arrival}|${s.arrivalTerminal}|${s.arrivalTime}|${s.isNextDay}|${s.flightTime}|${s.transferNote}`;}
+historySegmentKey=historySegmentKeyNoDate;
+getCurrentHistoryFlightData=function(){
+    const itinerary=document.querySelector('.itinerary-container');if(!itinerary)return [];
+    const id=itinerary.id.replace('iti','');
+    let savedTicket=(String(activeTicketItineraryId)===String(id)?ticketData:itineraryTicketStore[String(id)])||{segments:[]};
+    return Array.from(itinerary.querySelectorAll('.flight-segment')).map((segment,index)=>{
+        const sid=segment.id.split('-')[1],ticketSeg=savedTicket.segments?.[index]||{};
+        return normalizeHistorySegment({date:'',flightNo:ticketSeg.flightNo||'',departure:$('seg'+id+'-'+sid+'-departure')?.value||'',departureTerminal:ticketSeg.depTerminal||'',departureTime:$('seg'+id+'-'+sid+'-depTime')?.value||'',isEvening:$('seg'+id+'-'+sid+'-evening')?.value==='true',arrival:$('seg'+id+'-'+sid+'-arrival')?.value||'',arrivalTerminal:ticketSeg.arrTerminal||'',arrivalTime:$('seg'+id+'-'+sid+'-arrTime')?.value||'',isNextDay:$('seg'+id+'-'+sid+'-nextday')?.value==='true',flightTime:$('seg'+id+'-'+sid+'-checkin')?.value||'',transferNote:$('seg'+id+'-'+sid+'-transfer')?.value||''});
+    });
+};
+function itineraryDataForCompare(itinerary){
+    const id=itinerary.id.replace('iti',''),store=(String(activeTicketItineraryId)===String(id)?ticketData:itineraryTicketStore[String(id)])||{segments:[]};
+    return Array.from(itinerary.querySelectorAll('.flight-segment')).map((seg,i)=>{const sid=seg.id.split('-')[1],t=store.segments?.[i]||{};return normalizeHistorySegment({date:'',flightNo:t.flightNo||'',departure:$('seg'+id+'-'+sid+'-departure')?.value||'',departureTerminal:t.depTerminal||'',departureTime:$('seg'+id+'-'+sid+'-depTime')?.value||'',isEvening:$('seg'+id+'-'+sid+'-evening')?.value==='true',arrival:$('seg'+id+'-'+sid+'-arrival')?.value||'',arrivalTerminal:t.arrTerminal||'',arrivalTime:$('seg'+id+'-'+sid+'-arrTime')?.value||'',isNextDay:$('seg'+id+'-'+sid+'-nextday')?.value==='true',flightTime:$('seg'+id+'-'+sid+'-checkin')?.value||'',transferNote:$('seg'+id+'-'+sid+'-transfer')?.value||''});});
+}
+function dataIsEmpty(data){return !data.length||data.every(s=>HISTORY_FIELDS_PER_SEGMENT.every(f=>f==='isEvening'||f==='isNextDay'?!s[f]:!String(s[f]||'').trim()));}
+function dataEqual(a,b){return a.length===b.length&&a.map(historySegmentKeyNoDate).join('||')===b.map(historySegmentKeyNoDate).join('||');}
+function populateItineraryFromHistory(itinerary,data){
+    const id=itinerary.id.replace('iti',''),c=$('segContainer'+id);c.innerHTML='';segCounters[id]=0;const normalized=data.map(historyComparableSegment);
+    normalized.forEach(s=>{addSeg(id);const sid=segCounters[id];$('seg'+id+'-'+sid+'-date').value='';$('seg'+id+'-'+sid+'-departure').value=s.departure||'';$('seg'+id+'-'+sid+'-arrival').value=s.arrival||'';$('seg'+id+'-'+sid+'-depTime').value=s.departureTime||'';$('seg'+id+'-'+sid+'-arrTime').value=s.arrivalTime||'';$('seg'+id+'-'+sid+'-evening').value=s.isEvening?'true':'false';$('seg'+id+'-'+sid+'-nextday').value=s.isNextDay?'true':'false';const ch=$('seg'+id+'-'+sid+'-checkin');if(ch&&s.flightTime){if(!Array.from(ch.options).some(o=>o.value===s.flightTime))ch.add(new Option(s.flightTime,s.flightTime));ch.value=s.flightTime;}$('seg'+id+'-'+sid+'-transfer').value=s.transferNote||'';initSegmentSmart(id,sid);updatePreview(id,sid);});
+    itineraryTicketStore[String(id)]={passenger:'',segments:normalized.map(s=>({flightNo:s.flightNo||'',depTerminal:s.departureTerminal||'',arrTerminal:s.arrivalTerminal||'',seat:'',transfer:'',transferTemplate:'',transferReplacement:''})),carryOn:'',checkedBag:'',checkedCount:'1'};
+    activeTicketItineraryId=String(id);syncToTicket(id,false);updateDisplay();
+}
+fillFromHistory=function(data){
+    const normalized=data.map(historyComparableSegment);let itinerariesList=Array.from(document.querySelectorAll('.itinerary-container'));
+    for(const iti of itinerariesList){if(dataEqual(itineraryDataForCompare(iti),normalized)){alert('相同信息已存在，无需重复回填');return;}}
+    let target=itinerariesList.find(iti=>dataIsEmpty(itineraryDataForCompare(iti)));
+    if(!target){addItinerary();target=$('iti'+itineraryCount);}
+    populateItineraryFromHistory(target,normalized);
+    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="flight"]').classList.add('active');document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));$('flight-page').classList.add('active');
+    alert(`已回填到行程方案 ${target.id.replace('iti','')}`);
+};
+function buildHistoryTable(history){
+    const maxSeg=Math.max(1,...history.map(x=>(x.data||[]).length));const headers=['序号'];
+    for(let i=1;i<=maxSeg;i++)headers.push(`航段${i}航班号`,`航段${i}起飞城市`,`航段${i}起飞机场航站楼`,`航段${i}起飞时间`,`航段${i}夜间`,`航段${i}到达城市`,`航段${i}到达机场航站楼`,`航段${i}到达时间`,`航段${i}次日`,`航段${i}截止值机时间`,`航段${i}中转`);
+    const rows=[headers];history.forEach((item,rowIndex)=>{const row=[rowIndex+1];for(let i=0;i<maxSeg;i++){const s=normalizeHistorySegment(item.data?.[i]);row.push(s.flightNo,s.departure,s.departureTerminal,s.departureTime,s.isEvening?'是':'否',s.arrival,s.arrivalTerminal,s.arrivalTime,s.isNextDay?'是':'否',s.flightTime,s.transferNote);}rows.push(row);});return rows;
+}
+downloadSelectedHistory=function(){const checked=document.querySelectorAll('#historyList .history-checkbox:checked');if(!checked.length){alert('请先选择要下载的历史记录');return;}const ids=Array.from(checked).map(x=>Number(x.dataset.id));const history=JSON.parse(localStorage.getItem('flightHistory')||'[]').filter(x=>ids.includes(Number(x.id)));const rows=buildHistoryTable(history).map(r=>r.map(csvEscape).join(','));downloadTextFile('\uFEFF'+rows.join('\n'),`航程历史记录_${new Date().toISOString().split('T')[0]}.csv`,'text/csv;charset=utf-8');};
+downloadExcelTemplate=function(){const sample=[{data:[normalizeHistorySegment({flightNo:'SU1234',departure:'莫斯科',departureTerminal:'D',departureTime:'1430',isEvening:false,arrival:'北京',arrivalTerminal:'T3',arrivalTime:'1845',isNextDay:false,flightTime:'起飞前40分钟停办',transferNote:'无需提取行李，直挂目的地'})]}];const rows=buildHistoryTable(sample).map(r=>r.map(csvEscape).join(','));downloadTextFile('\uFEFF'+rows.join('\n'),`航程模板_${new Date().toISOString().split('T')[0]}.csv`,'text/csv;charset=utf-8');};
+function parseHistoryTable(lines){const header=parseCsvLine(lines[0]).map(x=>x.replace(/^\uFEFF/,''));const maxSeg=Math.max(0,...header.map(h=>(h.match(/^航段(\d+)航班号$/)||[])[1]||0).map(Number));const out=[];for(let r=1;r<lines.length;r++){const cols=parseCsvLine(lines[r]);const segs=[];for(let i=1;i<=maxSeg;i++){const get=name=>cols[header.indexOf(name)]||'';const flightNo=get(`航段${i}航班号`),departure=get(`航段${i}起飞城市`),arrival=get(`航段${i}到达城市`);if(!flightNo&&!departure&&!arrival)continue;segs.push(normalizeHistorySegment({date:'',flightNo,departure,departureTerminal:get(`航段${i}起飞机场航站楼`),departureTime:get(`航段${i}起飞时间`),isEvening:/^(是|true|1)$/i.test(get(`航段${i}夜间`)),arrival,arrivalTerminal:get(`航段${i}到达机场航站楼`),arrivalTime:get(`航段${i}到达时间`),isNextDay:/^(是|true|1)$/i.test(get(`航段${i}次日`)),flightTime:get(`航段${i}截止值机时间`),transferNote:get(`航段${i}中转`)}));}if(segs.length)out.push({id:Date.now()+r,data:segs,timestamp:new Date().toLocaleString()});}return out;}
+uploadHistoryFromExcel=function(file){const reader=new FileReader();reader.onload=e=>{try{const lines=String(e.target.result||'').split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)throw new Error('文件中没有数据');const added=parseHistoryTable(lines);if(!added.length)throw new Error('未解析到有效航程');let all=[...added,...JSON.parse(localStorage.getItem('flightHistory')||'[]')],seen=new Set(),unique=[];all.forEach(item=>{const key=(item.data||[]).map(historySegmentKeyNoDate).join('||');if(!seen.has(key)){seen.add(key);unique.push(item);}});localStorage.setItem('flightHistory',JSON.stringify(unique));loadHistory();alert(`成功导入 ${added.length} 条历史记录`);}catch(err){alert('导入失败：'+err.message);}};reader.readAsText(file,'utf-8');};
+function exportHistoryJson(){const payload={schema:'flight-history-v1',updatedAt:new Date().toISOString(),history:JSON.parse(localStorage.getItem('flightHistory')||'[]')};downloadTextFile(JSON.stringify(payload,null,2),'flight_history.json','application/json;charset=utf-8');}
+function importHistoryJson(file){const reader=new FileReader();reader.onload=e=>{try{const obj=JSON.parse(String(e.target.result||'')),incoming=Array.isArray(obj)?obj:obj.history;if(!Array.isArray(incoming))throw new Error('JSON 格式不正确');localStorage.setItem('flightHistory',JSON.stringify(incoming.map(item=>({...item,id:item.id||Date.now()+Math.random(),data:(item.data||[]).map(historyComparableSegment)}))));loadHistory();alert('JSON 数据已导入并更新');}catch(err){alert('JSON 导入失败：'+err.message);}};reader.readAsText(file,'utf-8');}
+setTimeout(()=>{
+    const exp=$('exportJsonBtn');if(exp)exp.onclick=exportHistoryJson;
+    const imp=$('importJsonBtn');if(imp)imp.onclick=()=>$('jsonFileInput').click();
+    const jf=$('jsonFileInput');if(jf)jf.onchange=function(){if(this.files[0])importHistoryJson(this.files[0]);this.value='';};
+},0);
+
 </script>
 </body>
 </html>
