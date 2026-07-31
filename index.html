@@ -11,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>航班信息生成器 v2.1.4</title>
+    <title>航班信息生成器 v2.2.2 中俄双语版</title>
     <style>
         *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         body{max-width:1100px;margin:0 auto;padding:15px;background:#f0f2f5;color:#333;font-size:12px}
@@ -787,11 +787,39 @@
             .flight-output-actions button,.ticket-output-actions button{width:100%!important;padding:5px 5px!important;font-size:11px!important}
         }
 
+        /* v2.1.7: unified action-button sizing and responsive history controls */
+        .flight-main-actions,.bottom-buttons,.flight-output-actions,.ticket-output-actions{
+            display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;flex-wrap:nowrap!important;
+        }
+        .flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
+            width:150px!important;min-width:150px!important;height:46px!important;min-height:46px!important;
+            box-sizing:border-box!important;margin:0!important;padding:6px 10px!important;border-radius:23px!important;
+            display:inline-flex!important;align-items:center!important;justify-content:center!important;line-height:1.15!important;
+            font-size:16px!important;font-weight:700!important;white-space:nowrap!important;vertical-align:middle!important;
+        }
+        #saveHistoryBtn,#copyTicketBtn{font-size:14px!important;}
+        #history-page .history-button-rows{justify-content:center!important;}
+        #history-page .history-button-rows button{
+            height:30px!important;min-height:30px!important;padding:3px 9px!important;font-size:11px!important;
+            display:inline-flex!important;align-items:center!important;justify-content:center!important;
+        }
+        @media(max-width:768px){
+            .flight-main-actions,.bottom-buttons,.flight-output-actions,.ticket-output-actions{
+                display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important;
+            }
+            .flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
+                width:100%!important;min-width:0!important;height:44px!important;min-height:44px!important;padding:5px 4px!important;font-size:14px!important;
+            }
+            #copyTicketBtn,#saveHistoryBtn{font-size:12px!important;}
+            #history-page .history-button-rows{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;}
+            #history-page .history-button-rows button{height:30px!important;min-height:30px!important;font-size:10px!important;padding:2px!important;}
+        }
+
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.1.6</span></h1>
+    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.1.9</span></h1>
     <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.1.2</div></div>
 
     <div class="page-tabs">
@@ -807,7 +835,7 @@
     <div id="flight-page" class="page-content active">
         <button class="itinerary-toggle-btn" id="createBtn">+ 创建新行程方案</button>
         <div id="itineraries"></div>
-        <div style="margin-top:20px;text-align:center;">
+        <div class="flight-main-actions" style="margin-top:20px;text-align:center;">
             <button id="genAllBtn" style="background:#38a169;">生成所有方案</button>
             <button id="resetAllBtn" style="background:#e53e3e;">重置所有</button>
         </div>
@@ -1201,8 +1229,8 @@ F
             <div class="history-button-rows">
                 <button id="selectAllVisibleBtn" class="select-all-visible-btn">全选</button>
                 <button id="uploadExcelBtn" style="background-color:#805ad5;">导入</button>
-                <button id="importJsonBtn" style="background-color:#805ad5;">导入JSON</button>
                 <button id="downloadSelectedBtn" class="download-selected-btn">导出</button>
+                <button id="importJsonBtn" style="background-color:#805ad5;">导入JSON</button>
                 <button id="exportJsonBtn" style="background-color:#3182ce;">导出JSON</button>
                 <button id="deleteSelectedHistoryBtn" style="background-color:#e53e3e;">删除</button>
             </div>
@@ -1245,7 +1273,7 @@ F
 
 <script>
 // ===== 全局数据 =====
-const APP_VER='2.1.4';
+const APP_VER='2.3.1';
 let flightQuestions=["起飞日期：","起飞城市：","到达城市：","起飞时间：","到达时间：","截止值机时间："];
 let TRANSFER_OPTIONS=["⚠️莫斯科住一夜⚠️","⚠️需要住宿⚠️","⚠️打车转机场⚠️","⚠️协助莫斯科打车、住宿服务⚠️","⚠️根据当前局势，建议提前一天抵达莫斯科，确保后程顺利中转⚠️"];
 let airportList=["莫斯科","阿拉木图","阿斯塔纳","埃里温","奥伦堡","奥斯","巴尔瑙尔","布市","彼尔姆","车里亚宾","赤塔","达尔","第比利斯","杜尚别","伏尔加","格罗兹尼","海参崴","哈巴","加里宁格勒","喀山","克市","矿泉水城","马嘎斯","马哈奇克拉","明斯克","欧姆斯克","萨马拉","圣彼得堡","斯塔夫","索契","塔什干","乌尔根奇","乌法","乌兰乌德","新西伯利亚","雅库茨克","叶卡","伊尔库","伊斯坦布尔","北京","长春","成都","重庆","广州","海口","哈尔滨","杭州","佳木斯","牡丹江","青岛","三亚","上海","沈阳","深圳","乌鲁木齐","西安"];
@@ -1344,6 +1372,7 @@ function convertCodeToCity(input){
 document.addEventListener('DOMContentLoaded',function(){
     initCityCodeMap();
     loadSettings();
+    checkCityTranslationCompleteness(false);
     initTabs();
     initPaymentStatusPage();
     initHistoryPage();
@@ -2341,6 +2370,194 @@ function getTripRouteHeading(depFull,arrFull){
     return `${oneWayRoute}的行程如下:`;
 }
 
+
+// ===== 俄文机票生成 =====
+const RU_MONTHS_FULL=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const RU_MONTHS_SHORT=['янв.','февр.','мар.','апр.','мая','июн.','июл.','авг.','сент.','окт.','нояб.','дек.'];
+const RU_CITY_MAP={
+'北京':'Пекин','佳木斯':'Цзямусы','牡丹江':'Муданьцзян','上海':'Шанхай','广州':'Гуанчжоу','深圳':'Шэньчжэнь','杭州':'Ханчжоу','成都':'Чэнду','重庆':'Чунцин','西安':'Сиань','南京':'Нанкин','武汉':'Ухань','天津':'Тяньцзинь','青岛':'Циндао','厦门':'Сямынь','昆明':'Куньмин','三亚':'Санья','海口':'Хайкоу','哈尔滨':'Харбин','大连':'Далянь','沈阳':'Шэньян','长春':'Чанчунь','郑州':'Чжэнчжоу','长沙':'Чанша','济南':'Цзинань','福州':'Фучжоу','南宁':'Наньнин','贵阳':'Гуйян','乌鲁木齐':'Урумчи','兰州':'Ланьчжоу','银川':'Иньчуань','呼和浩特':'Хух-Хото','石家庄':'Шицзячжуан','太原':'Тайюань','合肥':'Хэфэй','南昌':'Наньчан','宁波':'Нинбо','无锡':'Уси','温州':'Вэньчжоу','珠海':'Чжухай','佛山':'Фошань','义乌':'Иу','桂林':'Гуйлинь','张家界':'Чжанцзяцзе','喀什':'Кашгар','拉萨':'Лхаса','香港':'Гонконг','澳门':'Макао','台北':'Тайбэй',
+'莫斯科':'Москва','格罗兹尼':'Грозный','奥伦堡':'Оренбург','奥斯':'Ош','巴尔瑙尔':'Барнаул','克拉斯诺达尔':'Краснодар','达尔':'Краснодар','杜尚别':'Душанбе','矿泉水城':'Минеральные Воды','马嘎斯':'Магас','马哈奇克拉':'Махачкала','马哈奇卡拉':'Махачкала','欧姆斯克':'Омск','斯塔夫罗波尔':'Ставрополь','斯塔夫':'Ставрополь','乌尔根奇':'Ургенч','乌兰乌德':'Улан-Удэ','圣彼得堡':'Санкт-Петербург','叶卡捷琳堡':'Екатеринбург','新西伯利亚':'Новосибирск','伊尔库茨克':'Иркутск','海参崴':'Владивосток','符拉迪沃斯托克':'Владивосток','哈巴罗夫斯克':'Хабаровск','布拉格维申斯克':'Благовещенск','克拉斯诺亚尔斯克':'Красноярск','车里雅宾斯克':'Челябинск','喀山':'Казань','索契':'Сочи','乌法':'Уфа','鄂木斯克':'Омск','秋明':'Тюмень','萨马拉':'Самара','伏尔加格勒':'Волгоград','彼尔姆':'Пермь','雅库茨克':'Якутск','摩尔曼斯克':'Мурманск','加里宁格勒':'Калининград','苏尔古特':'Сургут','赤塔':'Чита','南萨哈林斯克':'Южно-Сахалинск',
+'曼谷':'Бангкок','东京':'Токио','首尔':'Сеул','迪拜':'Дубай','伊斯坦布尔':'Стамбул','巴黎':'Париж','伦敦':'Лондон','罗马':'Рим','米兰':'Милан','法兰克福':'Франкфурт','慕尼黑':'Мюнхен','阿拉木图':'Алматы','阿斯塔纳':'Астана','塔什干':'Ташкент','比什凯克':'Бишкек','第比利斯':'Тбилиси','埃里温':'Ереван','明斯克':'Минск','贝尔格莱德':'Белград','河内':'Ханой','胡志明市':'Хошимин','普吉':'Пхукет','新加坡':'Сингапур','吉隆坡':'Куала-Лумпур'
+};
+// IATA 城市代码后备翻译：当中文名称未收录到 RU_CITY_MAP 时，
+// 程序会尝试通过城市代码找到标准俄文城市名。
+const RU_IATA_CITY_MAP={
+'MOW':'Москва','ALA':'Алматы','NQZ':'Астана','EVN':'Ереван','REN':'Оренбург','OSS':'Ош','BAX':'Барнаул','BQS':'Благовещенск','PEE':'Пермь',
+'CEK':'Челябинск','HTA':'Чита','KRR':'Краснодар','TBS':'Тбилиси','DYU':'Душанбе','VOG':'Волгоград','GRV':'Грозный','VVO':'Владивосток','KHV':'Хабаровск','KGD':'Калининград',
+'KZN':'Казань','KJA':'Красноярск','MRV':'Минеральные Воды','IGT':'Магас','MCX':'Махачкала','MSQ':'Минск','OMS':'Омск','KUF':'Самара','LED':'Санкт-Петербург','STW':'Ставрополь',
+'AER':'Сочи','TAS':'Ташкент','UGC':'Ургенч','UFA':'Уфа','UUD':'Улан-Удэ','OVB':'Новосибирск','YKS':'Якутск','SVX':'Екатеринбург','IKT':'Иркутск','IST':'Стамбул',
+'BJS':'Пекин','PEK':'Пекин','CGQ':'Чанчунь','CTU':'Чэнду','CKG':'Чунцин','CAN':'Гуанчжоу','HAK':'Хайкоу','HRB':'Харбин','HGH':'Ханчжоу','JMU':'Цзямусы','MDG':'Муданьцзян','TAO':'Циндао',
+'SYX':'Санья','SHA':'Шанхай','SHE':'Шэньян','SZX':'Шэньчжэнь','URC':'Урумчи','SIA':'Сиань'
+};
+function normalizeCityName(city){
+    return String(city||'').trim().replace(/^[A-Z]{3}\s*[-—:]\s*/i,'').trim();
+}
+function findIataCodeForCity(city){
+    const target=normalizeCityName(city);
+    if(!target)return'';
+    if(/^[A-Z]{3}$/i.test(target))return target.toUpperCase();
+    const full=fullCityName(target)||target;
+    for(const [code,name] of Object.entries(cityCodeMap||{})){
+        const normalizedName=normalizeCityName(name);
+        const normalizedFull=fullCityName(normalizedName)||normalizedName;
+        if(normalizedName===target||normalizedName===full||normalizedFull===target||normalizedFull===full){
+            return String(code).toUpperCase();
+        }
+    }
+    return'';
+}
+function ruCity(city){
+    const raw=normalizeCityName(city);
+    const full=fullCityName(raw)||raw;
+    const direct=RU_CITY_MAP[full]||RU_CITY_MAP[raw];
+    if(direct)return direct;
+    const code=findIataCodeForCity(raw);
+    return RU_IATA_CITY_MAP[code]||full;
+}
+function hasRussianCityTranslation(city){
+    const raw=normalizeCityName(city);
+    const full=fullCityName(raw)||raw;
+    if(RU_CITY_MAP[full]||RU_CITY_MAP[raw])return true;
+    const code=findIataCodeForCity(raw);
+    return Boolean(code&&RU_IATA_CITY_MAP[code]);
+}
+function checkCityTranslationCompleteness(showAlert=false){
+    const allCities=Array.from(new Set([
+        ...(Array.isArray(airportList)?airportList:[]),
+        ...Object.values(cityCodeMap||{})
+    ].map(normalizeCityName).filter(Boolean)));
+    const missing=allCities.filter(city=>!hasRussianCityTranslation(city));
+    if(missing.length){
+        console.warn('[俄文城市翻译检查] 缺少翻译：',missing);
+        if(showAlert)alert('以下城市缺少俄文翻译：\n'+missing.join('、'));
+    }else{
+        console.info(`[俄文城市翻译检查] 已覆盖全部 ${allCities.length} 个城市。`);
+        if(showAlert)alert(`俄文城市翻译检查完成：已覆盖全部 ${allCities.length} 个城市。`);
+    }
+    return missing;
+}
+window.checkCityTranslationCompleteness=checkCityTranslationCompleteness;
+function parseTicketDate(raw){
+    if(!raw)return null;
+    let m=String(raw).match(/(?:(\d{4})[-/.年])?(\d{1,2})[-/.月](\d{1,2})日?/);
+    if(!m&&/^\d{4}$/.test(String(raw))){m=[raw,null,raw.slice(0,2),raw.slice(2)];}
+    if(!m)return null;
+    return {year:m[1]?+m[1]:new Date().getFullYear(),month:+m[2],day:+m[3]};
+}
+function ruDate(raw,shortMonth=false){
+    let d=parseTicketDate(raw);if(!d)return raw||'';
+    let months=shortMonth?RU_MONTHS_SHORT:RU_MONTHS_FULL;
+    return `${d.day} ${months[d.month-1]||''}`.trim();
+}
+function ruEvening(raw){
+    let d=parseTicketDate(raw);if(!d)return '(ночью накануне)';
+    let dt=new Date(d.year,d.month-1,d.day);dt.setDate(dt.getDate()-1);
+    return `(${dt.getDate()} ${RU_MONTHS_SHORT[dt.getMonth()]} ночью)`;
+}
+function ruTerminal(t){
+    if(!t)return'';
+    return String(t)
+      .replace(/谢列梅捷沃机场/g,'Шереметьево, терминал ')
+      .replace(/德莫杰多沃机场|大妈解答哇机场/g,'Домодедово')
+      .replace(/伏努科沃机场|福怒噶哇机场/g,'Внуково')
+      .replace(/茹科夫斯基机场/g,'Жуковский')
+      .replace(/首都/g,'Столичный аэропорт, ')
+      .replace(/大兴/g,'Дасин')
+      .replace(/虹桥/g,'Хунцяо')
+      .replace(/浦东/g,'Пудун')
+      .replace(/天府国际/g,'Тяньфу')
+      .replace(/双流国际/g,'Шуанлю')
+      .replace(/国际/g,'международный аэропорт')
+      .replace(/航站楼/g,'терминал ')
+      .replace(/Терминал/g,'терминал');
+}
+function ruCheckin(v){
+    if(!v)return'';
+    return String(v).replace(/起飞前40分钟停办/g,'регистрация заканчивается за 40 минут до вылета').replace(/起飞前1小时停办/g,'регистрация заканчивается за 1 час до вылета');
+}
+function ruCarry(v){
+    if(!v)return'';
+    let x=String(v).replace(/❗️/g,'').replace(/尺寸要求严格/g,'строгие ограничения по размеру: ').replace(/尺寸不超过/g,'размер не более ').replace(/各/g,'на каждого: ').replace(/公斤/g,' кг').replace(/厘米/g,' см').replace(/，/g,', ');
+    return x;
+}
+function ruChecked(v){
+    if(!v)return'';
+    let x=String(v).replace(/无托运行李/g,'без багажа').replace(/共(\d+)件/g,'всего $1 места').replace(/各1件/g,'по 1 месту на каждого').replace(/1件/g,'1 место').replace(/每件/g,'каждое место').replace(/公斤/g,' кг').replace(/，/g,', ');
+    return x;
+}
+function ruTransfer(v){
+    if(!v)return'';
+    return String(v).replace(/⚠️/g,'').replace(/隔日中转航班/g,'Пересадка на следующий день').replace(/当日中转航班/g,'Пересадка в тот же день').replace(/无需提取行李，直挂目的地/g,'Получать багаж не нужно, он зарегистрирован до конечного пункта').replace(/无需提取行李/g,'Получать багаж не нужно').replace(/重新办理值机/g,'Необходимо повторно пройти регистрацию').replace(/提取行李/g,'Необходимо получить багаж').replace(/打车中转到/g,'Переезд на такси в ').replace(/中转到/g,'Переход в ').replace(/航站楼/g,' терминал').replace(/机场/g,' аэропорт');
+}
+function getRussianRouteHeading(dep,arr){
+    const type=tripType.value||'单程';
+    if(type==='往返')return `Маршрут туда и обратно: ${dep} ⇄ ${arr}`;
+    if(type==='更改行程')return `Изменённый маршрут: ${dep} → ${arr}`;
+    if(type==='往返行程更改')return `Изменённый маршрут туда и обратно: ${dep} ⇄ ${arr}`;
+    if(type==='联程航班')return `Маршрут с пересадкой: ${dep} → ${arr}`;
+    return `Маршрут: ${dep} → ${arr}`;
+}
+function buildRussianTicket(source){
+    const dates=getEffectiveTicketDates(source);
+    const lines=[];
+
+    if(ticketData.passenger)lines.push(`Пассажир: ${ticketData.passenger}`,'');
+
+    source.forEach((s,i)=>{
+        const d=ticketData.segments[i]||{};
+        const date=dates[i]||s.date||'';
+
+        if(date){
+            let dateLine=`${ruDate(date)},`;
+            if(s.evening)dateLine+=` ${ruEvening(date)}`;
+            lines.push(dateLine);
+        }
+
+        if(d.flightNo)lines.push(`РЕЙС【${d.flightNo}】`);
+
+        const depPlace=[ruCity(s.dep),ruTerminal(d.depTerminal)].filter(Boolean).join(' ');
+        const arrPlace=[ruCity(s.arr),ruTerminal(d.arrTerminal)].filter(Boolean).join(' ');
+        let routeLine='🕙';
+        if(s.depT)routeLine+=s.depT;
+        if(depPlace)routeLine+=` ${depPlace}`;
+        if(s.depT||depPlace)routeLine+=' — ';
+        if(s.arrT)routeLine+=s.arrT;
+        if(arrPlace)routeLine+=` ${arrPlace}`;
+        if(s.nextday)routeLine+=' (на следующий день)';
+        routeLine+=',';
+        if(s.depT||depPlace||s.arrT||arrPlace)lines.push(routeLine);
+
+        if(s.checkin)lines.push(ruCheckin(s.checkin));
+
+        if(i<source.length-1&&d.transfer){
+            const transferText=ruTransfer(d.transfer).trim();
+            if(transferText)lines.push(transferText);
+        }
+
+        if(i<source.length-1)lines.push('');
+    });
+
+    let checked=ticketData.checkedBag||'';
+    if(checked.includes('*'))checked=checked.replace(/\*/g,ticketData.checkedCount||'1');
+    const baggageLines=[];
+    if(checked)baggageLines.push(`Багаж: ${ruChecked(checked)}`);
+    if(ticketData.carryOn)baggageLines.push(`Ручная кладь: ${ruCarry(ticketData.carryOn)}`);
+    if(baggageLines.length)lines.push('',...baggageLines);
+
+    const notes=getTicketNotes();
+    if(notes)lines.push('',ruTransfer(notes));
+
+    lines.push(
+        '',
+        'Внимание!',
+        'Для регистрации в аэропорту необходимо предьявить паспорт. Указанное время вылета/прибытия местное. Рекомендуем прибыть в аэропорту за два часа до вылета.',
+        '',
+        'Счастливого пути!'
+    );
+
+    return lines.join('\n');
+}
+
 function genTicket(){
     let source=getTicketSourceSegments();
     if(!source.length){ticketOutput.textContent='请先在航班信息页创建并填写航段';return;}
@@ -2390,7 +2607,9 @@ function genTicket(){
     let notes=getTicketNotes();
     if(notes)lines.push(`备注：${notes}`);
     lines.push('',`🔔温馨提示：`,`起降时间均为当地时间；`,`时间为24小时制；`,`凭护照办理值机。`,`长城票务：89128915882`,`✈️祝您旅途愉快！✈️`);
-    ticketOutput.textContent=lines.join('\n');
+    const chineseTicket=lines.join('\n');
+    const russianTicket=buildRussianTicket(source);
+    ticketOutput.textContent=chineseTicket+'\n\n==================== РУССКАЯ ВЕРСИЯ ====================\n\n'+russianTicket;
 }
 
 function resetAll(){
@@ -2446,14 +2665,14 @@ function initEvents(){
             if(Object.keys(newMap).length>0){
                 cityCodeMap=newMap;
                 saveSettings();
-                alert('城市代码已保存！');
+                checkCityTranslationCompleteness(true);
             }
         }
     };
     $('saveRoutes').onclick=function(){let v=$('setRoutes').value.split('\n').filter(x=>x.trim());if(v.length){commonRoutes=v;saveSettings();alert('已保存');}};
-    $('saveCities').onclick=function(){let v=$('setCities').value.split('\n').filter(x=>x.trim());if(v.length){airportList=v;savedLocations=v;saveSettings();alert('已保存');}};
+    $('saveCities').onclick=function(){let v=$('setCities').value.split('\n').filter(x=>x.trim());if(v.length){airportList=v;savedLocations=v;saveSettings();checkCityTranslationCompleteness(true);}};
     $('saveTerminals').onclick=function(){let v=$('setTerminals').value.split('\n').filter(x=>x.trim());if(v.length){terminalList=v;saveSettings();renderTicketStep();alert('已保存');}};
-    $('saveCityFullNames').onclick=function(){let v=$('setCityFullNames').value.split('\n').filter(x=>x.trim());if(v.length){let m={};v.forEach(line=>{let p=line.split('-');if(p.length>=2){let k=p.shift().trim(),val=p.join('-').trim();if(k&&val)m[k]=val;}});if(Object.keys(m).length){cityFullNameMap=m;saveSettings();updateTicketDisplay();if(ticketOutput.textContent)genTicket();alert('城市全称已保存');}}};
+    $('saveCityFullNames').onclick=function(){let v=$('setCityFullNames').value.split('\n').filter(x=>x.trim());if(v.length){let m={};v.forEach(line=>{let p=line.split('-');if(p.length>=2){let k=p.shift().trim(),val=p.join('-').trim();if(k&&val)m[k]=val;}});if(Object.keys(m).length){cityFullNameMap=m;saveSettings();updateTicketDisplay();if(ticketOutput.textContent)genTicket();checkCityTranslationCompleteness(true);}}};
     $('saveCheckin').onclick=function(){let v=$('setCheckin').value.split('\n').filter(x=>x.trim());if(v.length){checkinTimeOptions=v;saveSettings();alert('已保存');}};
     $('saveTransferNotes').onclick=function(){let v=$('setTransferNotes').value.split('\n').filter(x=>x.trim());if(v.length){transferNoteOptions=v;saveSettings();renderTicketStep();alert('已保存');}};
     $('saveNoteKeywords').onclick=function(){let v=$('setNoteKeywords').value.split('\n').filter(x=>x.trim());if(v.length){presetNotes=v;saveSettings();alert('已保存');}};
@@ -3156,6 +3375,230 @@ setTimeout(()=>{
     if(a)a.onclick=saveHistory;if(b)b.onclick=saveHistory;
 },0);
 </script>
+
+<script>
+/* v2.1.7: keep the ticket page synchronized with the topmost itinerary */
+(function(){
+    const syncToTicketV216 = syncToTicket;
+    function getTopmostItineraryId(){
+        const top=document.querySelector('#itineraries .itinerary-container');
+        return top ? top.id.replace('iti','') : null;
+    }
+    syncToTicket=function(_requestedId,resetAnswers=false){
+        const topId=getTopmostItineraryId();
+        if(!topId){
+            activeTicketItineraryId=null;
+            return syncToTicketV216(null,resetAnswers);
+        }
+        return syncToTicketV216(topId,resetAnswers);
+    };
+    const originalFillFromHistory=fillFromHistory;
+    fillFromHistory=function(data){
+        originalFillFromHistory(data);
+        const topId=getTopmostItineraryId();
+        if(topId)syncToTicket(topId,false);
+    };
+    const originalRemoveIti=removeIti;
+    removeIti=function(id){
+        originalRemoveIti(id);
+        const topId=getTopmostItineraryId();
+        if(topId)syncToTicket(topId,false);
+    };
+    document.addEventListener('click',function(e){
+        const tab=e.target.closest('.page-tab[data-page="ticket"]');
+        if(tab){setTimeout(()=>{const topId=getTopmostItineraryId();if(topId){syncToTicket(topId,false);initTicketSmart(false);}},0);}
+    });
+})();
+</script>
+
+
+<style>
+/* v2.1.8: compact controls, exact alignment, left-aligned history toolbar */
+.flight-main-actions,.bottom-buttons,.flight-output-actions,.ticket-output-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:12px!important;
+    flex-wrap:nowrap!important;
+}
+.flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
+    width:156px!important;
+    min-width:156px!important;
+    height:42px!important;
+    min-height:42px!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:5px 10px!important;
+    border-radius:21px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    line-height:1!important;
+    font-size:15px!important;
+    white-space:nowrap!important;
+}
+#copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{font-size:13px!important;}
+
+#history-page .history-controls{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:8px!important;}
+#history-page .history-button-rows{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    flex-wrap:nowrap!important;
+    gap:6px!important;
+    width:auto!important;
+}
+#history-page .history-button-rows button{
+    width:auto!important;
+    min-width:0!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:2px 9px!important;
+    border-radius:7px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    line-height:1!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+}
+#history-page #historySearchInput{margin:0!important;align-self:stretch!important;max-width:300px!important;}
+
+@media(max-width:768px){
+    .flight-main-actions,.bottom-buttons,.flight-output-actions,.ticket-output-actions{
+        display:grid!important;
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+        width:100%!important;
+        gap:8px!important;
+    }
+    .flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
+        width:100%!important;
+        min-width:0!important;
+        height:40px!important;
+        min-height:40px!important;
+        padding:4px 5px!important;
+        font-size:13px!important;
+    }
+    #copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{font-size:11px!important;}
+    #history-page .history-button-rows{
+        display:grid!important;
+        grid-template-columns:repeat(3,max-content)!important;
+        justify-content:start!important;
+        gap:6px!important;
+        width:100%!important;
+    }
+    #history-page .history-button-rows button{
+        width:auto!important;
+        min-width:0!important;
+        height:28px!important;
+        min-height:28px!important;
+        padding:2px 8px!important;
+        font-size:10px!important;
+    }
+    #history-page #historySearchInput{width:100%!important;max-width:none!important;}
+}
+</style>
+<script>
+/* v2.1.8: restore the original actions explicitly and use a local-file-safe clipboard fallback */
+(function(){
+    function copyTextReliable(text){
+        text=String(text||'');
+        if(!text){alert('没有可复制的内容');return;}
+        const fallback=function(){
+            const ta=document.createElement('textarea');
+            ta.value=text;
+            ta.setAttribute('readonly','');
+            ta.style.position='fixed';
+            ta.style.left='-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0,ta.value.length);
+            let ok=false;
+            try{ok=document.execCommand('copy');}catch(e){}
+            ta.remove();
+            alert(ok?'已复制':'复制失败，请手动复制');
+        };
+        if(navigator.clipboard&&window.isSecureContext){
+            navigator.clipboard.writeText(text).then(()=>alert('已复制')).catch(fallback);
+        }else fallback();
+    }
+    function restoreMainActions(){
+        const reset=document.getElementById('resetAllBtn');
+        const copyFlight=document.getElementById('copyBtn');
+        const copyTicketButton=document.getElementById('copyTicketBtn');
+        const saveFlight=document.getElementById('saveFlightHistoryBtn');
+        const saveTicket=document.getElementById('saveHistoryBtn');
+        if(reset) reset.onclick=function(e){e.preventDefault();resetAll();};
+        if(copyFlight) copyFlight.onclick=function(e){e.preventDefault();copyTextReliable(document.getElementById('allOutput')?.textContent||'');};
+        if(copyTicketButton) copyTicketButton.onclick=function(e){e.preventDefault();copyTextReliable(document.getElementById('ticketOutput')?.textContent||'');};
+        if(saveFlight) saveFlight.onclick=function(e){e.preventDefault();saveHistory();};
+        if(saveTicket) saveTicket.onclick=function(e){e.preventDefault();saveHistory();};
+    }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restoreMainActions);
+    else restoreMainActions();
+    setTimeout(restoreMainActions,0);
+    setTimeout(restoreMainActions,300);
+})();
+</script>
+
+<style>
+/* v2.1.9: final compact primary-action sizing */
+.flight-main-actions,.bottom-buttons,.flight-output-actions,.ticket-output-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    flex-wrap:wrap!important;
+}
+.flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
+    width:auto!important;
+    min-width:0!important;
+    height:34px!important;
+    min-height:34px!important;
+    padding:4px 14px!important;
+    margin:0!important;
+    border-radius:17px!important;
+    box-sizing:border-box!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    line-height:1!important;
+    font-size:13px!important;
+    white-space:nowrap!important;
+}
+#copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{
+    font-size:12px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+}
+@media(max-width:768px){
+    .flight-main-actions,.bottom-buttons,.flight-output-actions,.ticket-output-actions{
+        display:flex!important;
+        width:100%!important;
+        justify-content:center!important;
+        gap:7px!important;
+        flex-wrap:nowrap!important;
+    }
+    .flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
+        width:auto!important;
+        min-width:0!important;
+        height:32px!important;
+        min-height:32px!important;
+        padding:3px 10px!important;
+        border-radius:16px!important;
+        font-size:12px!important;
+        flex:0 0 auto!important;
+    }
+    #copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{
+        font-size:10.5px!important;
+        padding-left:8px!important;
+        padding-right:8px!important;
+    }
+}
+</style>
 
 </body>
 </html>
