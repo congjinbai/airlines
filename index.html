@@ -1026,7 +1026,7 @@ SHE-沈阳
 SZX-深圳
 URC-乌鲁木齐
 SIA-西安
-SIY-西安</textarea></div><button id="saveCityCodes" class="btn-success">保存城市代码</button></div>
+XIY-西安</textarea></div><button id="saveCityCodes" class="btn-success">保存城市代码</button></div>
 
         <div class="settings-section"><h3>常用航线设置</h3><div class="settings-group"><label>航线列表 (每行一个)</label><textarea id="setRoutes" rows="12">莫斯科-格罗兹尼
 莫斯科-马嘎斯
@@ -1395,7 +1395,7 @@ function initCityCodeMap(){
 'KZN':'喀山','KJA':'克市','MRV':'矿泉水城','IGT':'马嘎斯','MCX':'马哈奇克拉','MSQ':'明斯克','OMS':'欧姆斯克','KUF':'萨马拉','LED':'圣彼得堡','STW':'斯塔夫',
 'AER':'索契','TAS':'塔什干','UGC':'乌尔根奇','UFA':'乌法','UUD':'乌兰乌德','OVB':'新西伯利亚','YKS':'雅库茨克','SVX':'叶卡','IKT':'伊尔库','IST':'伊斯坦布尔',
 'BJS':'北京','PEK':'北京','CGQ':'长春','CTU':'成都','CKG':'重庆','CAN':'广州','HAK':'海口','HRB':'哈尔滨','HGH':'杭州','JMU':'佳木斯','MDG':'牡丹江','TAO':'青岛',
-'SYX':'三亚','SHA':'上海','SHE':'沈阳','SZX':'深圳','URC':'乌鲁木齐','SIA':'西安','SIY':'西安'
+'SYX':'三亚','SHA':'上海','SHE':'沈阳','SZX':'深圳','URC':'乌鲁木齐','SIA':'西安','XIY':'西安'
         };
     }
 }
@@ -1405,14 +1405,14 @@ function ensureDualCityCodes(){
     let hasBJS=false,hasSIA=false;
     Object.entries(cityCodeMap||{}).forEach(([rawCode,rawName])=>{
         const code=String(rawCode||'').trim().toUpperCase();
-        if(!code||code==='PEK'||code==='SIY')return;
+        if(!code||code==='PEK'||code==='XIY')return;
         ordered[code]=rawName;
         if(code==='BJS'){
             ordered.PEK='北京';
             hasBJS=true;
         }
         if(code==='SIA'){
-            ordered.SIY='西安';
+            ordered.XIY='西安';
             hasSIA=true;
         }
     });
@@ -1422,7 +1422,7 @@ function ensureDualCityCodes(){
     }
     if(!hasSIA){
         ordered.SIA='西安';
-        ordered.SIY='西安';
+        ordered.XIY='西安';
     }
     cityCodeMap=ordered;
 }
