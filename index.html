@@ -6,6 +6,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -750,6 +751,7 @@
 
     
         .ticket-output-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+        .russian-ticket-output{margin-top:14px}
         #history-page .history-header{justify-content:space-between}
         #history-page .history-actions-group{margin-left:auto;justify-content:flex-end}
         #history-page .history-checkbox{appearance:none;-webkit-appearance:none;width:16px!important;height:16px!important;border:1.8px solid #8e8e93;border-radius:50%;background:#fff;cursor:pointer;display:inline-block;position:relative;margin:0 8px 0 0!important;flex:0 0 16px}
@@ -797,7 +799,7 @@
             display:inline-flex!important;align-items:center!important;justify-content:center!important;line-height:1.15!important;
             font-size:16px!important;font-weight:700!important;white-space:nowrap!important;vertical-align:middle!important;
         }
-        #saveHistoryBtn,#copyTicketBtn{font-size:14px!important;}
+        #saveHistoryBtn,#copyTicketBtn,#copyRussianTicketBtn{font-size:14px!important;}
         #history-page .history-button-rows{justify-content:center!important;}
         #history-page .history-button-rows button{
             height:30px!important;min-height:30px!important;padding:3px 9px!important;font-size:11px!important;
@@ -810,7 +812,7 @@
             .flight-main-actions button,.bottom-buttons button,.flight-output-actions button,.ticket-output-actions button{
                 width:100%!important;min-width:0!important;height:44px!important;min-height:44px!important;padding:5px 4px!important;font-size:14px!important;
             }
-            #copyTicketBtn,#saveHistoryBtn{font-size:12px!important;}
+            #copyTicketBtn,#copyRussianTicketBtn,#saveHistoryBtn{font-size:12px!important;}
             #history-page .history-button-rows{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;}
             #history-page .history-button-rows button{height:30px!important;min-height:30px!important;font-size:10px!important;padding:2px!important;}
         }
@@ -841,7 +843,7 @@
         </div>
         <div class="output" id="allOutput"></div>
         <div class="output-buttons flight-output-actions">
-            <button id="copyBtn" class="copy-btn">复制到剪贴板</button>
+            <button id="copyBtn" class="copy-btn">发送至微信</button>
             <button id="saveFlightHistoryBtn" class="save-history-btn">保存记录</button>
         </div>
     </div>
@@ -895,7 +897,9 @@
         <div class="bottom-section">
             <div class="bottom-buttons"><button id="genTicketBtn" style="background:#38a169;" class="compact-btn">生成表单</button><button id="resetOutputBtn" style="background:#e53e3e;" class="compact-btn">重置表单</button></div>
             <div class="output" id="ticketOutput"></div>
-            <div class="ticket-output-actions"><button id="copyTicketBtn" class="copy-btn compact-btn">复制到剪贴板</button><button id="saveHistoryBtn" class="save-history-btn compact-btn">保存到历史记录</button></div>
+            <div class="ticket-output-actions"><button id="copyTicketBtn" class="copy-btn compact-btn">发送至微信</button><button id="saveHistoryBtn" class="save-history-btn compact-btn">保存到历史记录</button></div>
+            <div class="output russian-ticket-output" id="russianTicketOutput"></div>
+            <div class="ticket-output-actions russian-ticket-output-actions"><button id="copyRussianTicketBtn" class="copy-btn compact-btn">复制俄文机票</button></div>
         </div>
     </div>
 
@@ -1310,7 +1314,7 @@ let tValues={}, tStep=0, tEvening=false, tNextDay=false, tTransfer=false, tSelTr
 const $=id=>document.getElementById(id);
 const pName=$('pName'), tripType=$('tripType'), depInput=$('depInput'), arrInput=$('arrInput');
 const carryOn=$('carryOn'), checkedBag=$('checkedBag'), checkedCount=$('checkedCount');
-const flightDisplay=$('flightDisplay'), ticketOutput=$('ticketOutput');
+const flightDisplay=$('flightDisplay'), ticketOutput=$('ticketOutput'), russianTicketOutput=$('russianTicketOutput');
 const allOutput=$('allOutput'), itineraries=$('itineraries');
 const tSInput=$('tSInput'), tSSelect=$('tSSelect'), tSLabel=$('tSLabel'), tSStep=$('tSStep');
 const tSHint=$('tSHint'), tSProgress=$('tSProgress'), tSTags=$('tSTags'), tSTransferTags=$('tSTransferTags');
@@ -2560,7 +2564,7 @@ function buildRussianTicket(source){
 
 function genTicket(){
     let source=getTicketSourceSegments();
-    if(!source.length){ticketOutput.textContent='请先在航班信息页创建并填写航段';return;}
+    if(!source.length){ticketOutput.textContent='请先在航班信息页创建并填写航段';russianTicketOutput.textContent='';return;}
     if(!ticketData.segments||ticketData.segments.length!==source.length)syncToTicket(activeTicketItineraryId,false);
     let depFull=fullCityName(source[0].dep)||'';
     let arrFull=fullCityName(source[source.length-1].arr)||'';
@@ -2609,7 +2613,8 @@ function genTicket(){
     lines.push('',`🔔温馨提示：`,`起降时间均为当地时间；`,`时间为24小时制；`,`凭护照办理值机。`,`长城票务：89128915882`,`✈️祝您旅途愉快！✈️`);
     const chineseTicket=lines.join('\n');
     const russianTicket=buildRussianTicket(source);
-    ticketOutput.textContent=chineseTicket+'\n\n==================== РУССКАЯ ВЕРСИЯ ====================\n\n'+russianTicket;
+    ticketOutput.textContent=chineseTicket;
+    russianTicketOutput.textContent=russianTicket;
 }
 
 function resetAll(){
@@ -2618,6 +2623,7 @@ function resetAll(){
     itineraries.innerHTML='';
     allOutput.textContent='';
     ticketOutput.textContent='';
+    russianTicketOutput.textContent='';
     pName.value='';
     if(tripTypeOptions.includes('单程'))tripType.value='单程';else tripType.selectedIndex=0;
     carryOn.selectedIndex=0;
@@ -2632,9 +2638,74 @@ function resetAll(){
     alert('已重置');
 }
 
-function resetOutput(){ticketOutput.textContent='';}
-function copyOutput(){navigator.clipboard.writeText(allOutput.textContent).then(()=>alert('已复制')).catch(()=>alert('复制失败'));}
-function copyTicket(){navigator.clipboard.writeText(ticketOutput.textContent).then(()=>alert('已复制')).catch(()=>alert('复制失败'));}
+function resetOutput(){ticketOutput.textContent='';russianTicketOutput.textContent='';}
+function fallbackCopyText(text){
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    ta.setAttribute('readonly','');
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    ta.style.top='0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0,ta.value.length);
+    let ok=false;
+    try{ok=document.execCommand('copy');}catch(e){}
+    ta.remove();
+    return ok;
+}
+function showActionToast(message){
+    let toast=document.getElementById('actionToast');
+    if(!toast){
+        toast=document.createElement('div');
+        toast.id='actionToast';
+        toast.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:99999;background:rgba(29,29,31,.92);color:#fff;padding:9px 16px;border-radius:999px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);pointer-events:none;opacity:0;transition:opacity .18s ease;white-space:nowrap;';
+        document.body.appendChild(toast);
+    }
+    toast.textContent=message;
+    toast.style.opacity='1';
+    clearTimeout(showActionToast.timer);
+    showActionToast.timer=setTimeout(()=>{toast.style.opacity='0';},1800);
+}
+function copyTextReliable(text,successMessage,afterCopy){
+    text=String(text||'');
+    if(!text){alert('没有可复制的内容');return;}
+    const done=function(){
+        if(successMessage)showActionToast(successMessage);
+        if(typeof afterCopy==='function')afterCopy(text);
+    };
+    if(fallbackCopyText(text)){done();return;}
+    if(navigator.clipboard&&window.isSecureContext){
+        navigator.clipboard.writeText(text).then(done).catch(()=>alert('复制失败，请手动复制'));
+    }else{
+        alert('复制失败，请手动复制');
+    }
+}
+function launchWeChatScheme(){
+    const link=document.createElement('a');
+    link.href='weixin://';
+    link.style.display='none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(()=>link.remove(),1000);
+}
+function openWeChatForSharing(text){
+    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile&&typeof navigator.share==='function'){
+        navigator.share({text:text}).catch(err=>{
+            if(!err||err.name!=='AbortError')launchWeChatScheme();
+        });
+    }else{
+        launchWeChatScheme();
+    }
+}
+function sendTextToWeChat(text){
+    copyTextReliable(text,'已复制，正在打开微信…',openWeChatForSharing);
+}
+function copyOutput(){sendTextToWeChat(allOutput.textContent);}
+function copyTicket(){sendTextToWeChat(ticketOutput.textContent);}
+function copyRussianTicket(){copyTextReliable(russianTicketOutput.textContent,'俄文机票已复制');}
 
 // ===== 事件绑定 =====
 function initEvents(){
@@ -2647,6 +2718,7 @@ function initEvents(){
     $('genTicketBtn').onclick=genTicket;
     $('resetOutputBtn').onclick=resetOutput;
     $('copyTicketBtn').onclick=copyTicket;
+    $('copyRussianTicketBtn').onclick=copyRussianTicket;
     tripType.onchange=function(){updateTicketDisplay();if(ticketOutput.textContent)genTicket();};
 
     // 设置保存
@@ -2948,6 +3020,7 @@ function initTicketSmart(resetAnswers=true){
         syncToTicket(activeTicketItineraryId,true);
         tStep=0;
         ticketOutput.textContent='';
+        russianTicketOutput.textContent='';
         renderTicketStep();
     };
     tSInput.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();confirmTicketStep();}};
@@ -3437,7 +3510,7 @@ setTimeout(()=>{
     font-size:15px!important;
     white-space:nowrap!important;
 }
-#copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{font-size:13px!important;}
+#copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#copyRussianTicketBtn,#saveHistoryBtn{font-size:13px!important;}
 
 #history-page .history-controls{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:8px!important;}
 #history-page .history-button-rows{
@@ -3482,7 +3555,7 @@ setTimeout(()=>{
         padding:4px 5px!important;
         font-size:13px!important;
     }
-    #copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{font-size:11px!important;}
+    #copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#copyRussianTicketBtn,#saveHistoryBtn{font-size:11px!important;}
     #history-page .history-button-rows{
         display:grid!important;
         grid-template-columns:repeat(3,max-content)!important;
@@ -3504,36 +3577,17 @@ setTimeout(()=>{
 <script>
 /* v2.1.8: restore the original actions explicitly and use a local-file-safe clipboard fallback */
 (function(){
-    function copyTextReliable(text){
-        text=String(text||'');
-        if(!text){alert('没有可复制的内容');return;}
-        const fallback=function(){
-            const ta=document.createElement('textarea');
-            ta.value=text;
-            ta.setAttribute('readonly','');
-            ta.style.position='fixed';
-            ta.style.left='-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            ta.setSelectionRange(0,ta.value.length);
-            let ok=false;
-            try{ok=document.execCommand('copy');}catch(e){}
-            ta.remove();
-            alert(ok?'已复制':'复制失败，请手动复制');
-        };
-        if(navigator.clipboard&&window.isSecureContext){
-            navigator.clipboard.writeText(text).then(()=>alert('已复制')).catch(fallback);
-        }else fallback();
-    }
     function restoreMainActions(){
         const reset=document.getElementById('resetAllBtn');
         const copyFlight=document.getElementById('copyBtn');
         const copyTicketButton=document.getElementById('copyTicketBtn');
+        const copyRussianButton=document.getElementById('copyRussianTicketBtn');
         const saveFlight=document.getElementById('saveFlightHistoryBtn');
         const saveTicket=document.getElementById('saveHistoryBtn');
         if(reset) reset.onclick=function(e){e.preventDefault();resetAll();};
-        if(copyFlight) copyFlight.onclick=function(e){e.preventDefault();copyTextReliable(document.getElementById('allOutput')?.textContent||'');};
-        if(copyTicketButton) copyTicketButton.onclick=function(e){e.preventDefault();copyTextReliable(document.getElementById('ticketOutput')?.textContent||'');};
+        if(copyFlight) copyFlight.onclick=function(e){e.preventDefault();sendTextToWeChat(document.getElementById('allOutput')?.textContent||'');};
+        if(copyTicketButton) copyTicketButton.onclick=function(e){e.preventDefault();sendTextToWeChat(document.getElementById('ticketOutput')?.textContent||'');};
+        if(copyRussianButton) copyRussianButton.onclick=function(e){e.preventDefault();copyTextReliable(document.getElementById('russianTicketOutput')?.textContent||'','俄文机票已复制');};
         if(saveFlight) saveFlight.onclick=function(e){e.preventDefault();saveHistory();};
         if(saveTicket) saveTicket.onclick=function(e){e.preventDefault();saveHistory();};
     }
@@ -3569,7 +3623,7 @@ setTimeout(()=>{
     font-size:13px!important;
     white-space:nowrap!important;
 }
-#copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{
+#copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#copyRussianTicketBtn,#saveHistoryBtn{
     font-size:12px!important;
     padding-left:12px!important;
     padding-right:12px!important;
@@ -3592,7 +3646,7 @@ setTimeout(()=>{
         font-size:12px!important;
         flex:0 0 auto!important;
     }
-    #copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#saveHistoryBtn{
+    #copyBtn,#saveFlightHistoryBtn,#copyTicketBtn,#copyRussianTicketBtn,#saveHistoryBtn{
         font-size:10.5px!important;
         padding-left:8px!important;
         padding-right:8px!important;
