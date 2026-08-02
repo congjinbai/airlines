@@ -3824,5 +3824,131 @@ setTimeout(()=>{
 }
 </style>
 
+
+
+<style>
+/* ===== v2.3.3 付款状态页选择按钮修复：仅修复可见状态与点击区域 ===== */
+#payment-page #selectAllPayments,
+#payment-page .payment-checkbox{
+    -webkit-appearance:none!important;
+    appearance:none!important;
+    display:inline-block!important;
+    position:relative!important;
+    width:18px!important;
+    height:18px!important;
+    min-width:18px!important;
+    min-height:18px!important;
+    margin:0!important;
+    padding:0!important;
+    border:1.8px solid #8e8e93!important;
+    border-radius:50%!important;
+    background:#fff!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+    vertical-align:middle!important;
+    touch-action:manipulation!important;
+    -webkit-tap-highlight-color:transparent!important;
+}
+#payment-page #selectAllPayments:checked,
+#payment-page .payment-checkbox:checked{
+    background:#1d1d1f!important;
+    border-color:#1d1d1f!important;
+    box-shadow:inset 0 0 0 3px #fff!important;
+}
+#payment-page #selectAllPayments:indeterminate{
+    background:#1d1d1f!important;
+    border-color:#1d1d1f!important;
+}
+#payment-page #selectAllPayments:indeterminate::after{
+    content:"";
+    position:absolute;
+    left:3px;
+    right:3px;
+    top:7px;
+    height:2px;
+    border-radius:2px;
+    background:#fff;
+}
+#payment-page th.select-all,
+#payment-page td.select-row{
+    cursor:pointer!important;
+    text-align:center!important;
+    min-width:34px!important;
+    -webkit-user-select:none!important;
+    user-select:none!important;
+}
+</style>
+<script>
+/* v2.3.3：付款状态页全选/多选触控修复 */
+(function(){
+    function updateHeaderState(){
+        const master=document.getElementById('selectAllPayments');
+        if(!master)return;
+        const boxes=Array.from(document.querySelectorAll('#payment-page .payment-checkbox'));
+        const selected=boxes.filter(function(box){return box.checked;}).length;
+        master.checked=boxes.length>0&&selected===boxes.length;
+        master.indeterminate=selected>0&&selected<boxes.length;
+    }
+
+    function bindPaymentSelectionFix(){
+        const master=document.getElementById('selectAllPayments');
+        const body=document.getElementById('paymentTableBody');
+        const masterCell=master&&master.closest('th.select-all');
+        if(!master||!body)return;
+
+        if(!master.dataset.selectionFixBound){
+            master.dataset.selectionFixBound='1';
+            master.addEventListener('click',function(){
+                const boxes=Array.from(document.querySelectorAll('#payment-page .payment-checkbox'));
+                const allSelected=boxes.length>0&&boxes.every(function(box){return box.checked;});
+                const nextState=!allSelected;
+                window.setTimeout(function(){
+                    boxes.forEach(function(box){box.checked=nextState;});
+                    master.checked=nextState;
+                    master.indeterminate=false;
+                },0);
+            });
+        }
+
+        if(masterCell&&!masterCell.dataset.selectionFixBound){
+            masterCell.dataset.selectionFixBound='1';
+            masterCell.addEventListener('click',function(event){
+                if(event.target===master)return;
+                event.preventDefault();
+                master.click();
+            });
+        }
+
+        if(!body.dataset.selectionFixBound){
+            body.dataset.selectionFixBound='1';
+            body.addEventListener('click',function(event){
+                const cell=event.target.closest('td.select-row');
+                if(!cell||!body.contains(cell))return;
+                const box=cell.querySelector('.payment-checkbox');
+                if(!box)return;
+                if(event.target!==box){
+                    event.preventDefault();
+                    box.checked=!box.checked;
+                    box.dispatchEvent(new Event('change',{bubbles:true}));
+                }
+                window.setTimeout(updateHeaderState,0);
+            });
+            body.addEventListener('change',function(event){
+                if(event.target&&event.target.classList.contains('payment-checkbox'))updateHeaderState();
+            });
+        }
+        updateHeaderState();
+    }
+
+    if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded',bindPaymentSelectionFix);
+    }else{
+        bindPaymentSelectionFix();
+    }
+    window.setTimeout(bindPaymentSelectionFix,0);
+    window.setTimeout(bindPaymentSelectionFix,300);
+})();
+</script>
+
 </body>
 </html>
