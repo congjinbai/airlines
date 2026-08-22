@@ -822,6 +822,12 @@
             #history-page .history-button-rows button{height:30px!important;min-height:30px!important;font-size:10px!important;padding:2px!important;}
         }
 
+
+/* v2.3.8 mobile itinerary navigation */
+@media (max-width: 768px){
+  .itinerary-nav-dots, .itinerary-progress, .smart-area .smart-progress{gap:12px!important;}
+  .itinerary-nav-dots .step-dot, .itinerary-progress .step-dot, .smart-area .smart-progress .step-dot{min-width:22px!important;min-height:22px!important;padding:5px 9px!important;font-size:11px!important;border-radius:12px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;}
+}
 </style>
 
     <style>
@@ -2754,18 +2760,18 @@ function copyTextReliable(text,successMessage,afterCopy){
     }
 }
 function launchWeChatScheme(){
-    // 仅通过隐藏 iframe 尝试唤起系统已注册的微信协议。
-    // 不创建 <a target="_blank">，不执行 window.open，也不修改当前页面 location，
-    // 从而避免浏览器把 weixin:// 当成普通页面打开后出现空白页。
+    // 使用真实的 weixin:// 超链接点击调用系统已注册的微信协议。
+    // 不新开标签页、不修改当前页面 URL。
     let attempted=false;
     try{
-        const frame=document.createElement('iframe');
-        frame.setAttribute('aria-hidden','true');
-        frame.style.cssText='position:fixed;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px;top:-9999px;';
-        frame.src='weixin://';
-        document.body.appendChild(frame);
+        const link=document.createElement('a');
+        link.href='weixin://';
+        link.setAttribute('aria-hidden','true');
+        link.style.cssText='position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;';
+        document.body.appendChild(link);
+        link.click();
         attempted=true;
-        setTimeout(()=>{try{frame.remove();}catch(e){}},1200);
+        setTimeout(()=>{try{link.remove();}catch(e){}},800);
     }catch(e){}
     return attempted;
 }
