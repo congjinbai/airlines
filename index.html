@@ -823,11 +823,27 @@
         }
 
 
-/* v2.3.8 mobile itinerary navigation */
+/* v2.3.7 mobile itinerary navigation */
 @media (max-width: 768px){
-  .itinerary-nav-dots, .itinerary-progress, .smart-area .smart-progress{gap:12px!important;}
-  .itinerary-nav-dots .step-dot, .itinerary-progress .step-dot, .smart-area .smart-progress .step-dot{min-width:22px!important;min-height:22px!important;padding:5px 9px!important;font-size:11px!important;border-radius:12px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;}
-}
+            /* v2.3.7：手机端行程方案导航，扩大点击区域并拉开间距 */
+            .itinerary-nav-dots,
+            .itinerary-progress,
+            .smart-area .smart-progress{
+                gap:20px!important;
+            }
+            .itinerary-nav-dots .step-dot,
+            .itinerary-progress .step-dot,
+            .smart-area .smart-progress .step-dot{
+                min-width:32px!important;
+                min-height:32px!important;
+                padding:7px 12px!important;
+                font-size:12px!important;
+                border-radius:16px!important;
+                display:inline-flex!important;
+                align-items:center!important;
+                justify-content:center!important;
+            }
+        }
 </style>
 
     <style>
