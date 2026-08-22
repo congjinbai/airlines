@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -34,7 +35,13 @@
         .ticket-price-section{margin-bottom:20px;padding:12px;border-radius:6px;position:relative}
         .section-title{font-size:16px;font-weight:bold;margin-bottom:12px;color:#2d3748;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
         .itinerary-toggle-btn{background:#3182ce;color:#fff;padding:10px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;margin-bottom:16px;width:100%}
-        .itinerary-container{margin-bottom:24px}
+        .itinerary-container{margin-bottom:24px;scroll-margin-top:18px;transition:box-shadow .25s ease,transform .25s ease}
+        .itinerary-container.itinerary-focus{box-shadow:0 0 0 2px rgba(49,130,206,.18),0 8px 24px rgba(49,130,206,.10);transform:translateY(-1px)}
+        .itinerary-nav{display:none;position:sticky;top:8px;z-index:20;justify-content:center;gap:5px;margin:-4px 0 10px;pointer-events:none}
+        .itinerary-nav.visible{display:flex}
+        .itinerary-nav-dot{width:7px;height:7px;border:0;border-radius:999px;padding:0;background:#cbd5e0;cursor:pointer;pointer-events:auto;transition:width .18s ease,background .18s ease}
+        .itinerary-nav-dot.active{width:18px;background:#3182ce}
+        .itinerary-nav-dot:hover{background:#90cdf4}
         .remove-itinerary{background:#e53e3e;position:absolute;top:12px;right:12px;padding:4px 8px;font-size:12px}
         .copy-itinerary{background:#805ad5;position:absolute;top:12px;right:100px;padding:4px 8px;font-size:12px}
         .notes-container{display:none;margin-top:12px;padding:12px;border-radius:4px}
@@ -192,6 +199,12 @@
         .smart-area .smart-transfer-tags .t-tag{background:#fff5f5;padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid #feb2b2;color:#c53030}
         .smart-area .smart-transfer-tags .t-tag:hover{background:#fed7d7}
         .smart-area .smart-transfer-tags .t-tag.selected{background:#e53e3e;color:#fff;border-color:#e53e3e}
+        .smart-transfer-custom{display:none;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+        .smart-transfer-custom input{flex:1 1 220px;min-width:180px;height:30px;padding:5px 9px;font-size:11px}
+        .smart-transfer-custom button{height:30px;padding:4px 10px;font-size:11px;background:#38a169!important;color:#fff}
+        .smart-transfer-selected{display:none;margin-top:6px;font-size:11px;color:#c53030}
+        .smart-transfer-selected strong{font-weight:600}
+
         .smart-area .smart-display{background:#f8fafc;border-radius:6px;padding:8px 12px;border:1px solid #e2e8f0;margin-bottom:8px;min-height:32px;font-size:14px;color:#2d3748;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
         .smart-area .smart-display .empty{color:#a0aec0}
         .smart-area .smart-display .d-tag{background:#ebf8ff;color:#2b6cb0;padding:1px 8px;border-radius:4px;font-size:14px}
@@ -1304,7 +1317,7 @@ F
 
 <script>
 // ===== 全局数据 =====
-const APP_VER='2.3.4';
+const APP_VER='2.3.6';
 let flightQuestions=["起飞日期：","起飞城市：","到达城市：","起飞时间：","到达时间：","截止值机时间："];
 let TRANSFER_OPTIONS=["⚠️莫斯科住一夜⚠️","⚠️需要住宿⚠️","⚠️打车转机场⚠️","⚠️协助莫斯科打车、住宿服务⚠️","⚠️根据当前局势，建议提前一天抵达莫斯科，确保后程顺利中转⚠️"];
 let airportList=["莫斯科","阿拉木图","阿斯塔纳","埃里温","奥伦堡","奥斯","巴尔瑙尔","布市","彼尔姆","车里亚宾","赤塔","达尔","第比利斯","杜尚别","伏尔加","格罗兹尼","海参崴","哈巴","加里宁格勒","喀山","克市","矿泉水城","马嘎斯","马哈奇克拉","明斯克","欧姆斯克","萨马拉","圣彼得堡","斯塔夫","索契","塔什干","乌尔根奇","乌法","乌兰乌德","新西伯利亚","雅库茨克","叶卡","伊尔库","伊斯坦布尔","北京","长春","成都","重庆","广州","海口","哈尔滨","杭州","佳木斯","牡丹江","青岛","三亚","上海","沈阳","深圳","乌鲁木齐","西安"];
@@ -1332,7 +1345,7 @@ let ticketData={passenger:'',segments:[],carryOn:'',checkedBag:'',checkedCount:'
 let itineraryCount=0, segCounters={}, priceCounters={};
 let paymentData=[], currentFilters={date:[],passenger:[],amount:[],difference:[],settlement:[],notes:[]};
 let filteredPaymentData=null, activeFilterColumn=null;
-let versionHistory=[{version:'2.3.4',date:'2026-08-07',time:'02:52:00',desc:'历史记录页 CSV 与 JSON 导入改为追加，不再覆盖原有历史记录'},{version:'2.3.3',date:'2026-08-02',time:'23:25:00',desc:'付款状态页多选、日期自动格式、自适应列宽及表格下载分享优化'},{version:'2.1.2',date:'2026-07-27',time:'22:00:00',desc:'历史记录城市搜索与排序优化；恢复航班城市原有输入逻辑'},{version:'2.1',date:'2026-07-24',time:'10:00:00',desc:'机票页细节与航班页交互修复版'}];
+let versionHistory=[{version:'2.3.6',date:'2026-08-23',time:'00:03:00',desc:'微信桌面端打开优化；中转支持自定义输入；机票页重置恢复初始状态并返回航班页；复制行程后自动定位；新增行程方案轻量导航'},{version:'2.3.3',date:'2026-08-02',time:'23:25:00',desc:'付款状态页多选、日期自动格式、自适应列宽及表格下载分享优化'},{version:'2.1.2',date:'2026-07-27',time:'22:00:00',desc:'历史记录城市搜索与排序优化；恢复航班城市原有输入逻辑'},{version:'2.1',date:'2026-07-24',time:'10:00:00',desc:'机票页细节与航班页交互修复版'}];
 
 // 智能输入状态 - 机票页
 let tValues={}, tStep=0, tEvening=false, tNextDay=false, tTransfer=false, tSelTransfer='';
@@ -1585,6 +1598,7 @@ function addItinerary(){
         </div>
     `;
     itineraries.appendChild(div);
+    updateItineraryNavigation();
     bindCalc(itineraryCount);
     addSeg(itineraryCount);
     updateDisplay();
@@ -1619,6 +1633,11 @@ function addSeg(itiId){
             <div class="smart-progress" id="smartProgress${itiId}-${sid}"></div>
             <div class="smart-tags" id="smartTags${itiId}-${sid}"></div>
             <div class="smart-transfer-tags" id="smartTransferTags${itiId}-${sid}"></div>
+            <div class="smart-transfer-custom" id="smartTransferCustom${itiId}-${sid}">
+                <input type="text" id="smartTransferInput${itiId}-${sid}" placeholder="输入新的中转信息">
+                <button type="button" id="smartTransferAdd${itiId}-${sid}">添加</button>
+            </div>
+            <div class="smart-transfer-selected" id="smartTransferSelected${itiId}-${sid}"></div>
         </div>
         <!-- 隐藏字段 -->
         <input type="hidden" id="seg${itiId}-${sid}-date">
@@ -1645,42 +1664,28 @@ function removeSeg(itiId,sid){
     updateDisplay();
 }
 
-function removeIti(id){let el=$('iti'+id);if(el)el.remove();let notes=$('notes'+id);if(notes)notes.remove();delete segCounters[id];delete priceCounters[id];if(String(activeTicketItineraryId)===String(id)){activeTicketItineraryId=null;syncToTicket(null,true);}updateDisplay();}
+function removeIti(id){let el=$('iti'+id);if(el)el.remove();let notes=$('notes'+id);if(notes)notes.remove();delete segCounters[id];delete priceCounters[id];if(String(activeTicketItineraryId)===String(id)){activeTicketItineraryId=null;syncToTicket(null,true);}updateDisplay();updateItineraryNavigation();}
+
+function updateItineraryNavigation(){
+    const list=Array.from(itineraries.querySelectorAll('.itinerary-container'));let nav=$('itineraryNav');
+    if(!nav){nav=document.createElement('div');nav.id='itineraryNav';nav.className='itinerary-nav';itineraries.parentNode.insertBefore(nav,itineraries);}
+    nav.innerHTML='';if(list.length<2){nav.classList.remove('visible');return;}nav.classList.add('visible');
+    list.forEach((el,i)=>{const b=document.createElement('button');b.type='button';b.className='itinerary-nav-dot';b.title='跳转到行程方案 '+(i+1);b.setAttribute('aria-label','跳转到行程方案 '+(i+1));b.onclick=()=>scrollToItinerary(el);nav.appendChild(b);});
+    const updateActive=()=>{let best=0,bestDist=Infinity;list.forEach((el,i)=>{const d=Math.abs(el.getBoundingClientRect().top-70);if(d<bestDist){bestDist=d;best=i;}});nav.querySelectorAll('.itinerary-nav-dot').forEach((b,i)=>b.classList.toggle('active',i===best));};
+    if(nav._scrollHandler)window.removeEventListener('scroll',nav._scrollHandler);nav._scrollHandler=updateActive;window.addEventListener('scroll',updateActive,{passive:true});updateActive();
+}
+function scrollToItinerary(el){if(!el)return;el.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>{el.classList.add('itinerary-focus');setTimeout(()=>el.classList.remove('itinerary-focus'),900);},350);}
 
 function copyIti(id){
-    let orig=$('iti'+id);if(!orig)return;
-    addItinerary();
-    let nid=itineraryCount;
-    let segs=orig.querySelectorAll('.flight-segment');
-    let container=$('segContainer'+nid);
-    container.innerHTML='';
-    segs.forEach((s,idx)=>{
-        let sid=s.id.split('-')[1];
-        addSeg(nid);
-        let nsid=segCounters[nid];
-        setTimeout(()=>{
-            ['date','departure','arrival','depTime','arrTime','evening','nextday'].forEach(f=>{
-                let v=$('seg'+id+'-'+sid+'-'+f)?.value||'';
-                let el=$('seg'+nid+'-'+nsid+'-'+f);
-                if(el)el.value=v;
-            });
-            let ch=$('seg'+id+'-'+sid+'-checkin');
-            let el=$('seg'+nid+'-'+nsid+'-checkin');
-            if(ch&&el)el.value=ch.value;
-            let tr=$('seg'+id+'-'+sid+'-transfer');
-            let tel=$('seg'+nid+'-'+nsid+'-transfer');
-            if(tr&&tel)tel.value=tr.value;
-            updatePreview(nid,nsid);
-            initSegmentSmart(nid, nsid);
-        },50);
-    });
-    let notes=$('selNotesVal'+id)?.value||'';
-    $('selNotesVal'+nid).value=notes;
-    $('selNotes'+nid).textContent=notes;
-    updateDisplay();
-    alert('已复制');
+    let orig=$('iti'+id);if(!orig)return; addItinerary(); let nid=itineraryCount;
+    let segs=Array.from(orig.querySelectorAll('.flight-segment')), container=$('segContainer'+nid); container.innerHTML='';
+    let origCalc=orig.querySelector('.calculator-container'),newCalc=$('calc'+nid);
+    if(origCalc&&newCalc){['.calc-rmb','.calc-rate','.calc-ruble1','.calc-ruble2'].forEach(s=>{let a=origCalc.querySelector(s),b=newCalc.querySelector(s);if(a&&b)b.value=a.value;});let a=origCalc.querySelector('.calc-total'),b=newCalc.querySelector('.calc-total');if(a&&b)b.value=a.value;newCalc.style.display=origCalc.style.display;}
+    segs.forEach(s=>{let sid=s.id.split('-')[1];addSeg(nid);let nsid=segCounters[nid];['date','departure','arrival','depTime','arrTime','evening','nextday'].forEach(f=>{let a=$('seg'+id+'-'+sid+'-'+f),b=$('seg'+nid+'-'+nsid+'-'+f);if(a&&b)b.value=a.value;});let a=$('seg'+id+'-'+sid+'-checkin'),b=$('seg'+nid+'-'+nsid+'-checkin');if(a&&b)b.value=a.value;a=$('seg'+id+'-'+sid+'-transfer');b=$('seg'+nid+'-'+nsid+'-transfer');if(a&&b)b.value=a.value;updatePreview(nid,nsid);});
+    orig.querySelectorAll('.ticket-price-plan').forEach(op=>{addPrice(nid);let np=$('pricePlans'+nid).lastElementChild,os=op.querySelector('select'),oi=op.querySelector('input[type=text]'),oc=op.querySelector('.ticket-currency'),ns=np.querySelector('select'),ni=np.querySelector('input[type=text]'),nc=np.querySelector('.ticket-currency');if(os&&ns)ns.value=os.value;if(oi&&ni)ni.value=oi.value;if(oc&&nc)nc.value=oc.value;});
+    let notes=$('selNotesVal'+id)?.value||'';$('selNotesVal'+nid).value=notes;$('selNotes'+nid).textContent=notes;updateDisplay();
+    setTimeout(()=>{let target=$('iti'+nid);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.remove('itinerary-highlight');void target.offsetWidth;target.classList.add('itinerary-highlight');}showActionToast('已复制并跳转到行程方案 '+nid);},180);
 }
-
 function bindCalc(id){
     let box=$('calc'+id);if(!box)return;
     let rmb=box.querySelector('.calc-rmb'),rate=box.querySelector('.calc-rate');
@@ -1752,6 +1757,7 @@ function initSegmentSmart(itiId, sid){
     let doneBtn=$('smartDone'+id);
     let transferBtn=$('smartTransfer'+id);
     let btnsContainer=$('smartBtns'+id);
+    let transferCustom=$('smartTransferCustom'+id),transferCustomInput=$('smartTransferInput'+id),transferCustomAdd=$('smartTransferAdd'+id),transferSelected=$('smartTransferSelected'+id);
 
     if(!input)return;
 
@@ -1772,6 +1778,9 @@ function initSegmentSmart(itiId, sid){
     let segSelTransfer=parseMultiTransfer($('seg'+itiId+'-'+sid+'-transfer')?.value||'');
     let segTransfer=segSelTransfer.length>0;
     let isCheckinStep=false;
+    function refreshCustomTransferUI(){if(transferCustom)transferCustom.style.display=segTransfer?'flex':'none';if(transferSelected){transferSelected.style.display=segSelTransfer.length?'block':'none';transferSelected.innerHTML=segSelTransfer.length?'<strong>已添加：</strong>'+segSelTransfer.map(escapeHtml).join('、'):'';}}
+    function addCustomTransfer(){let v=(transferCustomInput?.value||'').trim();if(!v)return;if(!segSelTransfer.includes(v))segSelTransfer.push(v);segTransfer=true;let value=formatMultiTransfer(segSelTransfer);segValues['transfer']=value;let trEl=$('seg'+itiId+'-'+sid+'-transfer');if(trEl)trEl.value=value;if(transferCustomInput)transferCustomInput.value='';transferBtn.classList.add('active');transferBtn.textContent='中转 ✓';renderSegTransferTags();refreshCustomTransferUI();updatePreview(itiId,sid);updateDisplay();}
+    if(transferCustomAdd)transferCustomAdd.onclick=addCustomTransfer;if(transferCustomInput)transferCustomInput.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();addCustomTransfer();}};
     let extraRow=null;
     let citySelectControl=null;
     const flightProgressLabels={
@@ -2086,6 +2095,7 @@ function initSegmentSmart(itiId, sid){
                 if(trEl)trEl.value=value;
                 updatePreview(itiId, sid);
                 updateDisplay();
+                refreshCustomTransferUI();
             };
             transferTags.appendChild(tag);
         });
@@ -2197,8 +2207,8 @@ function initSegmentSmart(itiId, sid){
         segTransfer=!segTransfer;
         this.classList.toggle('active',segTransfer);
         this.textContent=segTransfer?'中转 ✓':'中转';
-        if(segTransfer){transferTags.style.display='flex';renderSegTransferTags();}
-        else{transferTags.style.display='none';segSelTransfer=[];segValues['transfer']='';$('seg'+itiId+'-'+sid+'-transfer').value='';updatePreview(itiId, sid);updateDisplay();}
+        if(segTransfer){transferTags.style.display='flex';renderSegTransferTags();refreshCustomTransferUI();}
+        else{transferTags.style.display='none';segSelTransfer=[];segValues['transfer']='';$('seg'+itiId+'-'+sid+'-transfer').value='';if(transferCustomInput)transferCustomInput.value='';refreshCustomTransferUI();updatePreview(itiId, sid);updateDisplay();}
     };
 
     input.onkeydown=function(e){
@@ -2414,6 +2424,10 @@ function genAll(){
     });
     text+='\n🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n+79128915882\n手机号绑定银行卡\nСбер,Т-Банк, Альфа\n\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️';
     allOutput.textContent=text;
+    // 生成所有方案后，自动滚动到下方的结果显示框。
+    setTimeout(()=>{
+        allOutput.scrollIntoView({behavior:'smooth',block:'start'});
+    },50);
 }
 
 function getTripRouteHeading(depFull,arrFull){
@@ -2676,6 +2690,7 @@ function resetAll(){
     if(!confirm('确定重置？'))return;
     document.querySelectorAll('#ticketSmart .notes-container').forEach(n=>n.remove());
     itineraries.innerHTML='';
+    updateItineraryNavigation();
     allOutput.textContent='';
     ticketOutput.textContent='';
     russianTicketOutput.textContent='';
@@ -2693,6 +2708,7 @@ function resetAll(){
     alert('已重置');
 }
 
+function switchToFlightPage(){document.querySelectorAll('.page-tab').forEach(x=>x.classList.remove('active'));document.querySelector('[data-page="flight"]')?.classList.add('active');document.querySelectorAll('.page-content').forEach(x=>x.classList.remove('active'));$('flight-page')?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 function resetOutput(){ticketOutput.textContent='';russianTicketOutput.textContent='';}
 function fallbackCopyText(text){
     const ta=document.createElement('textarea');
@@ -2738,21 +2754,45 @@ function copyTextReliable(text,successMessage,afterCopy){
     }
 }
 function launchWeChatScheme(){
-    const link=document.createElement('a');
-    link.href='weixin://';
-    link.style.display='none';
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(()=>link.remove(),1000);
+    // 仅通过隐藏 iframe 尝试唤起系统已注册的微信协议。
+    // 不创建 <a target="_blank">，不执行 window.open，也不修改当前页面 location，
+    // 从而避免浏览器把 weixin:// 当成普通页面打开后出现空白页。
+    let attempted=false;
+    try{
+        const frame=document.createElement('iframe');
+        frame.setAttribute('aria-hidden','true');
+        frame.style.cssText='position:fixed;width:1px;height:1px;border:0;opacity:0;pointer-events:none;left:-9999px;top:-9999px;';
+        frame.src='weixin://';
+        document.body.appendChild(frame);
+        attempted=true;
+        setTimeout(()=>{try{frame.remove();}catch(e){}},1200);
+    }catch(e){}
+    return attempted;
 }
-function openWeChatForSharing(){
-    // iOS版微信不接受Safari通过系统分享面板发送的纯文本。
-    // 内容已先复制到剪贴板，因此这里直接打开微信，用户进入聊天后粘贴即可。
-    launchWeChatScheme();
+function showWeChatFallback(){
+    let modal=$('wechatFallback');
+    if(!modal){
+        modal=document.createElement('div');modal.id='wechatFallback';modal.className='wechat-fallback';
+        modal.innerHTML='<h3>微信未能自动切换</h3><p>文字已经复制到剪贴板。当前浏览器没有把微信协议交给微信客户端，因此不会打开空白的 weixin:// 页面。</p><div class="wechat-fallback-actions"><button class="wechat-close" type="button">知道了</button></div>';
+        document.body.appendChild(modal);
+        modal.querySelector('.wechat-close').onclick=()=>modal.style.display='none';
+    }
+    modal.style.display='block';
 }
 function sendTextToWeChat(text){
-    copyTextReliable(text,'已复制，正在打开微信…',openWeChatForSharing);
+    text=String(text||'');if(!text){alert('没有可复制的内容');return;}
+    // 复制优先完成；随后在同一点击事件中尝试通过 iframe 唤起已运行的微信。
+    const copied=fallbackCopyText(text);
+    if(!copied && navigator.clipboard&&window.isSecureContext){
+        navigator.clipboard.writeText(text).catch(()=>{});
+    }
+    launchWeChatScheme();
+    showActionToast(copied?'已复制，正在切换到微信…':'正在切换到微信…');
+    setTimeout(()=>{
+        if(document.visibilityState==='visible')showWeChatFallback();
+    },1500);
 }
+
 function copyOutput(){sendTextToWeChat(allOutput.textContent);}
 function copyTicket(){sendTextToWeChat(ticketOutput.textContent);}
 function copyRussianTicket(){copyTextReliable(russianTicketOutput.textContent,'俄文机票已复制');}
@@ -2765,8 +2805,15 @@ function initEvents(){
     $('copyBtn').onclick=copyOutput;
     $('saveHistoryBtn').onclick=saveHistory;
     $('saveFlightHistoryBtn').onclick=saveHistory;
-    $('genTicketBtn').onclick=genTicket;
-    $('resetOutputBtn').onclick=resetOutput;
+    $('genTicketBtn').onclick=function(){
+        genTicket();
+        setTimeout(()=>{
+            if(ticketOutput){
+                ticketOutput.scrollIntoView({behavior:'smooth',block:'start'});
+            }
+        },100);
+    };
+    $('resetOutputBtn').onclick=function(){resetAll();switchToFlightPage();};
     $('copyTicketBtn').onclick=copyTicket;
     $('copyRussianTicketBtn').onclick=copyRussianTicket;
     tripType.onchange=function(){updateTicketDisplay();if(ticketOutput.textContent)genTicket();};
@@ -3247,6 +3294,13 @@ function renderTicketStep(){
         tSHint.textContent='🎉 已自动生成表单，可点击进度条返回修改';
         renderTicketProgress();
         updateTicketDisplay();
+        // 机票信息全部输入完成后，自动滚动到“生成表单”按钮及其下方的信息显示框。
+        setTimeout(()=>{
+            const target = $('genTicketBtn') || ticketOutput;
+            if(target){
+                target.scrollIntoView({behavior:'smooth',block:'center'});
+            }
+        },100);
         return;
     }
     let q=currentTicketQuestion();
