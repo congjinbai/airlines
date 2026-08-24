@@ -909,31 +909,6 @@
     }
     </style>
 
-
-<style id="mobile-swipe-page-transition">
-/* 仅用于手机/平板的双指横向切页：平移，不改变其他页面样式和功能。 */
-@media (max-width:768px){
-  .container{overflow-x:hidden;}
-  .page-content.mobile-swipe-in{
-    animation:mobileSwipePageIn 420ms cubic-bezier(.22,.61,.36,1) both;
-    will-change:transform;
-  }
-  .page-content.mobile-swipe-in-from-right{
-    animation-name:mobileSwipePageInFromRight;
-  }
-  .page-content.mobile-swipe-in-from-left{
-    animation-name:mobileSwipePageInFromLeft;
-  }
-  @keyframes mobileSwipePageInFromRight{
-    from{transform:translate3d(100%,0,0);}
-    to{transform:translate3d(0,0,0);}
-  }
-  @keyframes mobileSwipePageInFromLeft{
-    from{transform:translate3d(-100%,0,0);}
-    to{transform:translate3d(0,0,0);}
-  }
-}
-</style>
 </head>
 <body>
 <div class="container">
@@ -4187,18 +4162,6 @@ setTimeout(()=>{
         if(i<0||n<0||n>=pageOrder.length)return false;
         const tab=document.querySelector('.page-tab[data-page="'+pageOrder[n]+'"]');
         if(!tab)return false;
-
-        /* 只给“滑动切页”增加平移动画；普通点击标签的行为完全不变。 */
-        const nextPage=document.getElementById(pageOrder[n]+'-page');
-        const isMobile=window.matchMedia && window.matchMedia('(max-width:768px)').matches;
-        if(isMobile && nextPage){
-            nextPage.classList.remove('mobile-swipe-in','mobile-swipe-in-from-right','mobile-swipe-in-from-left');
-            nextPage.classList.add('mobile-swipe-in',delta>0?'mobile-swipe-in-from-right':'mobile-swipe-in-from-left');
-            nextPage.addEventListener('animationend',function(){
-                nextPage.classList.remove('mobile-swipe-in','mobile-swipe-in-from-right','mobile-swipe-in-from-left');
-            },{once:true});
-        }
-
         tab.click();
         window.scrollTo({top:0,behavior:'smooth'});
         return true;
