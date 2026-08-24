@@ -1633,7 +1633,12 @@ function scrollToItinerary(id){
     const el=$(id);
     if(!el)return;
     renderItineraryNav(id);
-    scrollToElementSmooth(el,'center');
+    requestAnimationFrame(()=>{
+        const nav=$('itineraryNav');
+        const navHeight=nav?nav.getBoundingClientRect().height:0;
+        const top=window.pageYOffset+el.getBoundingClientRect().top-navHeight-8;
+        window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+    });
 }
 function updateItineraryNavActive(){
     const items=Array.from(document.querySelectorAll('#itineraries .itinerary-container'));
@@ -1676,7 +1681,7 @@ function addItinerary(){
             <div class="section-title">行程方案 ${itineraryCount}</div>
             <div id="segContainer${itineraryCount}"></div>
             <div class="button-group">
-                <button class="add-segment compact-btn" onclick="addSeg(${itineraryCount})">+ 添加航段</button>
+                <button class="add-segment compact-btn" onclick="addSeg(${itineraryCount},true)">+ 添加航段</button>
                 <button class="calculator-btn compact-btn" onclick="toggleCalc(${itineraryCount})">计算</button>
                 <button class="ticket-price-btn compact-btn" id="priceBtn${itineraryCount}" style="display:none;" onclick="addPrice(${itineraryCount})">+ 机票价格</button>
             </div>
@@ -1712,7 +1717,18 @@ function addItinerary(){
     setTimeout(()=>scrollToItinerary(div.id),60);
 }
 
-function addSeg(itiId){
+function scrollToSegmentTop(itiId,sid){
+    const el=$('seg'+itiId+'-'+sid);
+    if(!el)return;
+    requestAnimationFrame(()=>{
+        const nav=$('itineraryNav');
+        const navHeight=nav?nav.getBoundingClientRect().height:0;
+        const top=window.pageYOffset+el.getBoundingClientRect().top-navHeight-8;
+        window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+    });
+}
+
+function addSeg(itiId,autoScroll=false){
     segCounters[itiId]=(segCounters[itiId]||0)+1;
     let sid=segCounters[itiId];
     let container=$('segContainer'+itiId);
@@ -1757,6 +1773,7 @@ function addSeg(itiId){
     $('priceBtn'+itiId).style.display='inline-block';
     initSegmentSmart(itiId, sid);
     updateDisplay();
+    if(autoScroll)setTimeout(()=>scrollToSegmentTop(itiId,sid),60);
 }
 
 function removeSeg(itiId,sid){
