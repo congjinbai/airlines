@@ -1,11 +1,10 @@
 
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>航班信息生成器 v2.3.4 中俄双语版</title>
+    <title>航班信息生成器 v2.3.7 中俄双语版</title>
     <style>
         *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         body{max-width:1100px;margin:0 auto;padding:15px;background:#f0f2f5;color:#333;font-size:12px}
@@ -35,13 +34,7 @@
         .ticket-price-section{margin-bottom:20px;padding:12px;border-radius:6px;position:relative}
         .section-title{font-size:16px;font-weight:bold;margin-bottom:12px;color:#2d3748;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
         .itinerary-toggle-btn{background:#3182ce;color:#fff;padding:10px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;margin-bottom:16px;width:100%}
-        .itinerary-container{margin-bottom:24px;scroll-margin-top:18px;transition:box-shadow .25s ease,transform .25s ease}
-        .itinerary-container.itinerary-focus{box-shadow:0 0 0 2px rgba(49,130,206,.18),0 8px 24px rgba(49,130,206,.10);transform:translateY(-1px)}
-        .itinerary-nav{display:none;position:sticky;top:8px;z-index:20;justify-content:center;gap:5px;margin:-4px 0 10px;pointer-events:none}
-        .itinerary-nav.visible{display:flex}
-        .itinerary-nav-dot{width:7px;height:7px;border:0;border-radius:999px;padding:0;background:#cbd5e0;cursor:pointer;pointer-events:auto;transition:width .18s ease,background .18s ease}
-        .itinerary-nav-dot.active{width:18px;background:#3182ce}
-        .itinerary-nav-dot:hover{background:#90cdf4}
+        .itinerary-container{margin-bottom:24px}
         .remove-itinerary{background:#e53e3e;position:absolute;top:12px;right:12px;padding:4px 8px;font-size:12px}
         .copy-itinerary{background:#805ad5;position:absolute;top:12px;right:100px;padding:4px 8px;font-size:12px}
         .notes-container{display:none;margin-top:12px;padding:12px;border-radius:4px}
@@ -199,12 +192,6 @@
         .smart-area .smart-transfer-tags .t-tag{background:#fff5f5;padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid #feb2b2;color:#c53030}
         .smart-area .smart-transfer-tags .t-tag:hover{background:#fed7d7}
         .smart-area .smart-transfer-tags .t-tag.selected{background:#e53e3e;color:#fff;border-color:#e53e3e}
-        .smart-transfer-custom{display:none;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
-        .smart-transfer-custom input{flex:1 1 220px;min-width:180px;height:30px;padding:5px 9px;font-size:11px}
-        .smart-transfer-custom button{height:30px;padding:4px 10px;font-size:11px;background:#38a169!important;color:#fff}
-        .smart-transfer-selected{display:none;margin-top:6px;font-size:11px;color:#c53030}
-        .smart-transfer-selected strong{font-weight:600}
-
         .smart-area .smart-display{background:#f8fafc;border-radius:6px;padding:8px 12px;border:1px solid #e2e8f0;margin-bottom:8px;min-height:32px;font-size:14px;color:#2d3748;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
         .smart-area .smart-display .empty{color:#a0aec0}
         .smart-area .smart-display .d-tag{background:#ebf8ff;color:#2b6cb0;padding:1px 8px;border-radius:4px;font-size:14px}
@@ -221,6 +208,71 @@
         .update-guide .command-title{font-weight:700;margin:10px 0 6px}
         .update-guide pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#1a202c;color:#f7fafc;border-radius:6px;padding:12px;font-size:11px;line-height:1.55;margin:0 0 12px}
         .update-guide .warning{margin-top:14px;background:#fffaf0;border-left:4px solid #ed8936;padding:12px;border-radius:4px}
+
+        /* ===== 行程方案极简导航点 ===== */
+        /* 正常状态：位于“创建新行程方案”按钮下方；滚动到顶部后自动吸附，始终可见。 */
+        #flight-page > #itineraryNav{
+            position:sticky!important;
+            top:0!important;
+            z-index:1000!important;
+            width:calc(100% + 36px)!important;
+            margin-left:-18px!important;
+            margin-right:-18px!important;
+            padding:8px 18px 10px!important;
+            box-sizing:border-box!important;
+            background:rgba(255,255,255,.97)!important;
+            backdrop-filter:blur(12px)!important;
+            -webkit-backdrop-filter:blur(12px)!important;
+            border-bottom:1px solid rgba(0,0,0,.06)!important;
+            box-shadow:0 2px 10px rgba(0,0,0,.05)!important;
+        }
+        .itinerary-nav{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:18px;
+            margin:-4px 0 14px;
+            min-height:22px;
+        }
+        .itinerary-nav-dot{
+            appearance:none;
+            -webkit-appearance:none;
+            width:14px;
+            height:14px;
+            min-width:14px;
+            min-height:14px;
+            padding:0;
+            margin:0;
+            border:0;
+            border-radius:999px;
+            background:#c7cbd1;
+            box-shadow:none!important;
+            cursor:pointer;
+            transition:width .18s ease,background-color .18s ease,transform .18s ease;
+            touch-action:manipulation;
+        }
+        .itinerary-nav-dot:hover{transform:scale(1.08)}
+        .itinerary-nav-dot.active{
+            width:28px;
+            background:#0071e3;
+        }
+        .smart-transfer-custom{
+            display:flex;
+            gap:8px;
+            width:100%;
+            margin-top:8px;
+            flex:1 1 100%;
+        }
+        .smart-transfer-custom input{flex:1;min-width:0}
+        .smart-transfer-custom button{flex:0 0 auto}
+        @media(max-width:768px){
+            .itinerary-nav{gap:18px;margin:-2px 0 14px}
+            .itinerary-nav-dot{width:14px;height:14px;min-width:14px;min-height:14px}
+            .itinerary-nav-dot.active{width:28px}
+
+            
+        }
+
         @media(max-width:768px){#settings-page.active{grid-template-columns:1fr}.smart-area .smart-row .smart-input-wrap{max-width:100%;flex:1 1 100%}.passenger-row,.baggage-location-row,.baggage-requirements-row{flex-wrap:wrap}}
 
         /* ===== 机票信息页重构 ===== */
@@ -822,28 +874,6 @@
             #history-page .history-button-rows button{height:30px!important;min-height:30px!important;font-size:10px!important;padding:2px!important;}
         }
 
-
-/* v2.3.7 mobile itinerary navigation */
-@media (max-width: 768px){
-            /* v2.3.7：手机端行程方案导航，扩大点击区域并拉开间距 */
-            .itinerary-nav-dots,
-            .itinerary-progress,
-            .smart-area .smart-progress{
-                gap:20px!important;
-            }
-            .itinerary-nav-dots .step-dot,
-            .itinerary-progress .step-dot,
-            .smart-area .smart-progress .step-dot{
-                min-width:32px!important;
-                min-height:32px!important;
-                padding:7px 12px!important;
-                font-size:12px!important;
-                border-radius:16px!important;
-                display:inline-flex!important;
-                align-items:center!important;
-                justify-content:center!important;
-            }
-        }
 </style>
 
     <style>
@@ -882,8 +912,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.3.4</span></h1>
-    <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.3.4</div></div>
+    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.3.7</span></h1>
+    <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.3.7</div></div>
 
     <div class="page-tabs">
         <div class="page-tab active" data-page="flight">航班信息</div>
@@ -897,6 +927,7 @@
     <!-- 航班信息页 -->
     <div id="flight-page" class="page-content active">
         <button class="itinerary-toggle-btn" id="createBtn">+ 创建新行程方案</button>
+        <div class="itinerary-nav" id="itineraryNav" aria-label="行程方案导航"></div>
         <div id="itineraries"></div>
         <div class="flight-main-actions" style="margin-top:20px;text-align:center;">
             <button id="genAllBtn" style="background:#38a169;">生成所有方案</button>
@@ -1367,7 +1398,7 @@ let ticketData={passenger:'',segments:[],carryOn:'',checkedBag:'',checkedCount:'
 let itineraryCount=0, segCounters={}, priceCounters={};
 let paymentData=[], currentFilters={date:[],passenger:[],amount:[],difference:[],settlement:[],notes:[]};
 let filteredPaymentData=null, activeFilterColumn=null;
-let versionHistory=[{version:'2.3.6',date:'2026-08-23',time:'00:03:00',desc:'微信桌面端打开优化；中转支持自定义输入；机票页重置恢复初始状态并返回航班页；复制行程后自动定位；新增行程方案轻量导航'},{version:'2.3.3',date:'2026-08-02',time:'23:25:00',desc:'付款状态页多选、日期自动格式、自适应列宽及表格下载分享优化'},{version:'2.1.2',date:'2026-07-27',time:'22:00:00',desc:'历史记录城市搜索与排序优化；恢复航班城市原有输入逻辑'},{version:'2.1',date:'2026-07-24',time:'10:00:00',desc:'机票页细节与航班页交互修复版'}];
+let versionHistory=[{version:'2.3.4',date:'2026-08-07',time:'02:52:00',desc:'历史记录页 CSV 与 JSON 导入改为追加，不再覆盖原有历史记录'},{version:'2.3.3',date:'2026-08-02',time:'23:25:00',desc:'付款状态页多选、日期自动格式、自适应列宽及表格下载分享优化'},{version:'2.1.2',date:'2026-07-27',time:'22:00:00',desc:'历史记录城市搜索与排序优化；恢复航班城市原有输入逻辑'},{version:'2.1',date:'2026-07-24',time:'10:00:00',desc:'机票页细节与航班页交互修复版'}];
 
 // 智能输入状态 - 机票页
 let tValues={}, tStep=0, tEvening=false, tNextDay=false, tTransfer=false, tSelTransfer='';
@@ -1576,6 +1607,60 @@ function initTabs(){
     });
 }
 
+// ===== 行程方案导航与滚动 =====
+function scrollToElementSmooth(el,block='center'){
+    if(!el)return;
+    requestAnimationFrame(()=>el.scrollIntoView({behavior:'smooth',block}));
+}
+function renderItineraryNav(activeId=null){
+    const nav=$('itineraryNav');
+    if(!nav)return;
+    const items=Array.from(document.querySelectorAll('#itineraries .itinerary-container'));
+    nav.innerHTML='';
+    items.forEach((iti,index)=>{
+        const dot=document.createElement('button');
+        dot.type='button';
+        dot.className='itinerary-nav-dot';
+        dot.dataset.itineraryId=iti.id;
+        dot.title=`方案 ${index+1}`;
+        dot.setAttribute('aria-label',`滚动到方案 ${index+1}`);
+        if(String(iti.id)===String(activeId))dot.classList.add('active');
+        dot.onclick=()=>scrollToItinerary(iti.id);
+        nav.appendChild(dot);
+    });
+}
+function scrollToItinerary(id){
+    const el=$(id);
+    if(!el)return;
+    renderItineraryNav(id);
+    scrollToElementSmooth(el,'center');
+}
+function updateItineraryNavActive(){
+    const items=Array.from(document.querySelectorAll('#itineraries .itinerary-container'));
+    if(!items.length){renderItineraryNav(null);return;}
+    const targetY=window.innerHeight*0.32;
+    let best=items[0],bestDistance=Infinity;
+    items.forEach(iti=>{
+        const r=iti.getBoundingClientRect();
+        const distance=Math.abs(r.top-targetY);
+        if(r.bottom>0 && r.top<window.innerHeight*0.92 && distance<bestDistance){
+            best=iti;bestDistance=distance;
+        }
+    });
+    renderItineraryNav(best.id);
+}
+function bindItineraryNavScroll(){
+    if(window.__itineraryNavScrollBound)return;
+    window.__itineraryNavScrollBound=true;
+    let ticking=false;
+    window.addEventListener('scroll',()=>{
+        if(ticking)return;
+        ticking=true;
+        requestAnimationFrame(()=>{ticking=false;updateItineraryNavActive();});
+    },{passive:true});
+}
+bindItineraryNavScroll();
+
 // ===== 航班信息 - 行程方案 =====
 function addItinerary(){
     itineraryCount++;
@@ -1620,10 +1705,11 @@ function addItinerary(){
         </div>
     `;
     itineraries.appendChild(div);
-    updateItineraryNavigation();
     bindCalc(itineraryCount);
     addSeg(itineraryCount);
+    renderItineraryNav(div.id);
     updateDisplay();
+    setTimeout(()=>scrollToItinerary(div.id),60);
 }
 
 function addSeg(itiId){
@@ -1655,11 +1741,6 @@ function addSeg(itiId){
             <div class="smart-progress" id="smartProgress${itiId}-${sid}"></div>
             <div class="smart-tags" id="smartTags${itiId}-${sid}"></div>
             <div class="smart-transfer-tags" id="smartTransferTags${itiId}-${sid}"></div>
-            <div class="smart-transfer-custom" id="smartTransferCustom${itiId}-${sid}">
-                <input type="text" id="smartTransferInput${itiId}-${sid}" placeholder="输入新的中转信息">
-                <button type="button" id="smartTransferAdd${itiId}-${sid}">添加</button>
-            </div>
-            <div class="smart-transfer-selected" id="smartTransferSelected${itiId}-${sid}"></div>
         </div>
         <!-- 隐藏字段 -->
         <input type="hidden" id="seg${itiId}-${sid}-date">
@@ -1686,27 +1767,46 @@ function removeSeg(itiId,sid){
     updateDisplay();
 }
 
-function removeIti(id){let el=$('iti'+id);if(el)el.remove();let notes=$('notes'+id);if(notes)notes.remove();delete segCounters[id];delete priceCounters[id];if(String(activeTicketItineraryId)===String(id)){activeTicketItineraryId=null;syncToTicket(null,true);}updateDisplay();updateItineraryNavigation();}
-
-function updateItineraryNavigation(){
-    const list=Array.from(itineraries.querySelectorAll('.itinerary-container'));let nav=$('itineraryNav');
-    if(!nav){nav=document.createElement('div');nav.id='itineraryNav';nav.className='itinerary-nav';itineraries.parentNode.insertBefore(nav,itineraries);}
-    nav.innerHTML='';if(list.length<2){nav.classList.remove('visible');return;}nav.classList.add('visible');
-    list.forEach((el,i)=>{const b=document.createElement('button');b.type='button';b.className='itinerary-nav-dot';b.title='跳转到行程方案 '+(i+1);b.setAttribute('aria-label','跳转到行程方案 '+(i+1));b.onclick=()=>scrollToItinerary(el);nav.appendChild(b);});
-    const updateActive=()=>{let best=0,bestDist=Infinity;list.forEach((el,i)=>{const d=Math.abs(el.getBoundingClientRect().top-70);if(d<bestDist){bestDist=d;best=i;}});nav.querySelectorAll('.itinerary-nav-dot').forEach((b,i)=>b.classList.toggle('active',i===best));};
-    if(nav._scrollHandler)window.removeEventListener('scroll',nav._scrollHandler);nav._scrollHandler=updateActive;window.addEventListener('scroll',updateActive,{passive:true});updateActive();
-}
-function scrollToItinerary(el){if(!el)return;el.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>{el.classList.add('itinerary-focus');setTimeout(()=>el.classList.remove('itinerary-focus'),900);},350);}
+function removeIti(id){let el=$('iti'+id);if(el)el.remove();let notes=$('notes'+id);if(notes)notes.remove();delete segCounters[id];delete priceCounters[id];if(String(activeTicketItineraryId)===String(id)){activeTicketItineraryId=null;syncToTicket(null,true);}renderItineraryNav();updateDisplay();updateItineraryNavActive();}
 
 function copyIti(id){
-    let orig=$('iti'+id);if(!orig)return; addItinerary(); let nid=itineraryCount;
-    let segs=Array.from(orig.querySelectorAll('.flight-segment')), container=$('segContainer'+nid); container.innerHTML='';
-    let origCalc=orig.querySelector('.calculator-container'),newCalc=$('calc'+nid);
-    if(origCalc&&newCalc){['.calc-rmb','.calc-rate','.calc-ruble1','.calc-ruble2'].forEach(s=>{let a=origCalc.querySelector(s),b=newCalc.querySelector(s);if(a&&b)b.value=a.value;});let a=origCalc.querySelector('.calc-total'),b=newCalc.querySelector('.calc-total');if(a&&b)b.value=a.value;newCalc.style.display=origCalc.style.display;}
-    segs.forEach(s=>{let sid=s.id.split('-')[1];addSeg(nid);let nsid=segCounters[nid];['date','departure','arrival','depTime','arrTime','evening','nextday'].forEach(f=>{let a=$('seg'+id+'-'+sid+'-'+f),b=$('seg'+nid+'-'+nsid+'-'+f);if(a&&b)b.value=a.value;});let a=$('seg'+id+'-'+sid+'-checkin'),b=$('seg'+nid+'-'+nsid+'-checkin');if(a&&b)b.value=a.value;a=$('seg'+id+'-'+sid+'-transfer');b=$('seg'+nid+'-'+nsid+'-transfer');if(a&&b)b.value=a.value;updatePreview(nid,nsid);});
-    orig.querySelectorAll('.ticket-price-plan').forEach(op=>{addPrice(nid);let np=$('pricePlans'+nid).lastElementChild,os=op.querySelector('select'),oi=op.querySelector('input[type=text]'),oc=op.querySelector('.ticket-currency'),ns=np.querySelector('select'),ni=np.querySelector('input[type=text]'),nc=np.querySelector('.ticket-currency');if(os&&ns)ns.value=os.value;if(oi&&ni)ni.value=oi.value;if(oc&&nc)nc.value=oc.value;});
-    let notes=$('selNotesVal'+id)?.value||'';$('selNotesVal'+nid).value=notes;$('selNotes'+nid).textContent=notes;updateDisplay();
-    setTimeout(()=>{let target=$('iti'+nid);if(target){target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.remove('itinerary-highlight');void target.offsetWidth;target.classList.add('itinerary-highlight');}showActionToast('已复制并跳转到行程方案 '+nid);},180);
+    let orig=$('iti'+id);
+    if(!orig)return;
+    addItinerary();
+    let nid=itineraryCount;
+    let newItinerary=$('iti'+nid);
+    let segs=orig.querySelectorAll('.flight-segment');
+    let container=$('segContainer'+nid);
+    container.innerHTML='';
+    segs.forEach((s,idx)=>{
+        let sid=s.id.split('-')[1];
+        addSeg(nid);
+        let nsid=segCounters[nid];
+        setTimeout(()=>{
+            ['date','departure','arrival','depTime','arrTime','evening','nextday'].forEach(f=>{
+                let v=$('seg'+id+'-'+sid+'-'+f)?.value||'';
+                let el=$('seg'+nid+'-'+nsid+'-'+f);
+                if(el)el.value=v;
+            });
+            let ch=$('seg'+id+'-'+sid+'-checkin');
+            let el=$('seg'+nid+'-'+nsid+'-checkin');
+            if(ch&&el)el.value=ch.value;
+            let tr=$('seg'+id+'-'+sid+'-transfer');
+            let tel=$('seg'+nid+'-'+nsid+'-transfer');
+            if(tr&&tel)tel.value=tr.value;
+            updatePreview(nid,nsid);
+            initSegmentSmart(nid,nsid);
+        },50);
+    });
+    let notes=$('selNotesVal'+id)?.value||'';
+    if($('selNotesVal'+nid))$('selNotesVal'+nid).value=notes;
+    if($('selNotes'+nid))$('selNotes'+nid).textContent=notes;
+    renderItineraryNav(newItinerary.id);
+    updateDisplay();
+    setTimeout(()=>{
+        scrollToItinerary(newItinerary.id);
+        showActionToast(`已复制到行程方案 ${nid}`);
+    },140);
 }
 function bindCalc(id){
     let box=$('calc'+id);if(!box)return;
@@ -1779,7 +1879,6 @@ function initSegmentSmart(itiId, sid){
     let doneBtn=$('smartDone'+id);
     let transferBtn=$('smartTransfer'+id);
     let btnsContainer=$('smartBtns'+id);
-    let transferCustom=$('smartTransferCustom'+id),transferCustomInput=$('smartTransferInput'+id),transferCustomAdd=$('smartTransferAdd'+id),transferSelected=$('smartTransferSelected'+id);
 
     if(!input)return;
 
@@ -1800,9 +1899,6 @@ function initSegmentSmart(itiId, sid){
     let segSelTransfer=parseMultiTransfer($('seg'+itiId+'-'+sid+'-transfer')?.value||'');
     let segTransfer=segSelTransfer.length>0;
     let isCheckinStep=false;
-    function refreshCustomTransferUI(){if(transferCustom)transferCustom.style.display=segTransfer?'flex':'none';if(transferSelected){transferSelected.style.display=segSelTransfer.length?'block':'none';transferSelected.innerHTML=segSelTransfer.length?'<strong>已添加：</strong>'+segSelTransfer.map(escapeHtml).join('、'):'';}}
-    function addCustomTransfer(){let v=(transferCustomInput?.value||'').trim();if(!v)return;if(!segSelTransfer.includes(v))segSelTransfer.push(v);segTransfer=true;let value=formatMultiTransfer(segSelTransfer);segValues['transfer']=value;let trEl=$('seg'+itiId+'-'+sid+'-transfer');if(trEl)trEl.value=value;if(transferCustomInput)transferCustomInput.value='';transferBtn.classList.add('active');transferBtn.textContent='中转 ✓';renderSegTransferTags();refreshCustomTransferUI();updatePreview(itiId,sid);updateDisplay();}
-    if(transferCustomAdd)transferCustomAdd.onclick=addCustomTransfer;if(transferCustomInput)transferCustomInput.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();addCustomTransfer();}};
     let extraRow=null;
     let citySelectControl=null;
     const flightProgressLabels={
@@ -2117,10 +2213,34 @@ function initSegmentSmart(itiId, sid){
                 if(trEl)trEl.value=value;
                 updatePreview(itiId, sid);
                 updateDisplay();
-                refreshCustomTransferUI();
             };
-            transferTags.appendChild(tag);
+                transferTags.appendChild(tag);
         });
+        const customWrap=document.createElement('div');
+        customWrap.className='smart-transfer-custom';
+        customWrap.innerHTML='<input type="text" class="compact-input" placeholder="自定义中转信息"><button type="button" class="add-custom-note compact-btn">添加</button>';
+        const customInput=customWrap.querySelector('input');
+        const customBtn=customWrap.querySelector('button');
+        customBtn.onclick=function(){
+            const txt=customInput.value.trim();
+            if(!txt)return;
+            if(!segSelTransfer.includes(txt))segSelTransfer.push(txt);
+            segTransfer=true;
+            transferBtn.classList.add('active');
+            transferBtn.textContent='中转 ✓';
+            const value=formatMultiTransfer(segSelTransfer);
+            segValues['transfer']=value;
+            const trEl=$('seg'+itiId+'-'+sid+'-transfer');
+            if(trEl)trEl.value=value;
+            customInput.value='';
+            renderSegTransferTags();
+            updatePreview(itiId,sid);
+            updateDisplay();
+        };
+        customInput.onkeydown=function(e){
+            if(e.key==='Enter'){e.preventDefault();customBtn.click();}
+        };
+        transferTags.appendChild(customWrap);
     }
 
     function confirmStep(){
@@ -2229,8 +2349,8 @@ function initSegmentSmart(itiId, sid){
         segTransfer=!segTransfer;
         this.classList.toggle('active',segTransfer);
         this.textContent=segTransfer?'中转 ✓':'中转';
-        if(segTransfer){transferTags.style.display='flex';renderSegTransferTags();refreshCustomTransferUI();}
-        else{transferTags.style.display='none';segSelTransfer=[];segValues['transfer']='';$('seg'+itiId+'-'+sid+'-transfer').value='';if(transferCustomInput)transferCustomInput.value='';refreshCustomTransferUI();updatePreview(itiId, sid);updateDisplay();}
+        if(segTransfer){transferTags.style.display='flex';renderSegTransferTags();}
+        else{transferTags.style.display='none';segSelTransfer=[];segValues['transfer']='';$('seg'+itiId+'-'+sid+'-transfer').value='';updatePreview(itiId, sid);updateDisplay();}
     };
 
     input.onkeydown=function(e){
@@ -2446,10 +2566,7 @@ function genAll(){
     });
     text+='\n🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n+79128915882\n手机号绑定银行卡\nСбер,Т-Банк, Альфа\n\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️';
     allOutput.textContent=text;
-    // 生成所有方案后，自动滚动到下方的结果显示框。
-    setTimeout(()=>{
-        allOutput.scrollIntoView({behavior:'smooth',block:'start'});
-    },50);
+    setTimeout(()=>scrollToElementSmooth(allOutput,'center'),60);
 }
 
 function getTripRouteHeading(depFull,arrFull){
@@ -2712,7 +2829,7 @@ function resetAll(){
     if(!confirm('确定重置？'))return;
     document.querySelectorAll('#ticketSmart .notes-container').forEach(n=>n.remove());
     itineraries.innerHTML='';
-    updateItineraryNavigation();
+    renderItineraryNav();
     allOutput.textContent='';
     ticketOutput.textContent='';
     russianTicketOutput.textContent='';
@@ -2730,8 +2847,20 @@ function resetAll(){
     alert('已重置');
 }
 
-function switchToFlightPage(){document.querySelectorAll('.page-tab').forEach(x=>x.classList.remove('active'));document.querySelector('[data-page="flight"]')?.classList.add('active');document.querySelectorAll('.page-content').forEach(x=>x.classList.remove('active'));$('flight-page')?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-function resetOutput(){ticketOutput.textContent='';russianTicketOutput.textContent='';}
+function switchToFlightPage(){
+    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+    const flightTab=document.querySelector('[data-page="flight"]');
+    if(flightTab)flightTab.classList.add('active');
+    document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));
+    const flightPage=$('flight-page');
+    if(flightPage)flightPage.classList.add('active');
+    renderItineraryNav();
+    setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),30);
+}
+function resetOutput(){
+    resetAll();
+    setTimeout(switchToFlightPage,80);
+}
 function fallbackCopyText(text){
     const ta=document.createElement('textarea');
     ta.value=text;
@@ -2776,45 +2905,21 @@ function copyTextReliable(text,successMessage,afterCopy){
     }
 }
 function launchWeChatScheme(){
-    // 使用真实的 weixin:// 超链接点击调用系统已注册的微信协议。
-    // 不新开标签页、不修改当前页面 URL。
-    let attempted=false;
-    try{
-        const link=document.createElement('a');
-        link.href='weixin://';
-        link.setAttribute('aria-hidden','true');
-        link.style.cssText='position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;';
-        document.body.appendChild(link);
-        link.click();
-        attempted=true;
-        setTimeout(()=>{try{link.remove();}catch(e){}},800);
-    }catch(e){}
-    return attempted;
+    const link=document.createElement('a');
+    link.href='weixin://';
+    link.style.display='none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(()=>link.remove(),1000);
 }
-function showWeChatFallback(){
-    let modal=$('wechatFallback');
-    if(!modal){
-        modal=document.createElement('div');modal.id='wechatFallback';modal.className='wechat-fallback';
-        modal.innerHTML='<h3>微信未能自动切换</h3><p>文字已经复制到剪贴板。当前浏览器没有把微信协议交给微信客户端，因此不会打开空白的 weixin:// 页面。</p><div class="wechat-fallback-actions"><button class="wechat-close" type="button">知道了</button></div>';
-        document.body.appendChild(modal);
-        modal.querySelector('.wechat-close').onclick=()=>modal.style.display='none';
-    }
-    modal.style.display='block';
+function openWeChatForSharing(){
+    // iOS版微信不接受Safari通过系统分享面板发送的纯文本。
+    // 内容已先复制到剪贴板，因此这里直接打开微信，用户进入聊天后粘贴即可。
+    launchWeChatScheme();
 }
 function sendTextToWeChat(text){
-    text=String(text||'');if(!text){alert('没有可复制的内容');return;}
-    // 复制优先完成；随后在同一点击事件中尝试通过 iframe 唤起已运行的微信。
-    const copied=fallbackCopyText(text);
-    if(!copied && navigator.clipboard&&window.isSecureContext){
-        navigator.clipboard.writeText(text).catch(()=>{});
-    }
-    launchWeChatScheme();
-    showActionToast(copied?'已复制，正在切换到微信…':'正在切换到微信…');
-    setTimeout(()=>{
-        if(document.visibilityState==='visible')showWeChatFallback();
-    },1500);
+    copyTextReliable(text,'已复制，正在打开微信…',openWeChatForSharing);
 }
-
 function copyOutput(){sendTextToWeChat(allOutput.textContent);}
 function copyTicket(){sendTextToWeChat(ticketOutput.textContent);}
 function copyRussianTicket(){copyTextReliable(russianTicketOutput.textContent,'俄文机票已复制');}
@@ -2827,15 +2932,8 @@ function initEvents(){
     $('copyBtn').onclick=copyOutput;
     $('saveHistoryBtn').onclick=saveHistory;
     $('saveFlightHistoryBtn').onclick=saveHistory;
-    $('genTicketBtn').onclick=function(){
-        genTicket();
-        setTimeout(()=>{
-            if(ticketOutput){
-                ticketOutput.scrollIntoView({behavior:'smooth',block:'start'});
-            }
-        },100);
-    };
-    $('resetOutputBtn').onclick=function(){resetAll();switchToFlightPage();};
+    $('genTicketBtn').onclick=function(){genTicket();setTimeout(()=>scrollToElementSmooth($('genTicketBtn'),'center'),60);};
+    $('resetOutputBtn').onclick=resetOutput;
     $('copyTicketBtn').onclick=copyTicket;
     $('copyRussianTicketBtn').onclick=copyRussianTicket;
     tripType.onchange=function(){updateTicketDisplay();if(ticketOutput.textContent)genTicket();};
@@ -3316,13 +3414,7 @@ function renderTicketStep(){
         tSHint.textContent='🎉 已自动生成表单，可点击进度条返回修改';
         renderTicketProgress();
         updateTicketDisplay();
-        // 机票信息全部输入完成后，自动滚动到“生成表单”按钮及其下方的信息显示框。
-        setTimeout(()=>{
-            const target = $('genTicketBtn') || ticketOutput;
-            if(target){
-                target.scrollIntoView({behavior:'smooth',block:'center'});
-            }
-        },100);
+        setTimeout(()=>scrollToElementSmooth($('genTicketBtn'),'center'),80);
         return;
     }
     let q=currentTicketQuestion();
@@ -4034,6 +4126,86 @@ setTimeout(()=>{
     }
     window.setTimeout(bindPaymentSelectionFix,0);
     window.setTimeout(bindPaymentSelectionFix,300);
+})();
+</script>
+
+
+<script>
+/* v2.3.8：两指左右滑动切换页面方向修正
+   手机/平板：使用真正的双指触摸手势。
+   电脑触控板：浏览器通常不会提供 touches.length，因此监听触控板产生的横向 wheel/scroll 事件；
+   MacBook 等设备的“两指左右滑动”会被浏览器表现为 deltaX。 */
+(function(){
+    const pageOrder=['flight','ticket','payment','settings','history','version'];
+    let tracking=false,startX=0,startY=0;
+    let wheelAccum=0,wheelLocked=false,wheelResetTimer=null;
+    function activePage(){return document.querySelector('.page-tab.active')?.dataset.page||'flight';}
+    function changePage(delta){
+        const i=pageOrder.indexOf(activePage()), n=i+delta;
+        if(i<0||n<0||n>=pageOrder.length)return false;
+        const tab=document.querySelector('.page-tab[data-page="'+pageOrder[n]+'"]');
+        if(!tab)return false;
+        tab.click();
+        window.scrollTo({top:0,behavior:'smooth'});
+        return true;
+    }
+    // 真实触摸屏：必须从双指开始，避免误触单指上下滚动。
+    document.addEventListener('touchstart',function(e){
+        if(e.touches.length!==2){tracking=false;return;}
+        tracking=true;
+        startX=(e.touches[0].clientX+e.touches[1].clientX)/2;
+        startY=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    },{passive:true});
+    document.addEventListener('touchmove',function(e){
+        if(!tracking||e.touches.length!==2)return;
+        const x=(e.touches[0].clientX+e.touches[1].clientX)/2;
+        const y=(e.touches[0].clientY+e.touches[1].clientY)/2;
+        const dx=x-startX,dy=y-startY;
+        if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)*1.25)e.preventDefault();
+    },{passive:false});
+    document.addEventListener('touchend',function(e){
+        if(!tracking||e.touches.length)return;
+        tracking=false;
+        const touches=e.changedTouches;
+        if(!touches||!touches.length)return;
+        // changedTouches 在部分浏览器只给出一根手指，因此使用最后一根作为位移参考；
+        // 双指手势的起点已取两指中心，方向判断仍然可靠。
+        const dx=touches[0].clientX-startX,dy=touches[0].clientY-startY;
+        if(Math.abs(dx)>=80&&Math.abs(dx)>Math.abs(dy)*1.25)changePage(dx<0?1:-1);
+    },{passive:true});
+    document.addEventListener('touchcancel',function(){tracking=false;},{passive:true});
+
+    // 电脑触控板：两指横向滑动通常以 wheel 事件的 deltaX 形式到达。
+    document.addEventListener('wheel',function(e){
+        const dx=e.deltaX||0,dy=e.deltaY||0;
+        if(Math.abs(dx)<8 || Math.abs(dx)<=Math.abs(dy)*1.15)return;
+        if(wheelLocked)return;
+        wheelAccum+=dx;
+        clearTimeout(wheelResetTimer);
+        wheelResetTimer=setTimeout(function(){wheelAccum=0;},180);
+        if(Math.abs(wheelAccum)<70)return;
+        const delta=wheelAccum<0?-1:1;
+        wheelAccum=0;
+        if(changePage(delta)){
+            wheelLocked=true;
+            setTimeout(function(){wheelLocked=false;},650);
+        }
+    },{passive:true});
+})();
+</script>
+
+<script>
+/* v2.3.6: itinerary navigation + mobile-friendly scrolling */
+(function(){
+    function bootItineraryNav(){
+        if(typeof renderItineraryNav==='function'){
+            renderItineraryNav();
+            if(typeof updateItineraryNavActive==='function')updateItineraryNavActive();
+        }
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootItineraryNav);
+    else bootItineraryNav();
+    setTimeout(bootItineraryNav,200);
 })();
 </script>
 
