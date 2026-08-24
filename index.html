@@ -907,51 +907,33 @@
         min-width:16px!important;
         min-height:16px!important;
     }
-
-        /* ===== 手机端页面平移导航：仅改变单指横滑的页面切换方式 ===== */
-        .mobile-page-slider{display:contents}
-        @media(max-width:768px){
-            .mobile-page-slider{
-                display:block;
-                position:relative;
-                width:100%;
-                overflow:hidden;
-                min-height:1px;
-                touch-action:pan-y;
-            }
-            .mobile-page-slider .page-content{
-                display:block!important;
-                position:absolute!important;
-                top:0;
-                left:0;
-                width:100%;
-                margin:0;
-                visibility:hidden;
-                opacity:1;
-                transform:translate3d(100%,0,0);
-                transition:transform .28s cubic-bezier(.22,.61,.36,1),visibility 0s linear .28s;
-                will-change:transform;
-            }
-            .mobile-page-slider .page-content.slider-current{
-                visibility:visible;
-                transform:translate3d(0,0,0);
-                transition:transform .28s cubic-bezier(.22,.61,.36,1),visibility 0s;
-            }
-            .mobile-page-slider .page-content.slider-left{
-                visibility:visible;
-                transform:translate3d(-100%,0,0);
-                transition:transform .28s cubic-bezier(.22,.61,.36,1),visibility 0s;
-            }
-            .mobile-page-slider .page-content.slider-right{
-                visibility:visible;
-                transform:translate3d(100%,0,0);
-                transition:transform .28s cubic-bezier(.22,.61,.36,1),visibility 0s;
-            }
-            .mobile-page-slider.is-dragging .page-content{transition:none!important}
-        }
-
     </style>
 
+
+<style id="mobile-swipe-page-transition">
+/* 仅用于手机/平板的双指横向切页：平移，不改变其他页面样式和功能。 */
+@media (max-width:768px){
+  .container{overflow-x:hidden;}
+  .page-content.mobile-swipe-in{
+    animation:mobileSwipePageIn 420ms cubic-bezier(.22,.61,.36,1) both;
+    will-change:transform;
+  }
+  .page-content.mobile-swipe-in-from-right{
+    animation-name:mobileSwipePageInFromRight;
+  }
+  .page-content.mobile-swipe-in-from-left{
+    animation-name:mobileSwipePageInFromLeft;
+  }
+  @keyframes mobileSwipePageInFromRight{
+    from{transform:translate3d(100%,0,0);}
+    to{transform:translate3d(0,0,0);}
+  }
+  @keyframes mobileSwipePageInFromLeft{
+    from{transform:translate3d(-100%,0,0);}
+    to{transform:translate3d(0,0,0);}
+  }
+}
+</style>
 </head>
 <body>
 <div class="container">
@@ -1646,7 +1628,6 @@ function initTabs(){
             document.querySelectorAll('.page-content').forEach(x=>x.classList.remove('active'));
             $(this.dataset.page+'-page').classList.add('active');
             if(this.dataset.page==='ticket'){syncToTicket(activeTicketItineraryId,false);initTicketSmart(false);}
-            if(typeof window.syncMobilePageSlider==='function')window.syncMobilePageSlider();
         };
     });
 }
@@ -4192,172 +4173,78 @@ setTimeout(()=>{
 
 
 <script>
-/* v2.4.0：手机端单指左右滑动采用整页平移效果
-   页面顺序固定为：航班信息 → 机票信息 → 付款状态 → 设置 → 历史记录 → 版本。
-   向左：下一页；向右：上一页。桌面端及其他功能保持原有逻辑。 */
+/* v2.3.8：两指左右滑动切换页面方向修正
+   手机/平板：使用真正的双指触摸手势。
+   电脑触控板：浏览器通常不会提供 touches.length，因此监听触控板产生的横向 wheel/scroll 事件；
+   MacBook 等设备的“两指左右滑动”会被浏览器表现为 deltaX。 */
 (function(){
     const pageOrder=['flight','ticket','payment','settings','history','version'];
-    let slider=null;
-    let pages=[];
-    let tracking=false;
-    let startX=0,startY=0;
-    let currentIndex=0;
-
-    function isMobile(){ return window.matchMedia('(max-width:768px)').matches; }
-
-    function getIndex(){
-        const active=document.querySelector('.page-tab.active');
-        const page=active?.dataset.page||'flight';
-        return Math.max(0,pageOrder.indexOf(page));
-    }
-
-    function setSliderHeight(index){
-        if(!slider||!isMobile()||!pages[index])return;
-        slider.style.height=Math.max(pages[index].scrollHeight,1)+'px';
-    }
-
-    function applyPosition(index,animate=true){
-        if(!slider)return;
-        currentIndex=Math.max(0,Math.min(pageOrder.length-1,index));
-        pages.forEach((page,i)=>{
-            page.classList.remove('slider-current','slider-left','slider-right');
-            if(i===currentIndex)page.classList.add('slider-current');
-            else if(i<currentIndex)page.classList.add('slider-left');
-            else page.classList.add('slider-right');
-        });
-        slider.classList.toggle('is-dragging',!animate);
-        setSliderHeight(currentIndex);
-    }
-
-    function translateDuringDrag(dx){
-        if(!slider||!isMobile())return;
-        const width=slider.clientWidth||1;
-        const current=pages[currentIndex];
-        if(!current)return;
-        const direction=dx<0?1:-1;
-        const neighbor=pages[currentIndex+direction];
-
-        current.style.transform='translate3d('+(dx/width*100)+'%,0,0)';
-        if(neighbor){
-            neighbor.style.visibility='visible';
-            neighbor.style.transform='translate3d('+((dx<0?100:-100)+(dx/width*100))+'%,0,0)';
-        }
-    }
-
-    function clearInlineTransforms(){ pages.forEach(page=>page.style.transform=''); }
-
+    let tracking=false,startX=0,startY=0;
+    let wheelAccum=0,wheelLocked=false,wheelResetTimer=null;
+    function activePage(){return document.querySelector('.page-tab.active')?.dataset.page||'flight';}
     function changePage(delta){
-        const next=currentIndex+delta;
-        if(next<0||next>=pageOrder.length)return false;
-        const tab=document.querySelector('.page-tab[data-page="'+pageOrder[next]+'"]');
+        const i=pageOrder.indexOf(activePage()), n=i+delta;
+        if(i<0||n<0||n>=pageOrder.length)return false;
+        const tab=document.querySelector('.page-tab[data-page="'+pageOrder[n]+'"]');
         if(!tab)return false;
+
+        /* 只给“滑动切页”增加平移动画；普通点击标签的行为完全不变。 */
+        const nextPage=document.getElementById(pageOrder[n]+'-page');
+        const isMobile=window.matchMedia && window.matchMedia('(max-width:768px)').matches;
+        if(isMobile && nextPage){
+            nextPage.classList.remove('mobile-swipe-in','mobile-swipe-in-from-right','mobile-swipe-in-from-left');
+            nextPage.classList.add('mobile-swipe-in',delta>0?'mobile-swipe-in-from-right':'mobile-swipe-in-from-left');
+            nextPage.addEventListener('animationend',function(){
+                nextPage.classList.remove('mobile-swipe-in','mobile-swipe-in-from-right','mobile-swipe-in-from-left');
+            },{once:true});
+        }
+
         tab.click();
+        window.scrollTo({top:0,behavior:'smooth'});
         return true;
     }
-
-    function setupSlider(){
-        if(slider)return;
-        pages=Array.from(document.querySelectorAll('.page-content'));
-        if(!pages.length)return;
-
-        const parent=pages[0].parentNode;
-        slider=document.createElement('div');
-        slider.className='mobile-page-slider';
-        parent.insertBefore(slider,pages[0]);
-        pages.forEach(page=>slider.appendChild(page));
-
-        currentIndex=getIndex();
-        applyPosition(currentIndex,true);
-
-        window.addEventListener('resize',function(){
-            if(isMobile()){
-                clearInlineTransforms();
-                applyPosition(getIndex(),true);
-            }else{
-                clearInlineTransforms();
-                slider.style.height='';
-            }
-        });
-    }
-
-    window.syncMobilePageSlider=function(){
-        if(!slider)return;
-        currentIndex=getIndex();
-        if(isMobile()){
-            clearInlineTransforms();
-            applyPosition(currentIndex,true);
-            requestAnimationFrame(()=>setSliderHeight(currentIndex));
-        }else{
-            clearInlineTransforms();
-            slider.style.height='';
-        }
-    };
-
-    function boot(){
-        setupSlider();
-        window.syncMobilePageSlider();
-    }
-
+    // 真实触摸屏：必须从双指开始，避免误触单指上下滚动。
     document.addEventListener('touchstart',function(e){
-        if(!isMobile()||e.touches.length!==1)return;
+        if(e.touches.length!==2){tracking=false;return;}
         tracking=true;
-        startX=e.touches[0].clientX;
-        startY=e.touches[0].clientY;
-        slider?.classList.add('is-dragging');
+        startX=(e.touches[0].clientX+e.touches[1].clientX)/2;
+        startY=(e.touches[0].clientY+e.touches[1].clientY)/2;
     },{passive:true});
-
     document.addEventListener('touchmove',function(e){
-        if(!tracking||!isMobile()||e.touches.length!==1)return;
-        const x=e.touches[0].clientX,y=e.touches[0].clientY;
+        if(!tracking||e.touches.length!==2)return;
+        const x=(e.touches[0].clientX+e.touches[1].clientX)/2;
+        const y=(e.touches[0].clientY+e.touches[1].clientY)/2;
         const dx=x-startX,dy=y-startY;
-        if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2){
-            e.preventDefault();
-            translateDuringDrag(dx);
-        }
+        if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)*1.25)e.preventDefault();
     },{passive:false});
-
     document.addEventListener('touchend',function(e){
-        if(!tracking)return;
+        if(!tracking||e.touches.length)return;
         tracking=false;
-
-        if(!isMobile()){
-            slider?.classList.remove('is-dragging');
-            return;
-        }
-
-        const touch=e.changedTouches&&e.changedTouches[0];
-        if(!touch){
-            slider?.classList.remove('is-dragging');
-            clearInlineTransforms();
-            applyPosition(currentIndex,true);
-            return;
-        }
-
-        const dx=touch.clientX-startX,dy=touch.clientY-startY;
-        const width=slider?.clientWidth||1;
-        const horizontal=Math.abs(dx)>Math.abs(dy)*1.2;
-        const threshold=Math.max(60,width*0.18);
-
-        if(horizontal&&Math.abs(dx)>=threshold){
-            changePage(dx<0?1:-1);
-        }else{
-            clearInlineTransforms();
-            applyPosition(currentIndex,true);
-        }
-        slider?.classList.remove('is-dragging');
+        const touches=e.changedTouches;
+        if(!touches||!touches.length)return;
+        // changedTouches 在部分浏览器只给出一根手指，因此使用最后一根作为位移参考；
+        // 双指手势的起点已取两指中心，方向判断仍然可靠。
+        const dx=touches[0].clientX-startX,dy=touches[0].clientY-startY;
+        if(Math.abs(dx)>=80&&Math.abs(dx)>Math.abs(dy)*1.25)changePage(dx<0?1:-1);
     },{passive:true});
+    document.addEventListener('touchcancel',function(){tracking=false;},{passive:true});
 
-    document.addEventListener('touchcancel',function(){
-        tracking=false;
-        clearInlineTransforms();
-        if(slider){
-            slider.classList.remove('is-dragging');
-            applyPosition(currentIndex,true);
+    // 电脑触控板：两指横向滑动通常以 wheel 事件的 deltaX 形式到达。
+    document.addEventListener('wheel',function(e){
+        const dx=e.deltaX||0,dy=e.deltaY||0;
+        if(Math.abs(dx)<8 || Math.abs(dx)<=Math.abs(dy)*1.15)return;
+        if(wheelLocked)return;
+        wheelAccum+=dx;
+        clearTimeout(wheelResetTimer);
+        wheelResetTimer=setTimeout(function(){wheelAccum=0;},180);
+        if(Math.abs(wheelAccum)<70)return;
+        const delta=wheelAccum<0?-1:1;
+        wheelAccum=0;
+        if(changePage(delta)){
+            wheelLocked=true;
+            setTimeout(function(){wheelLocked=false;},650);
         }
     },{passive:true});
-
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
-    else boot();
 })();
 </script>
 
