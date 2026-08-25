@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>航班信息生成器 v2.3.7 中俄双语版</title>
+    <title>航班信息生成器 v2.3.4 中俄双语版</title>
     <style>
         *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         body{max-width:1100px;margin:0 auto;padding:15px;background:#f0f2f5;color:#333;font-size:12px}
@@ -208,71 +208,6 @@
         .update-guide .command-title{font-weight:700;margin:10px 0 6px}
         .update-guide pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#1a202c;color:#f7fafc;border-radius:6px;padding:12px;font-size:11px;line-height:1.55;margin:0 0 12px}
         .update-guide .warning{margin-top:14px;background:#fffaf0;border-left:4px solid #ed8936;padding:12px;border-radius:4px}
-
-        /* ===== 行程方案极简导航点 ===== */
-        /* 正常状态：位于“创建新行程方案”按钮下方；滚动到顶部后自动吸附，始终可见。 */
-        #flight-page > #itineraryNav{
-            position:sticky!important;
-            top:0!important;
-            z-index:1000!important;
-            width:calc(100% + 36px)!important;
-            margin-left:-18px!important;
-            margin-right:-18px!important;
-            padding:8px 18px 10px!important;
-            box-sizing:border-box!important;
-            background:rgba(255,255,255,.97)!important;
-            backdrop-filter:blur(12px)!important;
-            -webkit-backdrop-filter:blur(12px)!important;
-            border-bottom:1px solid rgba(0,0,0,.06)!important;
-            box-shadow:0 2px 10px rgba(0,0,0,.05)!important;
-        }
-        .itinerary-nav{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:18px;
-            margin:-4px 0 14px;
-            min-height:22px;
-        }
-        .itinerary-nav-dot{
-            appearance:none;
-            -webkit-appearance:none;
-            width:14px;
-            height:14px;
-            min-width:14px;
-            min-height:14px;
-            padding:0;
-            margin:0;
-            border:0;
-            border-radius:999px;
-            background:#c7cbd1;
-            box-shadow:none!important;
-            cursor:pointer;
-            transition:width .18s ease,background-color .18s ease,transform .18s ease;
-            touch-action:manipulation;
-        }
-        .itinerary-nav-dot:hover{transform:scale(1.08)}
-        .itinerary-nav-dot.active{
-            width:28px;
-            background:#0071e3;
-        }
-        .smart-transfer-custom{
-            display:flex;
-            gap:8px;
-            width:100%;
-            margin-top:8px;
-            flex:1 1 100%;
-        }
-        .smart-transfer-custom input{flex:1;min-width:0}
-        .smart-transfer-custom button{flex:0 0 auto}
-        @media(max-width:768px){
-            .itinerary-nav{gap:18px;margin:-2px 0 14px}
-            .itinerary-nav-dot{width:14px;height:14px;min-width:14px;min-height:14px}
-            .itinerary-nav-dot.active{width:28px}
-
-            
-        }
-
         @media(max-width:768px){#settings-page.active{grid-template-columns:1fr}.smart-area .smart-row .smart-input-wrap{max-width:100%;flex:1 1 100%}.passenger-row,.baggage-location-row,.baggage-requirements-row{flex-wrap:wrap}}
 
         /* ===== 机票信息页重构 ===== */
@@ -912,8 +847,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.3.7</span></h1>
-    <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.3.7</div></div>
+    <h1>✈️ 航班信息生成器 <span class="version-badge" id="vBadge">v2.3.4</span></h1>
+    <div style="text-align:center;margin-bottom:10px;"><div class="version-current" id="vText">当前版本：2.3.4</div></div>
 
     <div class="page-tabs">
         <div class="page-tab active" data-page="flight">航班信息</div>
@@ -927,7 +862,6 @@
     <!-- 航班信息页 -->
     <div id="flight-page" class="page-content active">
         <button class="itinerary-toggle-btn" id="createBtn">+ 创建新行程方案</button>
-        <div class="itinerary-nav" id="itineraryNav" aria-label="行程方案导航"></div>
         <div id="itineraries"></div>
         <div class="flight-main-actions" style="margin-top:20px;text-align:center;">
             <button id="genAllBtn" style="background:#38a169;">生成所有方案</button>
@@ -1370,7 +1304,7 @@ F
 
 <script>
 // ===== 全局数据 =====
-const APP_VER='2.3.6';
+const APP_VER='2.3.4';
 let flightQuestions=["起飞日期：","起飞城市：","到达城市：","起飞时间：","到达时间：","截止值机时间："];
 let TRANSFER_OPTIONS=["⚠️莫斯科住一夜⚠️","⚠️需要住宿⚠️","⚠️打车转机场⚠️","⚠️协助莫斯科打车、住宿服务⚠️","⚠️根据当前局势，建议提前一天抵达莫斯科，确保后程顺利中转⚠️"];
 let airportList=["莫斯科","阿拉木图","阿斯塔纳","埃里温","奥伦堡","奥斯","巴尔瑙尔","布市","彼尔姆","车里亚宾","赤塔","达尔","第比利斯","杜尚别","伏尔加","格罗兹尼","海参崴","哈巴","加里宁格勒","喀山","克市","矿泉水城","马嘎斯","马哈奇克拉","明斯克","欧姆斯克","萨马拉","圣彼得堡","斯塔夫","索契","塔什干","乌尔根奇","乌法","乌兰乌德","新西伯利亚","雅库茨克","叶卡","伊尔库","伊斯坦布尔","北京","长春","成都","重庆","广州","海口","哈尔滨","杭州","佳木斯","牡丹江","青岛","三亚","上海","沈阳","深圳","乌鲁木齐","西安"];
@@ -1607,65 +1541,6 @@ function initTabs(){
     });
 }
 
-// ===== 行程方案导航与滚动 =====
-function scrollToElementSmooth(el,block='center'){
-    if(!el)return;
-    requestAnimationFrame(()=>el.scrollIntoView({behavior:'smooth',block}));
-}
-function renderItineraryNav(activeId=null){
-    const nav=$('itineraryNav');
-    if(!nav)return;
-    const items=Array.from(document.querySelectorAll('#itineraries .itinerary-container'));
-    nav.innerHTML='';
-    items.forEach((iti,index)=>{
-        const dot=document.createElement('button');
-        dot.type='button';
-        dot.className='itinerary-nav-dot';
-        dot.dataset.itineraryId=iti.id;
-        dot.title=`方案 ${index+1}`;
-        dot.setAttribute('aria-label',`滚动到方案 ${index+1}`);
-        if(String(iti.id)===String(activeId))dot.classList.add('active');
-        dot.onclick=()=>scrollToItinerary(iti.id);
-        nav.appendChild(dot);
-    });
-}
-function scrollToItinerary(id){
-    const el=$(id);
-    if(!el)return;
-    renderItineraryNav(id);
-    requestAnimationFrame(()=>{
-        const nav=$('itineraryNav');
-        const navHeight=nav?nav.getBoundingClientRect().height:0;
-        const top=window.pageYOffset+el.getBoundingClientRect().top-navHeight-8;
-        window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
-    });
-}
-function updateItineraryNavActive(){
-    const items=Array.from(document.querySelectorAll('#itineraries .itinerary-container'));
-    if(!items.length){renderItineraryNav(null);return;}
-    const targetY=window.innerHeight*0.32;
-    let best=items[0],bestDistance=Infinity;
-    items.forEach(iti=>{
-        const r=iti.getBoundingClientRect();
-        const distance=Math.abs(r.top-targetY);
-        if(r.bottom>0 && r.top<window.innerHeight*0.92 && distance<bestDistance){
-            best=iti;bestDistance=distance;
-        }
-    });
-    renderItineraryNav(best.id);
-}
-function bindItineraryNavScroll(){
-    if(window.__itineraryNavScrollBound)return;
-    window.__itineraryNavScrollBound=true;
-    let ticking=false;
-    window.addEventListener('scroll',()=>{
-        if(ticking)return;
-        ticking=true;
-        requestAnimationFrame(()=>{ticking=false;updateItineraryNavActive();});
-    },{passive:true});
-}
-bindItineraryNavScroll();
-
 // ===== 航班信息 - 行程方案 =====
 function addItinerary(){
     itineraryCount++;
@@ -1681,7 +1556,7 @@ function addItinerary(){
             <div class="section-title">行程方案 ${itineraryCount}</div>
             <div id="segContainer${itineraryCount}"></div>
             <div class="button-group">
-                <button class="add-segment compact-btn" onclick="addSeg(${itineraryCount},true)">+ 添加航段</button>
+                <button class="add-segment compact-btn" onclick="addSeg(${itineraryCount})">+ 添加航段</button>
                 <button class="calculator-btn compact-btn" onclick="toggleCalc(${itineraryCount})">计算</button>
                 <button class="ticket-price-btn compact-btn" id="priceBtn${itineraryCount}" style="display:none;" onclick="addPrice(${itineraryCount})">+ 机票价格</button>
             </div>
@@ -1712,23 +1587,10 @@ function addItinerary(){
     itineraries.appendChild(div);
     bindCalc(itineraryCount);
     addSeg(itineraryCount);
-    renderItineraryNav(div.id);
     updateDisplay();
-    setTimeout(()=>scrollToItinerary(div.id),60);
 }
 
-function scrollToSegmentTop(itiId,sid){
-    const el=$('seg'+itiId+'-'+sid);
-    if(!el)return;
-    requestAnimationFrame(()=>{
-        const nav=$('itineraryNav');
-        const navHeight=nav?nav.getBoundingClientRect().height:0;
-        const top=window.pageYOffset+el.getBoundingClientRect().top-navHeight-8;
-        window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
-    });
-}
-
-function addSeg(itiId,autoScroll=false){
+function addSeg(itiId){
     segCounters[itiId]=(segCounters[itiId]||0)+1;
     let sid=segCounters[itiId];
     let container=$('segContainer'+itiId);
@@ -1773,7 +1635,6 @@ function addSeg(itiId,autoScroll=false){
     $('priceBtn'+itiId).style.display='inline-block';
     initSegmentSmart(itiId, sid);
     updateDisplay();
-    if(autoScroll)setTimeout(()=>scrollToSegmentTop(itiId,sid),60);
 }
 
 function removeSeg(itiId,sid){
@@ -1784,14 +1645,12 @@ function removeSeg(itiId,sid){
     updateDisplay();
 }
 
-function removeIti(id){let el=$('iti'+id);if(el)el.remove();let notes=$('notes'+id);if(notes)notes.remove();delete segCounters[id];delete priceCounters[id];if(String(activeTicketItineraryId)===String(id)){activeTicketItineraryId=null;syncToTicket(null,true);}renderItineraryNav();updateDisplay();updateItineraryNavActive();}
+function removeIti(id){let el=$('iti'+id);if(el)el.remove();let notes=$('notes'+id);if(notes)notes.remove();delete segCounters[id];delete priceCounters[id];if(String(activeTicketItineraryId)===String(id)){activeTicketItineraryId=null;syncToTicket(null,true);}updateDisplay();}
 
 function copyIti(id){
-    let orig=$('iti'+id);
-    if(!orig)return;
+    let orig=$('iti'+id);if(!orig)return;
     addItinerary();
     let nid=itineraryCount;
-    let newItinerary=$('iti'+nid);
     let segs=orig.querySelectorAll('.flight-segment');
     let container=$('segContainer'+nid);
     container.innerHTML='';
@@ -1812,19 +1671,16 @@ function copyIti(id){
             let tel=$('seg'+nid+'-'+nsid+'-transfer');
             if(tr&&tel)tel.value=tr.value;
             updatePreview(nid,nsid);
-            initSegmentSmart(nid,nsid);
+            initSegmentSmart(nid, nsid);
         },50);
     });
     let notes=$('selNotesVal'+id)?.value||'';
-    if($('selNotesVal'+nid))$('selNotesVal'+nid).value=notes;
-    if($('selNotes'+nid))$('selNotes'+nid).textContent=notes;
-    renderItineraryNav(newItinerary.id);
+    $('selNotesVal'+nid).value=notes;
+    $('selNotes'+nid).textContent=notes;
     updateDisplay();
-    setTimeout(()=>{
-        scrollToItinerary(newItinerary.id);
-        showActionToast(`已复制到行程方案 ${nid}`);
-    },140);
+    alert('已复制');
 }
+
 function bindCalc(id){
     let box=$('calc'+id);if(!box)return;
     let rmb=box.querySelector('.calc-rmb'),rate=box.querySelector('.calc-rate');
@@ -2231,33 +2087,8 @@ function initSegmentSmart(itiId, sid){
                 updatePreview(itiId, sid);
                 updateDisplay();
             };
-                transferTags.appendChild(tag);
+            transferTags.appendChild(tag);
         });
-        const customWrap=document.createElement('div');
-        customWrap.className='smart-transfer-custom';
-        customWrap.innerHTML='<input type="text" class="compact-input" placeholder="自定义中转信息"><button type="button" class="add-custom-note compact-btn">添加</button>';
-        const customInput=customWrap.querySelector('input');
-        const customBtn=customWrap.querySelector('button');
-        customBtn.onclick=function(){
-            const txt=customInput.value.trim();
-            if(!txt)return;
-            if(!segSelTransfer.includes(txt))segSelTransfer.push(txt);
-            segTransfer=true;
-            transferBtn.classList.add('active');
-            transferBtn.textContent='中转 ✓';
-            const value=formatMultiTransfer(segSelTransfer);
-            segValues['transfer']=value;
-            const trEl=$('seg'+itiId+'-'+sid+'-transfer');
-            if(trEl)trEl.value=value;
-            customInput.value='';
-            renderSegTransferTags();
-            updatePreview(itiId,sid);
-            updateDisplay();
-        };
-        customInput.onkeydown=function(e){
-            if(e.key==='Enter'){e.preventDefault();customBtn.click();}
-        };
-        transferTags.appendChild(customWrap);
     }
 
     function confirmStep(){
@@ -2515,10 +2346,9 @@ function genAll(){
     if(!segs.length){allOutput.textContent='没有航段';return;}
     let text='🔍查询结果如下：\n';
     let containers=document.querySelectorAll('.itinerary-container');
-    const showPlanLabels=containers.length>=2;
     containers.forEach((c,idx)=>{
         let id=c.id.replace('iti','');
-        if(showPlanLabels)text+=`方案${idx+1}：\n`;
+        text+=`方案${idx+1}：\n`;
         let segs2=c.querySelectorAll('.flight-segment');
         let prevDate='';
         let priceTexts=[];
@@ -2584,7 +2414,6 @@ function genAll(){
     });
     text+='\n🔔温馨提示：\n🎫票价随销售情况变动，请尽早决定起飞行程！\n\n✈️长城票务✈️\n+79128915882\n手机号绑定银行卡\nСбер,Т-Банк, Альфа\n\n俄罗斯储蓄银行\nСБЕРБАНК РОССИИ\n卡号：\n2202 2082 5240 4711\n收款人：\nЦЗИНЬБАЙ Ц.\n🙏感谢及时返款[抱拳]\n✈️长城票务✈️';
     allOutput.textContent=text;
-    setTimeout(()=>scrollToElementSmooth(allOutput,'center'),60);
 }
 
 function getTripRouteHeading(depFull,arrFull){
@@ -2847,7 +2676,6 @@ function resetAll(){
     if(!confirm('确定重置？'))return;
     document.querySelectorAll('#ticketSmart .notes-container').forEach(n=>n.remove());
     itineraries.innerHTML='';
-    renderItineraryNav();
     allOutput.textContent='';
     ticketOutput.textContent='';
     russianTicketOutput.textContent='';
@@ -2865,20 +2693,7 @@ function resetAll(){
     alert('已重置');
 }
 
-function switchToFlightPage(){
-    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
-    const flightTab=document.querySelector('[data-page="flight"]');
-    if(flightTab)flightTab.classList.add('active');
-    document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));
-    const flightPage=$('flight-page');
-    if(flightPage)flightPage.classList.add('active');
-    renderItineraryNav();
-    setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),30);
-}
-function resetOutput(){
-    resetAll();
-    setTimeout(switchToFlightPage,80);
-}
+function resetOutput(){ticketOutput.textContent='';russianTicketOutput.textContent='';}
 function fallbackCopyText(text){
     const ta=document.createElement('textarea');
     ta.value=text;
@@ -2950,7 +2765,7 @@ function initEvents(){
     $('copyBtn').onclick=copyOutput;
     $('saveHistoryBtn').onclick=saveHistory;
     $('saveFlightHistoryBtn').onclick=saveHistory;
-    $('genTicketBtn').onclick=function(){genTicket();setTimeout(()=>scrollToElementSmooth($('genTicketBtn'),'center'),60);};
+    $('genTicketBtn').onclick=genTicket;
     $('resetOutputBtn').onclick=resetOutput;
     $('copyTicketBtn').onclick=copyTicket;
     $('copyRussianTicketBtn').onclick=copyRussianTicket;
@@ -3432,7 +3247,6 @@ function renderTicketStep(){
         tSHint.textContent='🎉 已自动生成表单，可点击进度条返回修改';
         renderTicketProgress();
         updateTicketDisplay();
-        setTimeout(()=>scrollToElementSmooth($('genTicketBtn'),'center'),80);
         return;
     }
     let q=currentTicketQuestion();
@@ -4144,498 +3958,6 @@ setTimeout(()=>{
     }
     window.setTimeout(bindPaymentSelectionFix,0);
     window.setTimeout(bindPaymentSelectionFix,300);
-})();
-</script>
-
-
-<style id="page-horizontal-slide-style">
-/* v2.4.0：页面横向 Slide / Swipe 切换
-   仅改变页面切换视觉效果，不改变页面 DOM 结构、布局及业务设置。 */
-.page-content.page-slide-transitioning{
-    transition:none!important;
-    will-change:transform;
-}
-.page-content.page-slide-old,
-.page-content.page-slide-new{
-    position:absolute!important;
-    left:0!important;
-    width:100%!important;
-    box-sizing:border-box!important;
-    display:block!important;
-    z-index:2!important;
-    will-change:transform;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-}
-.page-content.page-slide-new{z-index:3!important;}
-@media (prefers-reduced-motion:reduce){
-    .page-content.page-slide-old,
-    .page-content.page-slide-new{
-        transition:none!important;
-    }
-}
-</style>
-
-<script>
-/* v2.4.0：与商品图片 Lightbox 一致的横向 Slide / Swipe
-   - transform: translate3d
-   - 420ms
-   - cubic-bezier(.22,.72,.18,1)
-   - 55px 触发阈值
-   - 手机单指跟手滑动
-*/
-(function(){
-    const PAGE_ORDER=['flight','ticket','payment','settings','history','version'];
-    const DURATION=420;
-    const EASING='cubic-bezier(.22,.72,.18,1)';
-    const SWIPE_THRESHOLD=55;
-
-    let currentIndex=0;
-    let transitionBusy=false;
-    let touchTracking=false;
-    let touchStartX=0;
-    let touchStartY=0;
-    let touchDeltaX=0;
-    let touchDirection=0;
-    let touchStartPage=null;
-
-    function getPage(name){
-        return document.getElementById(name+'-page');
-    }
-    function getTab(name){
-        return document.querySelector('.page-tab[data-page="'+name+'"]');
-    }
-    function getActiveName(){
-        return document.querySelector('.page-tab.active')?.dataset.page || PAGE_ORDER[currentIndex] || 'flight';
-    }
-    function getContainer(){
-        const p=getPage(PAGE_ORDER[currentIndex]) || document.querySelector('.page-content');
-        return p?.parentElement || null;
-    }
-    function setActiveTab(name){
-        document.querySelectorAll('.page-tab').forEach(t=>{
-            t.classList.toggle('active',t.dataset.page===name);
-        });
-    }
-    function setPageVisible(page,visible){
-        if(!page)return;
-        page.classList.toggle('active',visible);
-    }
-
-    function callPageInit(name){
-        if(name==='ticket'){
-            try{
-                if(typeof syncToTicket==='function')syncToTicket(activeTicketItineraryId,false);
-                if(typeof initTicketSmart==='function')initTicketSmart(false);
-            }catch(e){}
-        }
-        if(name==='flight'){
-            try{
-                if(typeof renderItineraryNav==='function')renderItineraryNav();
-            }catch(e){}
-        }
-    }
-
-    function cleanupTransition(container,oldPage,newPage,oldStyles,newStyles){
-        [oldPage,newPage].forEach(p=>{
-            if(!p)return;
-            p.classList.remove('page-slide-transitioning','page-slide-old','page-slide-new');
-            p.style.position=oldStyles.get(p)?.position||'';
-            p.style.left=oldStyles.get(p)?.left||'';
-            p.style.top=oldStyles.get(p)?.top||'';
-            p.style.width=oldStyles.get(p)?.width||'';
-            p.style.zIndex=oldStyles.get(p)?.zIndex||'';
-            p.style.transform=oldStyles.get(p)?.transform||'';
-            p.style.transition=oldStyles.get(p)?.transition||'';
-            p.style.willChange=oldStyles.get(p)?.willChange||'';
-        });
-        if(container){
-            container.style.position=oldStyles.get(container)?.position||'';
-            container.style.minHeight=oldStyles.get(container)?.minHeight||'';
-            container.style.overflow=oldStyles.get(container)?.overflow||'';
-        }
-        // Ensure only the target page remains active/visible.
-        document.querySelectorAll('.page-content').forEach(p=>{
-            p.classList.toggle('active',p===newPage);
-            if(p!==newPage)p.style.display='';
-        });
-        if(newPage)newPage.style.display='';
-        transitionBusy=false;
-    }
-
-    function transitionTo(index,animate=true){
-        if(index<0||index>=PAGE_ORDER.length)return false;
-        if(index===currentIndex){
-            setActiveTab(PAGE_ORDER[index]);
-            setPageVisible(getPage(PAGE_ORDER[index]),true);
-            return true;
-        }
-        if(transitionBusy)return false;
-
-        const oldIndex=currentIndex;
-        const oldPage=getPage(PAGE_ORDER[oldIndex]);
-        const newPage=getPage(PAGE_ORDER[index]);
-        const container=oldPage?.parentElement || newPage?.parentElement;
-        if(!oldPage||!newPage||!container)return false;
-
-        const direction=index>oldIndex?1:-1;
-
-        // If reduced motion is requested, switch normally.
-        if(!animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){
-            oldPage.classList.remove('active');
-            newPage.classList.add('active');
-            setActiveTab(PAGE_ORDER[index]);
-            currentIndex=index;
-            callPageInit(PAGE_ORDER[index]);
-            window.scrollTo({top:0,behavior:'smooth'});
-            return true;
-        }
-
-        transitionBusy=true;
-
-        const saved=new Map();
-        [container,oldPage,newPage].forEach(el=>{
-            saved.set(el,{
-                position:el.style.position,
-                minHeight:el.style.minHeight,
-                overflow:el.style.overflow,
-                left:el.style.left,
-                top:el.style.top,
-                width:el.style.width,
-                zIndex:el.style.zIndex,
-                transform:el.style.transform,
-                transition:el.style.transition,
-                willChange:el.style.willChange
-            });
-        });
-
-        // Keep the original DOM hierarchy intact. This is important because
-        // the existing CSS contains direct-child selectors such as
-        // #flight-page > #itineraryNav.
-        const containerRect=container.getBoundingClientRect();
-        const oldRect=oldPage.getBoundingClientRect();
-
-        // Make the target visible only for measuring/animation.
-        newPage.classList.add('active');
-        newPage.style.display='block';
-
-        // Wait one frame so its natural layout is measured before positioning.
-        requestAnimationFrame(()=>{
-            const newRect=newPage.getBoundingClientRect();
-            const pageTop=Math.max(0,oldRect.top-containerRect.top);
-            const maxHeight=Math.max(oldRect.height,newRect.height,pageTop+1);
-
-            container.style.position='relative';
-            container.style.minHeight=maxHeight+'px';
-            container.style.overflow='hidden';
-
-            [oldPage,newPage].forEach(p=>{
-                p.classList.add('page-slide-transitioning');
-                p.style.position='absolute';
-                p.style.left='0';
-                p.style.top=pageTop+'px';
-                p.style.width='100%';
-                p.style.zIndex=p===newPage?'3':'2';
-                p.style.transition=`transform ${DURATION}ms ${EASING}`;
-                p.style.willChange='transform';
-            });
-
-            // Incoming page starts exactly one screen-width away.
-            newPage.style.transform=`translate3d(${direction*100}%,0,0)`;
-            oldPage.style.transform='translate3d(0,0,0)';
-
-            setActiveTab(PAGE_ORDER[index]);
-
-            requestAnimationFrame(()=>{
-                // Old page exits in the opposite direction while the new page
-                // enters from the side, producing the "one after another"
-                // carousel effect.
-                oldPage.style.transform=`translate3d(${-direction*100}%,0,0)`;
-                newPage.style.transform='translate3d(0,0,0)';
-            });
-
-            const finish=()=>{
-                newPage.removeEventListener('transitionend',finish);
-                currentIndex=index;
-                // Hide old page before restoring normal document flow.
-                oldPage.classList.remove('active');
-                oldPage.style.display='none';
-                newPage.classList.add('active');
-                cleanupTransition(container,oldPage,newPage,saved);
-                callPageInit(PAGE_ORDER[index]);
-                window.scrollTo({top:0,behavior:'smooth'});
-            };
-            newPage.addEventListener('transitionend',finish,{once:true});
-            setTimeout(finish,DURATION+60);
-        });
-        return true;
-    }
-
-    function navigateToName(name,animate=true){
-        const index=PAGE_ORDER.indexOf(name);
-        if(index<0)return false;
-        return transitionTo(index,animate);
-    }
-
-    function bindTabs(){
-        document.querySelectorAll('.page-tab').forEach(tab=>{
-            if(tab.dataset.slideBound==='1')return;
-            tab.dataset.slideBound='1';
-            tab.onclick=function(){
-                navigateToName(this.dataset.page,true);
-            };
-        });
-    }
-
-    // Re-route the existing flight-page helper so programmatic return to
-    // "航班信息" also uses the same transition.
-    function bindProgrammaticSwitch(){
-        if(typeof window.switchToFlightPage==='function' && !window.switchToFlightPage.__slideWrapped){
-            const original=window.switchToFlightPage;
-            const wrapped=function(){
-                const ok=navigateToName('flight',true);
-                if(!ok)original.apply(this,arguments);
-            };
-            wrapped.__slideWrapped=true;
-            window.switchToFlightPage=wrapped;
-        }
-    }
-
-    function bindSingleFingerSwipe(){
-        document.addEventListener('touchstart',function(e){
-            if(e.touches.length!==1){
-                touchTracking=false;
-                return;
-            }
-            if(transitionBusy)return;
-
-            const target=e.target;
-            // Do not hijack horizontal gestures inside form controls/buttons.
-            if(target.closest('input,textarea,select,button,[contenteditable="true"]'))return;
-
-            const page=target.closest('.page-content');
-            if(!page || !page.classList.contains('active'))return;
-
-            touchTracking=true;
-            touchStartX=e.touches[0].clientX;
-            touchStartY=e.touches[0].clientY;
-            touchDeltaX=0;
-            touchDirection=0;
-            touchStartPage=page;
-        },{passive:true});
-
-        document.addEventListener('touchmove',function(e){
-            if(!touchTracking || e.touches.length!==1 || transitionBusy)return;
-
-            const x=e.touches[0].clientX;
-            const y=e.touches[0].clientY;
-            const dx=x-touchStartX;
-            const dy=y-touchStartY;
-
-            // Only capture predominantly horizontal gestures.
-            if(Math.abs(dx)<8 || Math.abs(dx)<=Math.abs(dy)*1.1)return;
-
-            const activeIdx=currentIndex;
-            const nextIdx=dx<0?activeIdx+1:activeIdx-1;
-            if(nextIdx<0 || nextIdx>=PAGE_ORDER.length){
-                // At the first/last page, allow normal vertical/edge behavior.
-                return;
-            }
-
-            touchDirection=dx<0?1:-1;
-            touchDeltaX=dx;
-
-            const oldPage=getPage(PAGE_ORDER[activeIdx]);
-            const newPage=getPage(PAGE_ORDER[nextIdx]);
-            const container=getContainer();
-            if(!oldPage||!newPage||!container)return;
-
-            if(!newPage.classList.contains('page-slide-new')){
-                const cRect=container.getBoundingClientRect();
-                const oRect=oldPage.getBoundingClientRect();
-                const pageTop=Math.max(0,oRect.top-cRect.top);
-
-                newPage.classList.add('active','page-slide-new','page-slide-transitioning');
-                oldPage.classList.add('page-slide-old','page-slide-transitioning');
-
-                [oldPage,newPage].forEach(p=>{
-                    p.style.position='absolute';
-                    p.style.left='0';
-                    p.style.top=pageTop+'px';
-                    p.style.width='100%';
-                    p.style.transition='none';
-                    p.style.willChange='transform';
-                    p.style.zIndex=p===newPage?'3':'2';
-                });
-                container.style.position='relative';
-                container.style.overflow='hidden';
-                container.style.minHeight=Math.max(oRect.height,newPage.getBoundingClientRect().height,pageTop+1)+'px';
-            }
-
-            e.preventDefault();
-
-            const width=Math.max(1,container.clientWidth);
-            const resistance=Math.min(1,Math.max(.35,1-Math.max(0,Math.abs(dx)-width)/width*.65));
-            const move=dx*resistance;
-
-            oldPage.style.transform=`translate3d(${move}px,0,0)`;
-            newPage.style.transform=`translate3d(${(dx<0?width+move:-width+move)}px,0,0)`;
-        },{passive:false});
-
-        function finishSwipe(cancelled){
-            if(!touchTracking)return;
-            touchTracking=false;
-
-            const dx=touchDeltaX;
-            const direction=touchDirection;
-            touchDeltaX=0;
-            touchDirection=0;
-
-            if(!direction || Math.abs(dx)<=SWIPE_THRESHOLD){
-                // Snap back if the gesture did not reach the same 55px threshold
-                // as the product image Lightbox.
-                const oldPage=document.querySelector('.page-slide-old');
-                const newPage=document.querySelector('.page-slide-new');
-                if(oldPage&&newPage){
-                    oldPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    newPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    oldPage.style.transform='translate3d(0,0,0)';
-                    newPage.style.transform='translate3d('+(direction>0?'100%':'-100%')+',0,0)';
-                    setTimeout(()=>{
-                        const container=getContainer();
-                        [oldPage,newPage].forEach(p=>{
-                            p.classList.remove('page-slide-old','page-slide-new','page-slide-transitioning');
-                            p.style.position='';
-                            p.style.left='';
-                            p.style.top='';
-                            p.style.width='';
-                            p.style.zIndex='';
-                            p.style.transform='';
-                            p.style.transition='';
-                            p.style.willChange='';
-                        });
-                        if(newPage) newPage.classList.remove('active');
-                        if(container){
-                            container.style.position='';
-                            container.style.overflow='';
-                            container.style.minHeight='';
-                        }
-                    },DURATION+30);
-                }
-                return;
-            }
-
-            const targetIndex=currentIndex+(direction>0?1:-1);
-            if(targetIndex<0 || targetIndex>=PAGE_ORDER.length){
-                // No page in this direction; return to current page.
-                const oldPage=document.querySelector('.page-slide-old');
-                const newPage=document.querySelector('.page-slide-new');
-                if(oldPage&&newPage){
-                    oldPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    newPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    oldPage.style.transform='translate3d(0,0,0)';
-                    newPage.style.transform=`translate3d(${direction>0?'100%':'-100%'},0,0)`;
-                    setTimeout(()=>cleanupSwipe(),DURATION+30);
-                }
-                return;
-            }
-
-            const oldPage=document.querySelector('.page-slide-old');
-            const newPage=document.querySelector('.page-slide-new');
-            if(!oldPage||!newPage){
-                transitionTo(targetIndex,true);
-                return;
-            }
-
-            oldPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-            newPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-            oldPage.style.transform=`translate3d(${direction>0?-100:100}%,0,0)`;
-            newPage.style.transform='translate3d(0,0,0)';
-
-            setActiveTab(PAGE_ORDER[targetIndex]);
-            transitionBusy=true;
-            setTimeout(()=>{
-                currentIndex=targetIndex;
-                oldPage.classList.remove('active');
-                oldPage.style.display='none';
-                newPage.classList.add('active');
-                cleanupSwipe();
-                callPageInit(PAGE_ORDER[targetIndex]);
-                window.scrollTo({top:0,behavior:'smooth'});
-            },DURATION+30);
-        }
-
-        function cleanupSwipe(){
-            const oldPage=document.querySelector('.page-slide-old');
-            const newPage=document.querySelector('.page-slide-new');
-            const container=getContainer();
-            [oldPage,newPage].forEach(p=>{
-                if(!p)return;
-                p.classList.remove('page-slide-old','page-slide-new','page-slide-transitioning');
-                p.style.position='';
-                p.style.left='';
-                p.style.top='';
-                p.style.width='';
-                p.style.zIndex='';
-                p.style.transform='';
-                p.style.transition='';
-                p.style.willChange='';
-            });
-            if(newPage)newPage.style.display='';
-            if(container){
-                container.style.position='';
-                container.style.overflow='';
-                container.style.minHeight='';
-            }
-            transitionBusy=false;
-        }
-
-        document.addEventListener('touchend',function(e){
-            if(!touchTracking)return;
-            finishSwipe(false);
-        },{passive:true});
-        document.addEventListener('touchcancel',function(){
-            if(!touchTracking)return;
-            finishSwipe(true);
-        },{passive:true});
-    }
-
-    function init(){
-        const active=getActiveName();
-        const idx=PAGE_ORDER.indexOf(active);
-        currentIndex=idx>=0?idx:0;
-
-        bindTabs();
-        bindSingleFingerSwipe();
-        bindProgrammaticSwitch();
-
-        // In case initTabs runs after this script, bind again.
-        setTimeout(bindTabs,0);
-        setTimeout(bindTabs,100);
-        setTimeout(bindProgrammaticSwitch,100);
-        setTimeout(bindProgrammaticSwitch,500);
-    }
-
-    if(document.readyState==='loading'){
-        document.addEventListener('DOMContentLoaded',init);
-    }else{
-        init();
-    }
-})();
-</script>
-
-<script>
-/* v2.3.6: itinerary navigation + mobile-friendly scrolling */
-(function(){
-    function bootItineraryNav(){
-        if(typeof renderItineraryNav==='function'){
-            renderItineraryNav();
-            if(typeof updateItineraryNavActive==='function')updateItineraryNavActive();
-        }
-    }
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootItineraryNav);
-    else bootItineraryNav();
-    setTimeout(bootItineraryNav,200);
 })();
 </script>
 
