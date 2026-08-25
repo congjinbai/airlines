@@ -4148,7 +4148,7 @@ setTimeout(()=>{
 
 
 <style id="page-horizontal-slide-style">
-/* v2.4.0：页面横向 Slide / Swipe 切换
+/* v2.4.1：页面横向 Slide / Swipe 切换（消除切换后的二次布局/滚动停顿）
    仅改变页面切换视觉效果，不改变页面 DOM 结构、布局及业务设置。 */
 .page-content.page-slide-transitioning{
     transition:none!important;
@@ -4176,7 +4176,7 @@ setTimeout(()=>{
 </style>
 
 <script>
-/* v2.4.0：与商品图片 Lightbox 一致的横向 Slide / Swipe
+/* v2.4.1：与商品图片 Lightbox 一致的横向 Slide / Swipe
    - transform: translate3d
    - 420ms
    - cubic-bezier(.22,.72,.18,1)
@@ -4314,9 +4314,16 @@ setTimeout(()=>{
         const containerRect=container.getBoundingClientRect();
         const oldRect=oldPage.getBoundingClientRect();
 
-        // Make the target visible only for measuring/animation.
+        // 先把视口固定到页面顶部。原来的 smooth scroll 放在动画结束后，
+        // 会造成“切换完成后又停顿/调整一下”的二次视觉移动。
+        const savedScrollY=window.scrollY;
+        if(savedScrollY!==0) window.scrollTo(0,0);
+
+        // 在动画开始前完成目标页面自身的初始化/尺寸计算，避免
+        // 动画结束后才重新布局造成第二次“顿一下”。
         newPage.classList.add('active');
         newPage.style.display='block';
+        callPageInit(PAGE_ORDER[index]);
 
         // Wait one frame so its natural layout is measured before positioning.
         requestAnimationFrame(()=>{
@@ -4361,8 +4368,7 @@ setTimeout(()=>{
                 oldPage.style.display='none';
                 newPage.classList.add('active');
                 cleanupTransition(container,oldPage,newPage,saved);
-                callPageInit(PAGE_ORDER[index]);
-                window.scrollTo({top:0,behavior:'smooth'});
+                // 页面已经在动画开始前完成初始化，动画结束后不再再次触发布局/滚动调整。
             };
             newPage.addEventListener('transitionend',finish,{once:true});
             setTimeout(finish,DURATION+60);
@@ -4415,6 +4421,8 @@ setTimeout(()=>{
             const page=target.closest('.page-content');
             if(!page || !page.classList.contains('active'))return;
 
+            // 页面切换始终从顶部进行，避免切换完成后再出现一次滚动调整。
+            if(window.scrollY!==0) window.scrollTo(0,0);
             touchTracking=true;
             touchStartX=e.touches[0].clientX;
             touchStartY=e.touches[0].clientY;
@@ -4559,8 +4567,7 @@ setTimeout(()=>{
                 oldPage.style.display='none';
                 newPage.classList.add('active');
                 cleanupSwipe();
-                callPageInit(PAGE_ORDER[targetIndex]);
-                window.scrollTo({top:0,behavior:'smooth'});
+                // 目标页面已在拖拽过程中参与布局，不再在切换完成后二次滚动/调整。
             },DURATION+30);
         }
 
