@@ -2515,9 +2515,10 @@ function genAll(){
     if(!segs.length){allOutput.textContent='没有航段';return;}
     let text='🔍查询结果如下：\n';
     let containers=document.querySelectorAll('.itinerary-container');
+    const showPlanLabels=containers.length>=2;
     containers.forEach((c,idx)=>{
         let id=c.id.replace('iti','');
-        text+=`方案${idx+1}：\n`;
+        if(showPlanLabels)text+=`方案${idx+1}：\n`;
         let segs2=c.querySelectorAll('.flight-segment');
         let prevDate='';
         let priceTexts=[];
@@ -4235,15 +4236,7 @@ setTimeout(()=>{
         }
     }
 
-    function cleanupTransition(container,oldPage,newPage,oldStyles,oldHeight){
-        // Keep the container at the target page height while the browser
-        // returns the target page from absolute positioning to normal flow.
-        // Releasing this on the next paint prevents the visible post-slide
-        // layout snap on mobile.
-        if(container && Number.isFinite(oldHeight)) {
-            container.style.minHeight=oldHeight+'px';
-        }
-
+    function cleanupTransition(container,oldPage,newPage,oldStyles,newStyles){
         [oldPage,newPage].forEach(p=>{
             if(!p)return;
             p.classList.remove('page-slide-transitioning','page-slide-old','page-slide-new');
@@ -4258,22 +4251,16 @@ setTimeout(()=>{
         });
         if(container){
             container.style.position=oldStyles.get(container)?.position||'';
+            container.style.minHeight=oldStyles.get(container)?.minHeight||'';
             container.style.overflow=oldStyles.get(container)?.overflow||'';
         }
+        // Ensure only the target page remains active/visible.
         document.querySelectorAll('.page-content').forEach(p=>{
             p.classList.toggle('active',p===newPage);
             if(p!==newPage)p.style.display='';
         });
         if(newPage)newPage.style.display='';
-
-        requestAnimationFrame(()=>{
-            requestAnimationFrame(()=>{
-                if(container){
-                    container.style.minHeight=oldStyles.get(container)?.minHeight||'';
-                }
-                transitionBusy=false;
-            });
-        });
+        transitionBusy=false;
     }
 
     function transitionTo(index,animate=true){
@@ -4331,18 +4318,15 @@ setTimeout(()=>{
         // Make the target visible only for measuring/animation.
         newPage.classList.add('active');
         newPage.style.display='block';
-        // Initialize the target page BEFORE the slide starts. This prevents
-        // page-specific rendering from causing a second layout pass after the animation.
-        callPageInit(PAGE_ORDER[index]);
 
         // Wait one frame so its natural layout is measured before positioning.
         requestAnimationFrame(()=>{
             const newRect=newPage.getBoundingClientRect();
             const pageTop=Math.max(0,oldRect.top-containerRect.top);
-            const targetHeight=Math.max(newRect.height,pageTop+1);
+            const maxHeight=Math.max(oldRect.height,newRect.height,pageTop+1);
 
             container.style.position='relative';
-            container.style.minHeight=targetHeight+'px';
+            container.style.minHeight=maxHeight+'px';
             container.style.overflow='hidden';
 
             [oldPage,newPage].forEach(p=>{
@@ -4377,9 +4361,9 @@ setTimeout(()=>{
                 oldPage.classList.remove('active');
                 oldPage.style.display='none';
                 newPage.classList.add('active');
-                const finalHeight=Math.max(1,newPage.getBoundingClientRect().height);
-                cleanupTransition(container,oldPage,newPage,saved,finalHeight);
-                window.scrollTo(0,0);
+                cleanupTransition(container,oldPage,newPage,saved);
+                callPageInit(PAGE_ORDER[index]);
+                window.scrollTo({top:0,behavior:'smooth'});
             };
             newPage.addEventListener('transitionend',finish,{once:true});
             setTimeout(finish,DURATION+60);
@@ -4473,8 +4457,6 @@ setTimeout(()=>{
 
                 newPage.classList.add('active','page-slide-new','page-slide-transitioning');
                 oldPage.classList.add('page-slide-old','page-slide-transitioning');
-                // Prepare target page before movement to avoid post-animation reflow.
-                callPageInit(PAGE_ORDER[nextIdx]);
 
                 [oldPage,newPage].forEach(p=>{
                     p.style.position='absolute';
@@ -4487,7 +4469,7 @@ setTimeout(()=>{
                 });
                 container.style.position='relative';
                 container.style.overflow='hidden';
-                container.style.minHeight=Math.max(newPage.getBoundingClientRect().height,pageTop+1)+'px';
+                container.style.minHeight=Math.max(oRect.height,newPage.getBoundingClientRect().height,pageTop+1)+'px';
             }
 
             e.preventDefault();
@@ -4577,14 +4559,9 @@ setTimeout(()=>{
                 oldPage.classList.remove('active');
                 oldPage.style.display='none';
                 newPage.classList.add('active');
-                const container=getContainer();
-                const finalHeight=Math.max(1,newPage.getBoundingClientRect().height);
-                if(container) container.style.minHeight=finalHeight+'px';
                 cleanupSwipe();
-                window.scrollTo(0,0);
-                if(container){
-                    requestAnimationFrame(()=>requestAnimationFrame(()=>{ container.style.minHeight=''; }));
-                }
+                callPageInit(PAGE_ORDER[targetIndex]);
+                window.scrollTo({top:0,behavior:'smooth'});
             },DURATION+30);
         }
 
