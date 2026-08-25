@@ -4148,46 +4148,54 @@ setTimeout(()=>{
 
 
 <style id="page-horizontal-slide-style">
-/* v2.4.1：页面横向 Slide / Swipe 切换（消除切换后的二次布局/滚动停顿）
-   仅改变页面切换视觉效果，不改变页面 DOM 结构、布局及业务设置。 */
-.page-content.page-slide-transitioning{
-    transition:none!important;
-    will-change:transform;
-}
-.page-content.page-slide-old,
-.page-content.page-slide-new{
-    position:absolute!important;
-    left:0!important;
-    width:100%!important;
+/* v2.5.0：稳定版横向 Slide / Swipe
+   关键修复：切换动画使用独立视觉层，目标页面在动画期间已经完成真实布局。
+   因此横屏/竖屏、不同页面高度、响应式重排都不会在动画结束后突然跳一下。 */
+.page-slide-overlay{
+    position:fixed!important;
+    margin:0!important;
+    padding:0!important;
     box-sizing:border-box!important;
     display:block!important;
-    z-index:2!important;
+    visibility:visible!important;
+    pointer-events:none!important;
+    z-index:2147483000!important;
+    overflow:visible!important;
+    transform:translate3d(0,0,0);
     will-change:transform;
     backface-visibility:hidden;
     -webkit-backface-visibility:hidden;
 }
-.page-content.page-slide-new{z-index:3!important;}
+.page-slide-overlay.page-slide-overlay-enter{
+    z-index:2147483001!important;
+}
+/* 设置页原本是 grid，视觉层也必须保持同样的响应式布局。 */
+.page-slide-overlay#settings-page{display:grid!important;}
+.page-slide-overlay.page-slide-overlay-old,
+.page-slide-overlay.page-slide-overlay-enter{
+    transition:transform 420ms cubic-bezier(.22,.72,.18,1)!important;
+}
 @media (prefers-reduced-motion:reduce){
-    .page-content.page-slide-old,
-    .page-content.page-slide-new{
+    .page-slide-overlay.page-slide-overlay-old,
+    .page-slide-overlay.page-slide-overlay-enter{
         transition:none!important;
     }
 }
 </style>
 
 <script>
-/* v2.4.1：与商品图片 Lightbox 一致的横向 Slide / Swipe
-   - transform: translate3d
+/* v2.5.0：与商品图片 Lightbox 同一套横向 Slide / Swipe 手感
    - 420ms
    - cubic-bezier(.22,.72,.18,1)
-   - 55px 触发阈值
-   - 手机单指跟手滑动
-*/
+   - 55px
+   - 手机单指跟手
+   - 视觉层与真实页面布局分离，彻底避免“滑完以后重新布局一下” */
 (function(){
     const PAGE_ORDER=['flight','ticket','payment','settings','history','version'];
     const DURATION=420;
     const EASING='cubic-bezier(.22,.72,.18,1)';
     const SWIPE_THRESHOLD=55;
+    const OVERLAY_Z=2147483000;
 
     let currentIndex=0;
     let transitionBusy=false;
@@ -4196,437 +4204,267 @@ setTimeout(()=>{
     let touchStartY=0;
     let touchDeltaX=0;
     let touchDirection=0;
-    let touchStartPage=null;
+    let gesturePage=null;
+    let observer=null;
+    let suppressObserver=0;
 
-    function getPage(name){
-        return document.getElementById(name+'-page');
-    }
-    function getTab(name){
-        return document.querySelector('.page-tab[data-page="'+name+'"]');
-    }
-    function getActiveName(){
+    function getPage(name){return document.getElementById(name+'-page');}
+    function activeName(){
         return document.querySelector('.page-tab.active')?.dataset.page || PAGE_ORDER[currentIndex] || 'flight';
     }
-    function getContainer(){
-        const p=getPage(PAGE_ORDER[currentIndex]) || document.querySelector('.page-content');
-        return p?.parentElement || null;
-    }
-    function setActiveTab(name){
-        document.querySelectorAll('.page-tab').forEach(t=>{
-            t.classList.toggle('active',t.dataset.page===name);
-        });
-    }
-    function setPageVisible(page,visible){
-        if(!page)return;
-        page.classList.toggle('active',visible);
-    }
+    function indexOfName(name){return PAGE_ORDER.indexOf(name);}
 
-    function callPageInit(name){
-        if(name==='ticket'){
-            try{
-                if(typeof syncToTicket==='function')syncToTicket(activeTicketItineraryId,false);
-                if(typeof initTicketSmart==='function')initTicketSmart(false);
-            }catch(e){}
+    function copyLiveState(source,clone){
+        const a=source.querySelectorAll('input,textarea,select');
+        const b=clone.querySelectorAll('input,textarea,select');
+        const n=Math.min(a.length,b.length);
+        for(let i=0;i<n;i++){
+            const s=a[i],d=b[i];
+            if(s instanceof HTMLInputElement){
+                d.value=s.value;
+                d.checked=s.checked;
+                d.disabled=s.disabled;
+            }else if(s instanceof HTMLTextAreaElement){
+                d.value=s.value;
+            }else if(s instanceof HTMLSelectElement){
+                d.value=s.value;
+                d.selectedIndex=s.selectedIndex;
+            }
         }
-        if(name==='flight'){
-            try{
-                if(typeof renderItineraryNav==='function')renderItineraryNav();
-            }catch(e){}
+        // Preserve scroll positions of scrollable descendants.
+        const sa=source.querySelectorAll('*');
+        const sb=clone.querySelectorAll('*');
+        const m=Math.min(sa.length,sb.length);
+        for(let i=0;i<m;i++){
+            if(sa[i].scrollTop)sb[i].scrollTop=sa[i].scrollTop;
+            if(sa[i].scrollLeft)sb[i].scrollLeft=sa[i].scrollLeft;
         }
-    }
-
-    function cleanupTransition(container,oldPage,newPage,oldStyles,newStyles){
-        [oldPage,newPage].forEach(p=>{
-            if(!p)return;
-            p.classList.remove('page-slide-transitioning','page-slide-old','page-slide-new');
-            p.style.position=oldStyles.get(p)?.position||'';
-            p.style.left=oldStyles.get(p)?.left||'';
-            p.style.top=oldStyles.get(p)?.top||'';
-            p.style.width=oldStyles.get(p)?.width||'';
-            p.style.zIndex=oldStyles.get(p)?.zIndex||'';
-            p.style.transform=oldStyles.get(p)?.transform||'';
-            p.style.transition=oldStyles.get(p)?.transition||'';
-            p.style.willChange=oldStyles.get(p)?.willChange||'';
-        });
-        if(container){
-            container.style.position=oldStyles.get(container)?.position||'';
-            container.style.minHeight=oldStyles.get(container)?.minHeight||'';
-            container.style.overflow=oldStyles.get(container)?.overflow||'';
-        }
-        // Ensure only the target page remains active/visible.
-        document.querySelectorAll('.page-content').forEach(p=>{
-            p.classList.toggle('active',p===newPage);
-            if(p!==newPage)p.style.display='';
-        });
-        if(newPage)newPage.style.display='';
-        transitionBusy=false;
     }
 
-    function transitionTo(index,animate=true){
-        if(index<0||index>=PAGE_ORDER.length)return false;
-        if(index===currentIndex){
-            setActiveTab(PAGE_ORDER[index]);
-            setPageVisible(getPage(PAGE_ORDER[index]),true);
-            return true;
-        }
-        if(transitionBusy)return false;
+    function makeOverlay(page,className,rect){
+        const clone=page.cloneNode(true);
+        clone.classList.remove('page-slide-transitioning','page-slide-old','page-slide-new');
+        clone.classList.add('active');
+        clone.classList.add('page-slide-overlay',className);
+        clone.style.cssText += `;position:fixed!important;left:${rect.left}px!important;top:${rect.top}px!important;width:${rect.width}px!important;min-height:${rect.height}px!important;height:auto!important;transform:translate3d(0,0,0)!important;`;
+        clone.style.zIndex=String(className.includes('enter')?OVERLAY_Z+1:OVERLAY_Z);
+        copyLiveState(page,clone);
+        return clone;
+    }
 
-        const oldIndex=currentIndex;
-        const oldPage=getPage(PAGE_ORDER[oldIndex]);
-        const newPage=getPage(PAGE_ORDER[index]);
-        const container=oldPage?.parentElement || newPage?.parentElement;
-        if(!oldPage||!newPage||!container)return false;
+    function removeOverlay(el){if(el&&el.parentNode)el.parentNode.removeChild(el);}
 
-        const direction=index>oldIndex?1:-1;
+    function cleanAllOverlays(){
+        document.querySelectorAll('.page-slide-overlay').forEach(removeOverlay);
+    }
 
-        // If reduced motion is requested, switch normally.
-        if(!animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){
-            oldPage.classList.remove('active');
-            newPage.classList.add('active');
-            setActiveTab(PAGE_ORDER[index]);
-            currentIndex=index;
-            callPageInit(PAGE_ORDER[index]);
-            window.scrollTo({top:0,behavior:'smooth'});
-            return true;
-        }
+    function getPageRect(page){
+        const r=page.getBoundingClientRect();
+        return {left:r.left,top:r.top,width:r.width,height:Math.max(1,r.height)};
+    }
 
+    function startVisualTransition(oldPage,newPage,direction,done){
+        if(!oldPage||!newPage||transitionBusy)return;
         transitionBusy=true;
 
-        const saved=new Map();
-        [container,oldPage,newPage].forEach(el=>{
-            saved.set(el,{
-                position:el.style.position,
-                minHeight:el.style.minHeight,
-                overflow:el.style.overflow,
-                left:el.style.left,
-                top:el.style.top,
-                width:el.style.width,
-                zIndex:el.style.zIndex,
-                transform:el.style.transform,
-                transition:el.style.transition,
-                willChange:el.style.willChange
-            });
-        });
+        // The real target page has already been activated by the original
+        // application code. It is therefore fully laid out BEFORE the visual
+        // animation begins. The old page, however, has already become
+        // display:none, so temporarily restore it invisibly just long enough
+        // to capture its final visual state. This does not alter its layout
+        // after the overlay is created.
+        const oldInlineDisplay=oldPage.style.display;
+        const oldInlineVisibility=oldPage.style.visibility;
+        oldPage.style.display='block';
+        oldPage.style.visibility='hidden';
+        const rect=getPageRect(newPage);
+        const oldRect=getPageRect(oldPage);
+        const oldOverlay=makeOverlay(oldPage,'page-slide-overlay-old',oldRect);
+        const newOverlay=makeOverlay(newPage,'page-slide-overlay-enter',rect);
+        oldPage.style.display=oldInlineDisplay;
+        oldPage.style.visibility=oldInlineVisibility;
 
-        // Keep the original DOM hierarchy intact. This is important because
-        // the existing CSS contains direct-child selectors such as
-        // #flight-page > #itineraryNav.
-        const containerRect=container.getBoundingClientRect();
-        const oldRect=oldPage.getBoundingClientRect();
+        // Put the overlays at the exact current page positions.
+        oldOverlay.style.transform='translate3d(0,0,0)';
+        newOverlay.style.transform=`translate3d(${direction*100}%,0,0)`;
+        document.body.appendChild(oldOverlay);
+        document.body.appendChild(newOverlay);
 
-        // 先把视口固定到页面顶部。原来的 smooth scroll 放在动画结束后，
-        // 会造成“切换完成后又停顿/调整一下”的二次视觉移动。
-        const savedScrollY=window.scrollY;
-        if(savedScrollY!==0) window.scrollTo(0,0);
+        // The real target is already in its final responsive layout.
+        // Cover it during the animation so no intermediate reflow is visible.
+        newPage.style.visibility='hidden';
 
-        // 在动画开始前完成目标页面自身的初始化/尺寸计算，避免
-        // 动画结束后才重新布局造成第二次“顿一下”。
-        newPage.classList.add('active');
-        newPage.style.display='block';
-        callPageInit(PAGE_ORDER[index]);
+        // Force the browser to commit the starting positions before the next
+        // frame, otherwise mobile Safari/Chrome may merge the two transforms.
+        void oldOverlay.offsetWidth;
 
-        // Wait one frame so its natural layout is measured before positioning.
         requestAnimationFrame(()=>{
-            const newRect=newPage.getBoundingClientRect();
-            const pageTop=Math.max(0,oldRect.top-containerRect.top);
-            const maxHeight=Math.max(oldRect.height,newRect.height,pageTop+1);
-
-            container.style.position='relative';
-            container.style.minHeight=maxHeight+'px';
-            container.style.overflow='hidden';
-
-            [oldPage,newPage].forEach(p=>{
-                p.classList.add('page-slide-transitioning');
-                p.style.position='absolute';
-                p.style.left='0';
-                p.style.top=pageTop+'px';
-                p.style.width='100%';
-                p.style.zIndex=p===newPage?'3':'2';
-                p.style.transition=`transform ${DURATION}ms ${EASING}`;
-                p.style.willChange='transform';
-            });
-
-            // Incoming page starts exactly one screen-width away.
-            newPage.style.transform=`translate3d(${direction*100}%,0,0)`;
-            oldPage.style.transform='translate3d(0,0,0)';
-
-            setActiveTab(PAGE_ORDER[index]);
-
-            requestAnimationFrame(()=>{
-                // Old page exits in the opposite direction while the new page
-                // enters from the side, producing the "one after another"
-                // carousel effect.
-                oldPage.style.transform=`translate3d(${-direction*100}%,0,0)`;
-                newPage.style.transform='translate3d(0,0,0)';
-            });
-
-            const finish=()=>{
-                newPage.removeEventListener('transitionend',finish);
-                currentIndex=index;
-                // Hide old page before restoring normal document flow.
-                oldPage.classList.remove('active');
-                oldPage.style.display='none';
-                newPage.classList.add('active');
-                cleanupTransition(container,oldPage,newPage,saved);
-                // 页面已经在动画开始前完成初始化，动画结束后不再再次触发布局/滚动调整。
-            };
-            newPage.addEventListener('transitionend',finish,{once:true});
-            setTimeout(finish,DURATION+60);
+            oldOverlay.style.transform=`translate3d(${-direction*100}%,0,0)`;
+            newOverlay.style.transform='translate3d(0,0,0)';
         });
-        return true;
+
+        const finish=()=>{
+            oldOverlay.removeEventListener('transitionend',finish);
+            removeOverlay(oldOverlay);
+            removeOverlay(newOverlay);
+            newPage.style.visibility='';
+            transitionBusy=false;
+            if(done)done();
+        };
+        newOverlay.addEventListener('transitionend',finish,{once:true});
+        setTimeout(finish,DURATION+80);
     }
 
-    function navigateToName(name,animate=true){
-        const index=PAGE_ORDER.indexOf(name);
-        if(index<0)return false;
-        return transitionTo(index,animate);
-    }
+    function observePageChanges(){
+        observer=new MutationObserver(()=>{
+            if(suppressObserver||transitionBusy)return;
+            const name=activeName();
+            const idx=indexOfName(name);
+            if(idx<0)return;
+            if(idx===currentIndex)return;
 
-    function bindTabs(){
-        document.querySelectorAll('.page-tab').forEach(tab=>{
-            if(tab.dataset.slideBound==='1')return;
-            tab.dataset.slideBound='1';
-            tab.onclick=function(){
-                navigateToName(this.dataset.page,true);
-            };
+            const oldPage=getPage(PAGE_ORDER[currentIndex]);
+            const newPage=getPage(name);
+            if(!oldPage||!newPage){currentIndex=idx;return;}
+
+            // The original application has already performed its normal page
+            // switch and all responsive layout calculations. We only add the
+            // visual transition on top of that final state.
+            const direction=idx>currentIndex?1:-1;
+            currentIndex=idx;
+            startVisualTransition(oldPage,newPage,direction,()=>{});
         });
+
+        document.querySelectorAll('.page-tab').forEach(t=>observer.observe(t,{attributes:true,attributeFilter:['class']}));
+        document.querySelectorAll('.page-content').forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['class']}));
     }
 
-    // Re-route the existing flight-page helper so programmatic return to
-    // "航班信息" also uses the same transition.
-    function bindProgrammaticSwitch(){
-        if(typeof window.switchToFlightPage==='function' && !window.switchToFlightPage.__slideWrapped){
-            const original=window.switchToFlightPage;
-            const wrapped=function(){
-                const ok=navigateToName('flight',true);
-                if(!ok)original.apply(this,arguments);
-            };
-            wrapped.__slideWrapped=true;
-            window.switchToFlightPage=wrapped;
-        }
+    function triggerPage(name){
+        const tab=document.querySelector('.page-tab[data-page="'+name+'"]');
+        if(!tab)return;
+        tab.click();
     }
 
     function bindSingleFingerSwipe(){
         document.addEventListener('touchstart',function(e){
-            if(e.touches.length!==1){
-                touchTracking=false;
-                return;
-            }
-            if(transitionBusy)return;
-
+            if(e.touches.length!==1||transitionBusy)return;
             const target=e.target;
-            // Do not hijack horizontal gestures inside form controls/buttons.
             if(target.closest('input,textarea,select,button,[contenteditable="true"]'))return;
-
             const page=target.closest('.page-content');
-            if(!page || !page.classList.contains('active'))return;
+            if(!page||!page.classList.contains('active'))return;
 
-            // 页面切换始终从顶部进行，避免切换完成后再出现一次滚动调整。
-            if(window.scrollY!==0) window.scrollTo(0,0);
             touchTracking=true;
             touchStartX=e.touches[0].clientX;
             touchStartY=e.touches[0].clientY;
             touchDeltaX=0;
             touchDirection=0;
-            touchStartPage=page;
+            gesturePage=page;
         },{passive:true});
 
         document.addEventListener('touchmove',function(e){
-            if(!touchTracking || e.touches.length!==1 || transitionBusy)return;
-
-            const x=e.touches[0].clientX;
-            const y=e.touches[0].clientY;
-            const dx=x-touchStartX;
-            const dy=y-touchStartY;
-
-            // Only capture predominantly horizontal gestures.
-            if(Math.abs(dx)<8 || Math.abs(dx)<=Math.abs(dy)*1.1)return;
+            if(!touchTracking||e.touches.length!==1||transitionBusy)return;
+            const dx=e.touches[0].clientX-touchStartX;
+            const dy=e.touches[0].clientY-touchStartY;
+            if(Math.abs(dx)<8||Math.abs(dx)<=Math.abs(dy)*1.1)return;
 
             const activeIdx=currentIndex;
             const nextIdx=dx<0?activeIdx+1:activeIdx-1;
-            if(nextIdx<0 || nextIdx>=PAGE_ORDER.length){
-                // At the first/last page, allow normal vertical/edge behavior.
-                return;
-            }
+            if(nextIdx<0||nextIdx>=PAGE_ORDER.length)return;
 
-            touchDirection=dx<0?1:-1;
+            e.preventDefault();
             touchDeltaX=dx;
+            touchDirection=dx<0?1:-1;
 
             const oldPage=getPage(PAGE_ORDER[activeIdx]);
             const newPage=getPage(PAGE_ORDER[nextIdx]);
-            const container=getContainer();
-            if(!oldPage||!newPage||!container)return;
+            if(!oldPage||!newPage)return;
 
-            if(!newPage.classList.contains('page-slide-new')){
-                const cRect=container.getBoundingClientRect();
-                const oRect=oldPage.getBoundingClientRect();
-                const pageTop=Math.max(0,oRect.top-cRect.top);
-
-                newPage.classList.add('active','page-slide-new','page-slide-transitioning');
-                oldPage.classList.add('page-slide-old','page-slide-transitioning');
-
-                [oldPage,newPage].forEach(p=>{
-                    p.style.position='absolute';
-                    p.style.left='0';
-                    p.style.top=pageTop+'px';
-                    p.style.width='100%';
-                    p.style.transition='none';
-                    p.style.willChange='transform';
-                    p.style.zIndex=p===newPage?'3':'2';
-                });
-                container.style.position='relative';
-                container.style.overflow='hidden';
-                container.style.minHeight=Math.max(oRect.height,newPage.getBoundingClientRect().height,pageTop+1)+'px';
+            // Create live-looking overlays on the first horizontal movement.
+            if(!document.querySelector('.page-slide-gesture-old')){
+                const oldRect=getPageRect(oldPage);
+                const newRect=getPageRect(newPage);
+                const oldOverlay=makeOverlay(oldPage,'page-slide-overlay-old page-slide-gesture-old',oldRect);
+                const newOverlay=makeOverlay(newPage,'page-slide-overlay-enter page-slide-gesture-new',newRect);
+                document.body.appendChild(oldOverlay);
+                document.body.appendChild(newOverlay);
+                newOverlay.style.transform=`translate3d(${touchDirection*100}%,0,0)`;
+                newPage.style.visibility='hidden';
+                void oldOverlay.offsetWidth;
             }
 
-            e.preventDefault();
-
-            const width=Math.max(1,container.clientWidth);
+            const oldOverlay=document.querySelector('.page-slide-gesture-old');
+            const newOverlay=document.querySelector('.page-slide-gesture-new');
+            const width=Math.max(1,window.innerWidth);
             const resistance=Math.min(1,Math.max(.35,1-Math.max(0,Math.abs(dx)-width)/width*.65));
             const move=dx*resistance;
-
-            oldPage.style.transform=`translate3d(${move}px,0,0)`;
-            newPage.style.transform=`translate3d(${(dx<0?width+move:-width+move)}px,0,0)`;
+            if(oldOverlay&&newOverlay){
+                oldOverlay.style.transition='none';
+                newOverlay.style.transition='none';
+                oldOverlay.style.transform=`translate3d(${move}px,0,0)`;
+                newOverlay.style.transform=`translate3d(${(touchDirection>0?width+move:-width+move)}px,0,0)`;
+            }
         },{passive:false});
 
-        function finishSwipe(cancelled){
+        function finishSwipe(){
             if(!touchTracking)return;
             touchTracking=false;
-
             const dx=touchDeltaX;
             const direction=touchDirection;
             touchDeltaX=0;
             touchDirection=0;
 
-            if(!direction || Math.abs(dx)<=SWIPE_THRESHOLD){
-                // Snap back if the gesture did not reach the same 55px threshold
-                // as the product image Lightbox.
-                const oldPage=document.querySelector('.page-slide-old');
-                const newPage=document.querySelector('.page-slide-new');
-                if(oldPage&&newPage){
-                    oldPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    newPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    oldPage.style.transform='translate3d(0,0,0)';
-                    newPage.style.transform='translate3d('+(direction>0?'100%':'-100%')+',0,0)';
-                    setTimeout(()=>{
-                        const container=getContainer();
-                        [oldPage,newPage].forEach(p=>{
-                            p.classList.remove('page-slide-old','page-slide-new','page-slide-transitioning');
-                            p.style.position='';
-                            p.style.left='';
-                            p.style.top='';
-                            p.style.width='';
-                            p.style.zIndex='';
-                            p.style.transform='';
-                            p.style.transition='';
-                            p.style.willChange='';
-                        });
-                        if(newPage) newPage.classList.remove('active');
-                        if(container){
-                            container.style.position='';
-                            container.style.overflow='';
-                            container.style.minHeight='';
-                        }
-                    },DURATION+30);
-                }
-                return;
+            const oldOverlay=document.querySelector('.page-slide-gesture-old');
+            const newOverlay=document.querySelector('.page-slide-gesture-new');
+            if(!oldOverlay||!newOverlay){gesturePage=null;return;}
+
+            const targetIdx=currentIndex+(direction>0?1:-1);
+            const valid=Math.abs(dx)>SWIPE_THRESHOLD&&targetIdx>=0&&targetIdx<PAGE_ORDER.length;
+            oldOverlay.style.transition=`transform ${DURATION}ms ${EASING}`;
+            newOverlay.style.transition=`transform ${DURATION}ms ${EASING}`;
+
+            if(valid){
+                oldOverlay.style.transform=`translate3d(${direction>0?-100:100}%,0,0)`;
+                newOverlay.style.transform='translate3d(0,0,0)';
+
+                // Let the original page logic run only after the visual swipe
+                // has completed, so the real DOM never changes underneath the
+                // finger animation.
+                setTimeout(()=>{
+                    removeOverlay(oldOverlay);
+                    removeOverlay(newOverlay);
+                    const oldPage=gesturePage;
+                    if(oldPage)oldPage.style.visibility='';
+                    currentIndex=targetIdx;
+                    gesturePage=null;
+                    triggerPage(PAGE_ORDER[targetIdx]);
+                },DURATION+30);
+            }else{
+                oldOverlay.style.transform='translate3d(0,0,0)';
+                newOverlay.style.transform=`translate3d(${direction>0?'100%':'-100%'},0,0)`;
+                setTimeout(()=>{
+                    removeOverlay(oldOverlay);
+                    removeOverlay(newOverlay);
+                    if(gesturePage)gesturePage.style.visibility='';
+                    gesturePage=null;
+                },DURATION+30);
             }
-
-            const targetIndex=currentIndex+(direction>0?1:-1);
-            if(targetIndex<0 || targetIndex>=PAGE_ORDER.length){
-                // No page in this direction; return to current page.
-                const oldPage=document.querySelector('.page-slide-old');
-                const newPage=document.querySelector('.page-slide-new');
-                if(oldPage&&newPage){
-                    oldPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    newPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-                    oldPage.style.transform='translate3d(0,0,0)';
-                    newPage.style.transform=`translate3d(${direction>0?'100%':'-100%'},0,0)`;
-                    setTimeout(()=>cleanupSwipe(),DURATION+30);
-                }
-                return;
-            }
-
-            const oldPage=document.querySelector('.page-slide-old');
-            const newPage=document.querySelector('.page-slide-new');
-            if(!oldPage||!newPage){
-                transitionTo(targetIndex,true);
-                return;
-            }
-
-            oldPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-            newPage.style.transition=`transform ${DURATION}ms ${EASING}`;
-            oldPage.style.transform=`translate3d(${direction>0?-100:100}%,0,0)`;
-            newPage.style.transform='translate3d(0,0,0)';
-
-            setActiveTab(PAGE_ORDER[targetIndex]);
-            transitionBusy=true;
-            setTimeout(()=>{
-                currentIndex=targetIndex;
-                oldPage.classList.remove('active');
-                oldPage.style.display='none';
-                newPage.classList.add('active');
-                cleanupSwipe();
-                // 目标页面已在拖拽过程中参与布局，不再在切换完成后二次滚动/调整。
-            },DURATION+30);
         }
 
-        function cleanupSwipe(){
-            const oldPage=document.querySelector('.page-slide-old');
-            const newPage=document.querySelector('.page-slide-new');
-            const container=getContainer();
-            [oldPage,newPage].forEach(p=>{
-                if(!p)return;
-                p.classList.remove('page-slide-old','page-slide-new','page-slide-transitioning');
-                p.style.position='';
-                p.style.left='';
-                p.style.top='';
-                p.style.width='';
-                p.style.zIndex='';
-                p.style.transform='';
-                p.style.transition='';
-                p.style.willChange='';
-            });
-            if(newPage)newPage.style.display='';
-            if(container){
-                container.style.position='';
-                container.style.overflow='';
-                container.style.minHeight='';
-            }
-            transitionBusy=false;
-        }
-
-        document.addEventListener('touchend',function(e){
-            if(!touchTracking)return;
-            finishSwipe(false);
-        },{passive:true});
-        document.addEventListener('touchcancel',function(){
-            if(!touchTracking)return;
-            finishSwipe(true);
-        },{passive:true});
+        document.addEventListener('touchend',finishSwipe,{passive:true});
+        document.addEventListener('touchcancel',finishSwipe,{passive:true});
     }
 
     function init(){
-        const active=getActiveName();
-        const idx=PAGE_ORDER.indexOf(active);
+        const name=activeName();
+        const idx=indexOfName(name);
         currentIndex=idx>=0?idx:0;
-
-        bindTabs();
+        cleanAllOverlays();
+        observePageChanges();
         bindSingleFingerSwipe();
-        bindProgrammaticSwitch();
-
-        // In case initTabs runs after this script, bind again.
-        setTimeout(bindTabs,0);
-        setTimeout(bindTabs,100);
-        setTimeout(bindProgrammaticSwitch,100);
-        setTimeout(bindProgrammaticSwitch,500);
     }
 
-    if(document.readyState==='loading'){
-        document.addEventListener('DOMContentLoaded',init);
-    }else{
-        init();
-    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+    else init();
 })();
 </script>
 
