@@ -3127,8 +3127,13 @@ function fillFromHistory(data){
     syncToTicket(id,true);
     ticketData.segments=normalized.map(s=>({flightNo:s.flightNo||'',depTerminal:s.departureTerminal||'',arrTerminal:s.arrivalTerminal||'',seat:'',transfer:'',transferTemplate:'',transferReplacement:''}));
     tValues=ticketData;updateTicketDisplay();updateDisplay();
-    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="flight"]').classList.add('active');
-    document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));$('flight-page').classList.add('active');
+    // 通过统一页面导航器切换到航班信息页，同时同步 currentIndex，避免后续切页出现页面叠加。
+    if(typeof window.__navigatePage==='function'){
+        window.__navigatePage('flight',false);
+    }else{
+        document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="flight"]').classList.add('active');
+        document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));$('flight-page').classList.add('active');
+    }
     alert('已回填历史记录');
 }
 function editHistoryItem(item){
@@ -3724,7 +3729,16 @@ fillFromHistory=function(data){
     let target=itinerariesList.find(iti=>dataIsEmpty(itineraryDataForCompare(iti)));
     if(!target){addItinerary();target=$('iti'+itineraryCount);}
     populateItineraryFromHistory(target,normalized);
-    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));document.querySelector('[data-page="flight"]').classList.add('active');document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));$('flight-page').classList.add('active');
+    // 历史记录模块在文件后部重新定义了 fillFromHistory，实际双击时执行的是这里。
+    // 必须通过统一导航器切换到航班信息，否则只改 DOM 的 active 状态，currentIndex 不会同步。
+    if(typeof window.__navigatePage==='function'){
+        window.__navigatePage('flight',false);
+    }else{
+        document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelector('[data-page="flight"]').classList.add('active');
+        document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));
+        $('flight-page').classList.add('active');
+    }
     alert(`已回填到行程方案 ${target.id.replace('iti','')}`);
 };
 function buildHistoryTable(history){
@@ -4298,6 +4312,8 @@ setTimeout(()=>{
         if(index<0)return false;
         return transitionTo(index,animate);
     }
+    // Expose the unified navigator for programmatic page switches.
+    window.__navigatePage=navigateToName;
 
     function bindTabs(){
         document.querySelectorAll('.page-tab').forEach(tab=>{
